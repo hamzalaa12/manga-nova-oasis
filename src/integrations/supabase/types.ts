@@ -21,8 +21,11 @@ export type Database = {
           created_by: string | null
           description: string | null
           id: string
+          is_premium: boolean
+          is_private: boolean
           manga_id: string
           pages: Json[] | null
+          price: number | null
           title: string | null
           updated_at: string
           views_count: number | null
@@ -33,8 +36,11 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          is_premium?: boolean
+          is_private?: boolean
           manga_id: string
           pages?: Json[] | null
+          price?: number | null
           title?: string | null
           updated_at?: string
           views_count?: number | null
@@ -45,8 +51,11 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          is_premium?: boolean
+          is_private?: boolean
           manga_id?: string
           pages?: Json[] | null
+          price?: number | null
           title?: string | null
           updated_at?: string
           views_count?: number | null

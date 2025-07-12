@@ -1,10 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Eye, User, Bookmark, Play } from 'lucide-react';
+import { ArrowRight, Calendar, Eye, User, Bookmark, Play, Edit, Trash2, Lock, DollarSign, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -31,10 +51,15 @@ interface Chapter {
   description: string;
   views_count: number;
   created_at: string;
+  is_premium: boolean;
+  is_private: boolean;
+  price: number;
 }
 
 const MangaDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const { user, userProfile, isAdmin } = useAuth();
+  const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -105,6 +130,79 @@ const MangaDetails = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ar-SA');
+  };
+
+  const handleDeleteChapter = async (chapterId: string, chapterNumber: number) => {
+    try {
+      const { error } = await supabase
+        .from('chapters')
+        .delete()
+        .eq('id', chapterId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'تم الحذف!',
+        description: `تم حذف الفصل ${chapterNumber} بنجاح`,
+      });
+
+      // Refresh chapters list
+      fetchChapters();
+    } catch (error: any) {
+      toast({
+        title: 'خطأ',
+        description: 'فشل في حذف الفصل',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleTogglePremium = async (chapterId: string, isPremium: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('chapters')
+        .update({ is_premium: !isPremium })
+        .eq('id', chapterId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'تم التحديث!',
+        description: isPremium ? 'تم جعل الفصل مجاني' : 'تم جعل الفصل مدفوع',
+      });
+
+      fetchChapters();
+    } catch (error: any) {
+      toast({
+        title: 'خطأ',
+        description: 'فشل في تحديث حالة الفصل',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleTogglePrivate = async (chapterId: string, isPrivate: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('chapters')
+        .update({ is_private: !isPrivate })
+        .eq('id', chapterId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'تم التحديث!',
+        description: isPrivate ? 'تم نشر الفصل' : 'تم جعل الفصل خاص',
+      });
+
+      fetchChapters();
+    } catch (error: any) {
+      toast({
+        title: 'خطأ',
+        description: 'فشل في تحديث حالة الفصل',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (loading) {
@@ -245,20 +343,37 @@ const MangaDetails = () => {
                 ) : (
                   <div className="space-y-2">
                     {chapters.map((chapter) => (
-                      <Link key={chapter.id} to={`/read/${chapter.id}`}>
-                        <div className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
-                          <div className="flex items-center justify-between">
+                      <div key={chapter.id} className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <Link to={`/read/${chapter.id}`} className="flex-1">
                             <div>
-                              <h3 className="font-medium">
-                                الفصل {chapter.chapter_number}
-                                {chapter.title && `: ${chapter.title}`}
-                              </h3>
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-medium">
+                                  الفصل {chapter.chapter_number}
+                                  {chapter.title && `: ${chapter.title}`}
+                                </h3>
+                                {chapter.is_premium && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    <DollarSign className="h-3 w-3 ml-1" />
+                                    مدفوع
+                                  </Badge>
+                                )}
+                                {chapter.is_private && (
+                                  <Badge variant="outline" className="text-xs">
+                                    <Lock className="h-3 w-3 ml-1" />
+                                    خاص
+                                  </Badge>
+                                )}
+                              </div>
                               {chapter.description && (
                                 <p className="text-sm text-muted-foreground mt-1">
                                   {chapter.description}
                                 </p>
                               )}
                             </div>
+                          </Link>
+                          
+                          <div className="flex items-center gap-2">
                             <div className="text-sm text-muted-foreground text-left">
                               <div className="flex items-center gap-1">
                                 <Eye className="h-3 w-3" />
@@ -266,9 +381,56 @@ const MangaDetails = () => {
                               </div>
                               <div>{formatDate(chapter.created_at)}</div>
                             </div>
+                            
+                            {isAdmin && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleTogglePremium(chapter.id, chapter.is_premium)}>
+                                    <DollarSign className="h-4 w-4 ml-2" />
+                                    {chapter.is_premium ? 'جعله مجاني' : 'جعله مدفوع'}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleTogglePrivate(chapter.id, chapter.is_private)}>
+                                    <Lock className="h-4 w-4 ml-2" />
+                                    {chapter.is_private ? 'نشر الفصل' : 'جعله خاص'}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                        <Trash2 className="h-4 w-4 ml-2" />
+                                        حذف الفصل
+                                      </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          هل أنت متأكد من حذف الفصل {chapter.chapter_number}؟ 
+                                          هذا الإجراء لا يمكن التراجع عنه.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                                        <AlertDialogAction 
+                                          onClick={() => handleDeleteChapter(chapter.id, chapter.chapter_number)}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          حذف
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}
