@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Upload, Link } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,6 +18,13 @@ interface Manga {
   manga_type: string;
 }
 
+interface PageItem {
+  type: 'url' | 'file';
+  url?: string;
+  file?: File;
+  preview?: string;
+}
+
 const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +35,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     title: '',
     description: '',
   });
-  const [pages, setPages] = useState<string[]>(['']);
+  const [pages, setPages] = useState<PageItem[]>([{ type: 'url', url: '' }]);
 
   useEffect(() => {
     fetchMangaList();
@@ -53,7 +60,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   };
 
   const addPage = () => {
-    setPages([...pages, '']);
+    setPages([...pages, { type: 'url', url: '' }]);
   };
 
   const removePage = (index: number) => {
@@ -62,10 +69,50 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     }
   };
 
-  const updatePage = (index: number, url: string) => {
+  const updatePageUrl = (index: number, url: string) => {
     const newPages = [...pages];
-    newPages[index] = url;
+    newPages[index] = { ...newPages[index], type: 'url', url };
     setPages(newPages);
+  };
+
+  const updatePageFile = (index: number, file: File | null) => {
+    const newPages = [...pages];
+    if (file) {
+      const preview = URL.createObjectURL(file);
+      newPages[index] = { type: 'file', file, preview };
+    } else {
+      newPages[index] = { type: 'url', url: '' };
+    }
+    setPages(newPages);
+  };
+
+  const togglePageType = (index: number) => {
+    const newPages = [...pages];
+    const currentPage = newPages[index];
+    if (currentPage.type === 'url') {
+      newPages[index] = { type: 'file' };
+    } else {
+      newPages[index] = { type: 'url', url: '' };
+    }
+    setPages(newPages);
+  };
+
+  const uploadFile = async (file: File, index: number): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${index}.${fileExt}`;
+    const filePath = `${formData.mangaId}/${formData.chapterNumber}/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('chapter-images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from('chapter-images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,10 +120,23 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     setIsLoading(true);
 
     try {
-      // Filter out empty page URLs
-      const validPages = pages.filter(page => page.trim() !== '').map(url => ({ url }));
+      // Process pages - upload files and get URLs
+      const pageUrls = [];
       
-      if (validPages.length === 0) {
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        
+        if (page.type === 'file' && page.file) {
+          // Upload file and get URL
+          const url = await uploadFile(page.file, i);
+          pageUrls.push({ url });
+        } else if (page.type === 'url' && page.url && page.url.trim() !== '') {
+          // Use existing URL
+          pageUrls.push({ url: page.url });
+        }
+      }
+      
+      if (pageUrls.length === 0) {
         throw new Error('يجب إضافة صفحة واحدة على الأقل');
       }
 
@@ -87,7 +147,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
           chapter_number: parseFloat(formData.chapterNumber),
           title: formData.title,
           description: formData.description,
-          pages: validPages,
+          pages: pageUrls,
         });
 
       if (error) throw error;
@@ -174,30 +234,65 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
           </Button>
         </div>
         
-        <div className="space-y-3">
+        <div className="space-y-4">
           {pages.map((page, index) => (
-            <div key={index} className="flex gap-2">
-              <Input
-                value={page}
-                onChange={(e) => updatePage(index, e.target.value)}
-                placeholder={`رابط الصفحة ${index + 1}`}
-                className="flex-1"
-              />
-              {pages.length > 1 && (
-                <Button
-                  type="button"
-                  onClick={() => removePage(index)}
-                  size="sm"
-                  variant="outline"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+            <div key={index} className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">الصفحة {index + 1}</span>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => togglePageType(index)}
+                    size="sm"
+                    variant="outline"
+                  >
+                    {page.type === 'url' ? <Upload className="h-4 w-4" /> : <Link className="h-4 w-4" />}
+                    {page.type === 'url' ? 'رفع ملف' : 'رابط'}
+                  </Button>
+                  {pages.length > 1 && (
+                    <Button
+                      type="button"
+                      onClick={() => removePage(index)}
+                      size="sm"
+                      variant="outline"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {page.type === 'url' ? (
+                <Input
+                  value={page.url || ''}
+                  onChange={(e) => updatePageUrl(index, e.target.value)}
+                  placeholder={`رابط الصفحة ${index + 1}`}
+                  className="w-full"
+                />
+              ) : (
+                <div className="space-y-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => updatePageFile(index, e.target.files?.[0] || null)}
+                    className="w-full"
+                  />
+                  {page.preview && (
+                    <div className="w-32 h-32 border rounded overflow-hidden">
+                      <img 
+                        src={page.preview} 
+                        alt={`معاينة الصفحة ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           ))}
         </div>
         <p className="text-sm text-muted-foreground mt-2">
-          أضف روابط صور الفصل بالترتيب الصحيح
+          يمكنك إضافة صور من ملفاتك أو استخدام روابط خارجية
         </p>
       </div>
 
