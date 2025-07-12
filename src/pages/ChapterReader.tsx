@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Home, ChevronDown } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Home, ChevronDown, Info, Eye, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
@@ -145,37 +145,91 @@ const ChapterReader = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-white/10">
+      {/* Top Title Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Left Action Icons */}
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+              >
+                <Bookmark className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Center Title */}
+            <div className="text-center flex-1">
+              <h1 className="text-lg font-bold text-white">
+                {manga.title} - {chapter.chapter_number}
+              </h1>
+            </div>
+
+            {/* Right Breadcrumb */}
+            <div className="text-sm text-gray-400">
+              {chapter.chapter_number} / {manga.title} / <Link to="/" className="hover:text-white">الرئيسية</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Bar */}
+      <div className="fixed top-16 left-0 right-0 z-40 bg-black/80 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
+            {/* Left Navigation */}
             <div className="flex items-center gap-4">
               <Link to={`/manga/${manga.id}`}>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hover:bg-white/10">
                   <ArrowRight className="h-4 w-4 ml-1" />
                   العودة
                 </Button>
               </Link>
-              <Link to="/">
-                <Button variant="ghost" size="sm">
-                  <Home className="h-4 w-4" />
-                </Button>
-              </Link>
+              
+              {/* Next Chapter Button */}
+              {nextChapter && (
+                <Link to={`/read/${nextChapter.id}`}>
+                  <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    التالي →
+                  </Button>
+                </Link>
+              )}
             </div>
 
+            {/* Center Chapter Info */}
             <div className="text-center">
-              <h1 className="font-medium">{manga.title}</h1>
               <p className="text-sm text-gray-400">
                 الفصل {chapter.chapter_number}
                 {chapter.title && `: ${chapter.title}`}
               </p>
             </div>
 
+            {/* Right Chapter Selector */}
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-sm text-gray-400 hover:text-white">
-                    الفصل {chapter.chapter_number}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded min-w-[60px]"
+                  >
+                    {chapter.chapter_number}
                     <ChevronDown className="h-3 w-3 mr-1" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -201,10 +255,10 @@ const ChapterReader = () => {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content - Vertical Layout */}
-      <main className="pt-16 pb-20">
+      <main className="pt-32 pb-20">
         {chapter.pages.length === 0 ? (
           <div className="flex items-center justify-center min-h-[80vh]">
             <p className="text-gray-400">لا توجد صفحات في هذا الفصل</p>
