@@ -82,13 +82,35 @@ const MangaDetails = () => {
       if (error) throw error;
       setManga(data);
 
-      // Update views count
-      await supabase
-        .from('manga')
-        .update({ views_count: (data.views_count || 0) + 1 })
-        .eq('id', id);
+      // Track view using the new system
+      await trackMangaView(id);
     } catch (error) {
       console.error('Error fetching manga details:', error);
+    }
+  };
+
+  const trackMangaView = async (mangaId: string) => {
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add authorization header if user is logged in
+      if (sessionData.session?.access_token) {
+        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+      }
+
+      await supabase.functions.invoke('track-view', {
+        body: { 
+          mangaId: mangaId,
+          type: 'manga'
+        },
+        headers
+      });
+    } catch (error) {
+      console.error('Error tracking view:', error);
+      // Don't fail the page load if view tracking fails
     }
   };
 

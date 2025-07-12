@@ -1,0 +1,138 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { mangaId, type = 'manga' } = await req.json();
+    
+    if (!mangaId) {
+      throw new Error("mangaId is required");
+    }
+
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    // Get user from authorization header (if provided)
+    const authHeader = req.headers.get("Authorization");
+    let userId = null;
+    let sessionId = null;
+
+    if (authHeader) {
+      try {
+        const token = authHeader.replace("Bearer ", "");
+        const { data: userData } = await supabaseClient.auth.getUser(token);
+        userId = userData.user?.id || null;
+      } catch (error) {
+        console.log("Could not get user from token:", error);
+      }
+    }
+
+    // If no user, create session ID from IP and User-Agent
+    if (!userId) {
+      const ip = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "unknown";
+      const userAgent = req.headers.get("user-agent") || "unknown";
+      sessionId = `${ip}-${userAgent}`.slice(0, 100); // Limit length
+    }
+
+    // Check if view already exists
+    let existingView = null;
+    if (userId) {
+      const { data } = await supabaseClient
+        .from('manga_views')
+        .select('id')
+        .eq('manga_id', mangaId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      existingView = data;
+    } else if (sessionId) {
+      const { data } = await supabaseClient
+        .from('manga_views')
+        .select('id')
+        .eq('manga_id', mangaId)
+        .eq('session_id', sessionId)
+        .maybeSingle();
+      existingView = data;
+    }
+
+    // If view doesn't exist, add it and increment counter
+    if (!existingView) {
+      // Insert new view record
+      const { error: viewError } = await supabaseClient
+        .from('manga_views')
+        .insert({
+          manga_id: mangaId,
+          user_id: userId,
+          session_id: sessionId
+        });
+
+      if (viewError) {
+        console.error("Error inserting view:", viewError);
+        // Continue anyway - maybe view was added by another request
+      }
+
+      // Increment views count in manga/chapters table
+      const tableName = type === 'chapter' ? 'chapters' : 'manga';
+      const { error: updateError } = await supabaseClient
+        .from(tableName)
+        .update({ 
+          views_count: supabaseClient.raw('COALESCE(views_count, 0) + 1')
+        })
+        .eq('id', mangaId);
+
+      if (updateError) {
+        console.error("Error updating views count:", updateError);
+        throw updateError;
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          newView: true,
+          message: "View recorded successfully" 
+        }),
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200 
+        }
+      );
+    } else {
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          newView: false,
+          message: "View already recorded for this user/session" 
+        }),
+        { 
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200 
+        }
+      );
+    }
+
+  } catch (error) {
+    console.error("Error in track-view function:", error);
+    return new Response(
+      JSON.stringify({ 
+        error: error.message || "Internal server error" 
+      }),
+      { 
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500 
+      }
+    );
+  }
+});

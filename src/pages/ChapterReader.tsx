@@ -78,16 +78,38 @@ const ChapterReader = () => {
       if (chaptersError) throw chaptersError;
       setAllChapters(chaptersData || []);
 
-      // Update views count
-      await supabase
-        .from('chapters')
-        .update({ views_count: (chapterData.views_count || 0) + 1 })
-        .eq('id', id);
+      // Track view using the new system
+      await trackChapterView(id);
 
     } catch (error) {
       console.error('Error fetching chapter details:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const trackChapterView = async (chapterId: string) => {
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add authorization header if user is logged in
+      if (sessionData.session?.access_token) {
+        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+      }
+
+      await supabase.functions.invoke('track-view', {
+        body: { 
+          mangaId: chapterId,
+          type: 'chapter'
+        },
+        headers
+      });
+    } catch (error) {
+      console.error('Error tracking chapter view:', error);
+      // Don't fail the page load if view tracking fails
     }
   };
 
