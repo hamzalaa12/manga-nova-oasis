@@ -1,4 +1,5 @@
 import { BookOpen, Heart, Mail, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -28,11 +29,11 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4 text-foreground">روابط سريعة</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">الرئيسية</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">مانجا يابانية</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">مانهوا كورية</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">مانها صينية</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">الأكثر شعبية</a></li>
+              <li><Link to="/" className="text-muted-foreground hover:text-primary transition-colors">الرئيسية</Link></li>
+              <li><Link to="/type/manga" className="text-muted-foreground hover:text-primary transition-colors">مانجا يابانية</Link></li>
+              <li><Link to="/type/manhwa" className="text-muted-foreground hover:text-primary transition-colors">مانهوا كورية</Link></li>
+              <li><Link to="/type/manhua" className="text-muted-foreground hover:text-primary transition-colors">مانها صينية</Link></li>
+              <li><Link to="/type/all" className="text-muted-foreground hover:text-primary transition-colors">جميع القصص</Link></li>
             </ul>
           </div>
 
