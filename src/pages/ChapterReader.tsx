@@ -176,9 +176,11 @@ const ChapterReader = () => {
 
             {/* Center Title */}
             <div className="text-center flex-1">
-              <h1 className="text-lg font-bold text-white">
-                {manga.title} - {chapter.chapter_number}
-              </h1>
+              <Link to={`/manga/${manga.id}`} className="hover:text-blue-400 transition-colors">
+                <h1 className="text-lg font-bold text-white hover:text-blue-400">
+                  {manga.title} - {chapter.chapter_number}
+                </h1>
+              </Link>
             </div>
 
             {/* Right Breadcrumb */}
