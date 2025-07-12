@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus, Upload, Link } from 'lucide-react';
+import { X, Plus, Upload, Link, FolderOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -95,6 +95,24 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
       newPages[index] = { type: 'url', url: '' };
     }
     setPages(newPages);
+  };
+
+  const handleMultipleFiles = (files: FileList | null) => {
+    if (!files) return;
+    
+    const fileArray = Array.from(files);
+    const newPages: PageItem[] = fileArray.map((file) => ({
+      type: 'file',
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+    
+    setPages(newPages);
+    
+    toast({
+      title: 'تم تحديد الملفات',
+      description: `تم تحديد ${fileArray.length} صفحة`,
+    });
   };
 
   const uploadFile = async (file: File, index: number): Promise<string> => {
@@ -228,11 +246,43 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium">صور الفصل *</label>
-          <Button type="button" onClick={addPage} size="sm">
-            <Plus className="h-4 w-4 ml-1" />
-            إضافة صفحة
-          </Button>
+          <div className="flex gap-2">
+            <Button type="button" onClick={addPage} size="sm" variant="outline">
+              <Plus className="h-4 w-4 ml-1" />
+              إضافة صفحة
+            </Button>
+            <div className="relative">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(e) => handleMultipleFiles(e.target.files)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                id="multiple-files"
+              />
+              <Button type="button" size="sm" asChild>
+                <label htmlFor="multiple-files" className="cursor-pointer flex items-center">
+                  <FolderOpen className="h-4 w-4 ml-1" />
+                  رفع جميع الصفحات
+                </label>
+              </Button>
+            </div>
+          </div>
         </div>
+        
+        {pages.length > 0 && (
+          <div className="mb-4 p-3 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              إجمالي الصفحات: {pages.length}
+              {pages.filter(p => p.type === 'file').length > 0 && 
+                ` | ملفات: ${pages.filter(p => p.type === 'file').length}`
+              }
+              {pages.filter(p => p.type === 'url' && p.url).length > 0 && 
+                ` | روابط: ${pages.filter(p => p.type === 'url' && p.url).length}`
+              }
+            </p>
+          </div>
+        )}
         
         <div className="space-y-4">
           {pages.map((page, index) => (
