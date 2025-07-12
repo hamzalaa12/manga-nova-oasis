@@ -2,41 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Modern Manga Website Design System - Dark theme optimized for reading */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Dark background system */
+    --background: 220 13% 8%;
+    --foreground: 210 20% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card system with subtle elevation */
+    --card: 220 13% 12%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Popover system */
+    --popover: 220 13% 10%;
+    --popover-foreground: 210 20% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Neon blue primary for manga theme */
+    --primary: 200 100% 60%;
+    --primary-foreground: 220 13% 8%;
+    --primary-glow: 200 100% 70%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Subtle secondary colors */
+    --secondary: 220 13% 16%;
+    --secondary-foreground: 210 20% 90%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted colors for less important content */
+    --muted: 220 13% 14%;
+    --muted-foreground: 210 15% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent colors for highlights */
+    --accent: 280 100% 70%;
+    --accent-foreground: 220 13% 8%;
 
-    --destructive: 0 84.2% 60.2%;
+    /* Destructive colors */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Border and input styling */
+    --border: 220 13% 20%;
+    --input: 220 13% 16%;
+    --ring: 200 100% 60%;
 
-    --radius: 0.5rem;
+    /* Border radius */
+    --radius: 0.75rem;
+
+    /* Custom gradient system */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-hero: linear-gradient(135deg, hsl(220 13% 8%) 0%, hsl(220 13% 12%) 50%, hsl(200 50% 15%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 13% 14%));
+    
+    /* Shadow system with glow effects */
+    --shadow-card: 0 4px 20px -2px hsl(220 13% 4% / 0.3);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
+    --shadow-accent: 0 0 20px hsl(var(--accent) / 0.15);
+
+    /* Animation system */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +123,56 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Manga card hover effect */
+  .manga-card {
+    @apply relative overflow-hidden rounded-lg transition-all duration-300;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+  
+  .manga-card:hover {
+    @apply scale-105;
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Hero section styling */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+
+  /* Glowing button effect */
+  .btn-glow {
+    @apply relative overflow-hidden;
+    background: var(--gradient-primary);
+    transition: var(--transition-smooth);
+  }
+  
+  .btn-glow:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Search bar glow effect */
+  .search-glow:focus {
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.5);
+  }
+
+  /* Animated underline for navigation */
+  .nav-link {
+    @apply relative;
+  }
+  
+  .nav-link::after {
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
+    content: '';
+  }
+  
+  .nav-link:hover::after {
+    @apply w-full;
   }
 }
