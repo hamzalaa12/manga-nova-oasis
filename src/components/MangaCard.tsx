@@ -1,7 +1,9 @@
 import { Star, Eye, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
 
 interface MangaCardProps {
+  id?: string;
   title: string;
   cover: string;
   rating: number;
@@ -11,65 +13,57 @@ interface MangaCardProps {
   lastUpdate: string;
 }
 
-const MangaCard = ({ title, cover, rating, views, status, genre, lastUpdate }: MangaCardProps) => {
-  return (
-    <div className="manga-card group cursor-pointer">
-      {/* Cover Image */}
+const MangaCard = ({ id, title, cover, rating, views, status, genre, lastUpdate }: MangaCardProps) => {
+  const CardContent = (
+    <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
       <div className="relative overflow-hidden">
-        <img 
-          src={cover} 
+        <img
+          src={cover}
           alt={title}
-          className="w-full h-80 object-cover transition-transform duration-300 group-hover:scale-110"
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <div className="text-white text-center p-4">
-            <div className="flex items-center justify-center mb-2">
-              <Star className="h-4 w-4 text-yellow-400 mr-1" />
-              <span className="text-sm">{rating}</span>
-            </div>
-            <div className="flex items-center justify-center text-sm">
-              <Eye className="h-4 w-4 mr-1" />
-              <span>{views}</span>
-            </div>
-          </div>
+        <div className="absolute top-2 right-2">
+          <Badge variant={status === 'مستمر' ? 'default' : 'secondary'} className="text-xs">
+            {status}
+          </Badge>
         </div>
-
-        {/* Status Badge */}
-        <Badge 
-          variant={status === 'مكتمل' ? 'default' : 'secondary'} 
-          className="absolute top-2 right-2"
-        >
-          {status}
-        </Badge>
+        <div className="absolute bottom-2 left-2">
+          <Badge variant="outline" className="text-xs bg-background/80 backdrop-blur-sm">
+            {genre}
+          </Badge>
+        </div>
       </div>
-
-      {/* Content */}
-      <div className="p-4">
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+      
+      <div className="p-3 space-y-2">
+        <h3 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
         
-        <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
-          <span className="bg-accent/20 text-accent px-2 py-1 rounded text-xs">
-            {genre}
-          </span>
-          <div className="flex items-center">
-            <Clock className="h-3 w-3 mr-1" />
-            <span>{lastUpdate}</span>
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-1">
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span>{rating}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Eye className="h-3 w-3" />
+            <span>{views}</span>
           </div>
         </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Star className="h-4 w-4 text-yellow-400 mr-1" />
-            <span className="text-sm font-medium">{rating}</span>
-          </div>
-          <span className="text-xs text-muted-foreground">{views} مشاهدة</span>
+        
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Clock className="h-3 w-3" />
+          <span>{lastUpdate}</span>
         </div>
       </div>
     </div>
+  );
+
+  return id ? (
+    <Link to={`/manga/${id}`}>
+      {CardContent}
+    </Link>
+  ) : (
+    CardContent
   );
 };
 
