@@ -175,7 +175,7 @@ const ChapterReader = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-sm text-gray-400 hover:text-white">
-                    {chapter.pages.length} صفحة
+                    الفصل {chapter.chapter_number}
                     <ChevronDown className="h-3 w-3 mr-1" />
                   </Button>
                 </DropdownMenuTrigger>
