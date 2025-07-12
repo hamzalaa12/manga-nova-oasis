@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Home, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Chapter {
@@ -166,9 +172,32 @@ const ChapterReader = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-400">
-                {chapter.pages.length} صفحة
-              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-sm text-gray-400 hover:text-white">
+                    {chapter.pages.length} صفحة
+                    <ChevronDown className="h-3 w-3 mr-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700">
+                  {allChapters.map((chapterItem) => (
+                    <DropdownMenuItem 
+                      key={chapterItem.id}
+                      className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700 ${
+                        chapterItem.id === chapter.id ? 'bg-gray-700 text-white' : ''
+                      }`}
+                      onClick={() => navigate(`/read/${chapterItem.id}`)}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">الفصل {chapterItem.chapter_number}</span>
+                        {chapterItem.title && (
+                          <span className="text-xs text-gray-400">{chapterItem.title}</span>
+                        )}
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
