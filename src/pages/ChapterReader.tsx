@@ -280,46 +280,66 @@ const ChapterReader = () => {
         )}
       </main>
 
-      {/* Bottom Navigation - Chapter Navigation Only */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-t border-white/10">
+      {/* Bottom Navigation - Fixed and Minimal */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {previousChapter ? (
-                <Link to={`/read/${previousChapter.id}`}>
-                  <Button variant="outline" size="sm">
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                    الفصل السابق
-                  </Button>
-                </Link>
-              ) : (
-                <Button variant="outline" size="sm" disabled>
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                  الفصل السابق
-                </Button>
-              )}
-            </div>
-
-            <div className="text-center">
-              <span className="text-sm text-gray-400">
-                الفصل {chapter.chapter_number}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
+            {/* Next Chapter Button */}
+            <div>
               {nextChapter ? (
                 <Link to={`/read/${nextChapter.id}`}>
-                  <Button variant="outline" size="sm">
-                    الفصل التالي
-                    <ChevronLeft className="h-4 w-4 mr-1" />
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+                  >
+                    التالي →
                   </Button>
                 </Link>
               ) : (
-                <Button variant="outline" size="sm" disabled>
-                  الفصل التالي
-                  <ChevronLeft className="h-4 w-4 mr-1" />
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  disabled
+                  className="bg-gray-600 text-gray-300 px-6 py-2 rounded-lg font-medium cursor-not-allowed"
+                >
+                  التالي →
                 </Button>
               )}
+            </div>
+
+            {/* Chapter Selector */}
+            <div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg min-w-[60px] font-medium"
+                  >
+                    {chapter.chapter_number}
+                    <ChevronDown className="h-3 w-3 mr-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700 mb-2">
+                  {allChapters.map((chapterItem) => (
+                    <DropdownMenuItem 
+                      key={chapterItem.id}
+                      className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700 ${
+                        chapterItem.id === chapter.id ? 'bg-gray-700 text-white' : ''
+                      }`}
+                      onClick={() => navigate(`/read/${chapterItem.id}`)}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">الفصل {chapterItem.chapter_number}</span>
+                        {chapterItem.title && (
+                          <span className="text-xs text-gray-400">{chapterItem.title}</span>
+                        )}
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
