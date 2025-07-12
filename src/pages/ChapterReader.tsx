@@ -32,7 +32,6 @@ const ChapterReader = () => {
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [manga, setManga] = useState<Manga | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -100,44 +99,10 @@ const ChapterReader = () => {
     return currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
   };
 
-  const goToPage = (pageIndex: number) => {
-    if (pageIndex >= 0 && chapter && pageIndex < chapter.pages.length) {
-      setCurrentPageIndex(pageIndex);
-    }
-  };
-
-  const goToPreviousPage = () => {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex(currentPageIndex - 1);
-    } else {
-      const prevChapter = getPreviousChapter();
-      if (prevChapter) {
-        navigate(`/read/${prevChapter.id}`);
-      }
-    }
-  };
-
-  const goToNextPage = () => {
-    if (chapter && currentPageIndex < chapter.pages.length - 1) {
-      setCurrentPageIndex(currentPageIndex + 1);
-    } else {
-      const nextChapter = getNextChapter();
-      if (nextChapter) {
-        navigate(`/read/${nextChapter.id}`);
-      }
-    }
-  };
-
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
-        case 'ArrowLeft':
-          goToNextPage();
-          break;
-        case 'ArrowRight':
-          goToPreviousPage();
-          break;
         case 'Escape':
           navigate(-1);
           break;
@@ -146,7 +111,7 @@ const ChapterReader = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPageIndex, chapter]);
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -169,7 +134,6 @@ const ChapterReader = () => {
     );
   }
 
-  const currentPage = chapter.pages[currentPageIndex];
   const previousChapter = getPreviousChapter();
   const nextChapter = getNextChapter();
 
@@ -203,62 +167,37 @@ const ChapterReader = () => {
 
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-400">
-                {currentPageIndex + 1} / {chapter.pages.length}
+                {chapter.pages.length} صفحة
               </span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="pt-16">
+      {/* Main Content - Vertical Layout */}
+      <main className="pt-16 pb-20">
         {chapter.pages.length === 0 ? (
           <div className="flex items-center justify-center min-h-[80vh]">
             <p className="text-gray-400">لا توجد صفحات في هذا الفصل</p>
           </div>
         ) : (
-          <div className="relative">
-            {/* Current Page */}
-            <div className="flex justify-center bg-gray-900">
-              <img
-                src={currentPage?.url || '/placeholder.svg'}
-                alt={`صفحة ${currentPageIndex + 1}`}
-                className="max-w-full max-h-screen object-contain"
-                onClick={goToNextPage}
-              />
-            </div>
-
-            {/* Navigation Overlays */}
-            <button
-              className="fixed left-0 top-16 bottom-0 w-1/4 z-10 bg-transparent hover:bg-white/5 transition-colors"
-              onClick={goToPreviousPage}
-              title="الصفحة السابقة"
-            />
-            <button
-              className="fixed right-0 top-16 bottom-0 w-1/4 z-10 bg-transparent hover:bg-white/5 transition-colors"
-              onClick={goToNextPage}
-              title="الصفحة التالية"
-            />
-
-            {/* Page Indicators */}
-            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-20">
-              <div className="flex gap-1 bg-black/60 backdrop-blur-sm rounded-full px-3 py-2">
-                {chapter.pages.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentPageIndex ? 'bg-white' : 'bg-white/30'
-                    }`}
-                    onClick={() => goToPage(index)}
-                  />
-                ))}
+          <div className="max-w-4xl mx-auto">
+            {/* All Pages Displayed Vertically */}
+            {chapter.pages.map((page, index) => (
+              <div key={index} className="mb-2">
+                <img
+                  src={page?.url || '/placeholder.svg'}
+                  alt={`صفحة ${index + 1}`}
+                  className="w-full max-w-full object-contain bg-gray-900"
+                  loading={index < 3 ? "eager" : "lazy"}
+                />
               </div>
-            </div>
+            ))}
           </div>
         )}
       </main>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation - Chapter Navigation Only */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-t border-white/10">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
@@ -278,13 +217,10 @@ const ChapterReader = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={goToPreviousPage}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" onClick={goToNextPage}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+            <div className="text-center">
+              <span className="text-sm text-gray-400">
+                الفصل {chapter.chapter_number}
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
