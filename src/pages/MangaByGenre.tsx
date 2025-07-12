@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Tag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,64 +22,63 @@ interface Manga {
   created_at: string;
 }
 
-const MangaByType = () => {
-  const { type } = useParams<{ type: string }>();
+const MangaByGenre = () => {
+  const { genre } = useParams<{ genre: string }>();
   const [manga, setManga] = useState<Manga[]>([]);
   const [filteredManga, setFilteredManga] = useState<Manga[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'rating'>('latest');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [genreFilter, setGenreFilter] = useState<string>('all');
-  const [availableGenres, setAvailableGenres] = useState<string[]>([]);
+  const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  const typeNames = {
-    manga: 'مانجا يابانية',
-    manhwa: 'مانهوا كورية', 
-    manhua: 'مانها صينية'
+  const genreNames: { [key: string]: string } = {
+    action: 'أكشن',
+    romance: 'رومانسية',
+    comedy: 'كوميديا',
+    adventure: 'مغامرات',
+    fantasy: 'فانتازيا',
+    drama: 'دراما',
+    horror: 'رعب',
+    mystery: 'غموض',
+    scifi: 'خيال علمي',
+    sports: 'رياضة'
   };
 
-  const currentTypeName = typeNames[type as keyof typeof typeNames] || 'جميع القصص';
+  const currentGenreName = genreNames[genre as string] || 'تصنيف غير معروف';
 
   useEffect(() => {
-    fetchMangaByType();
-  }, [type]);
+    fetchMangaByGenre();
+  }, [genre]);
 
   useEffect(() => {
     filterAndSortManga();
-  }, [manga, searchTerm, sortBy, statusFilter, genreFilter]);
+  }, [manga, searchTerm, sortBy, typeFilter]);
 
-  useEffect(() => {
-    extractAvailableGenres();
-  }, [manga]);
-
-  const fetchMangaByType = async () => {
+  const fetchMangaByGenre = async () => {
     try {
       setLoading(true);
       
-      let query = supabase
+      const { data, error } = await supabase
         .from('manga')
-        .select('*');
-
-      if (type && type !== 'all' && ['manga', 'manhwa', 'manhua'].includes(type)) {
-        query = query.eq('manga_type', type as 'manga' | 'manhwa' | 'manhua');
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setManga(data || []);
+      
+      // Filter by genre
+      const filtered = (data || []).filter(item => 
+        genre && item.genre?.some(g => 
+          g.toLowerCase().includes(genre.toLowerCase()) ||
+          genreNames[genre]?.toLowerCase().includes(g.toLowerCase())
+        )
+      );
+      
+      setManga(filtered);
     } catch (error) {
-      console.error('Error fetching manga:', error);
+      console.error('Error fetching manga by genre:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const extractAvailableGenres = () => {
-    const allGenres = manga.flatMap(item => item.genre || []);
-    const uniqueGenres = [...new Set(allGenres)].filter(Boolean).sort();
-    setAvailableGenres(uniqueGenres);
   };
 
   const filterAndSortManga = () => {
@@ -89,19 +88,13 @@ const MangaByType = () => {
     if (searchTerm) {
       filtered = filtered.filter(item =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.genre?.some(g => g.toLowerCase().includes(searchTerm.toLowerCase()))
+        item.author?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Genre filter
-    if (genreFilter !== 'all') {
-      filtered = filtered.filter(item => item.genre?.includes(genreFilter));
-    }
-
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(item => item.status === statusFilter);
+    // Type filter
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter(item => item.manga_type === typeFilter);
     }
 
     // Sort
@@ -128,7 +121,10 @@ const MangaByType = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">{currentTypeName}</h1>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Tag className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold">{currentGenreName}</h1>
+          </div>
           <p className="text-muted-foreground">
             {loading ? 'جاري التحميل...' : `${filteredManga.length} قصة متاحة`}
           </p>
@@ -139,7 +135,7 @@ const MangaByType = () => {
           <div className="relative flex-1">
             <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="ابحث عن المانجا، المؤلف، أو النوع..."
+              placeholder="ابحث عن المانجا أو المؤلف..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pr-10"
@@ -158,30 +154,15 @@ const MangaByType = () => {
               </SelectContent>
             </Select>
 
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="الحالة" />
+                <SelectValue placeholder="النوع" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">جميع الحالات</SelectItem>
-                <SelectItem value="ongoing">مستمرة</SelectItem>
-                <SelectItem value="completed">مكتملة</SelectItem>
-                <SelectItem value="hiatus">متوقفة</SelectItem>
-                <SelectItem value="cancelled">ملغية</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={genreFilter} onValueChange={setGenreFilter}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="التصنيف" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">جميع التصنيفات</SelectItem>
-                {availableGenres.map((genre) => (
-                  <SelectItem key={genre} value={genre}>
-                    {genre}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">جميع الأنواع</SelectItem>
+                <SelectItem value="manga">مانجا</SelectItem>
+                <SelectItem value="manhwa">مانهوا</SelectItem>
+                <SelectItem value="manhua">مانها</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -195,12 +176,12 @@ const MangaByType = () => {
           </div>
         ) : filteredManga.length === 0 ? (
           <div className="text-center py-12">
-            <Filter className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <Tag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">لا توجد نتائج</h3>
             <p className="text-muted-foreground">
-              {searchTerm || statusFilter !== 'all' || genreFilter !== 'all' 
+              {searchTerm || typeFilter !== 'all' 
                 ? 'جرب تغيير معايير البحث أو الفلترة'
-                : 'لا توجد قصص من هذا النوع حالياً'
+                : `لا توجد قصص من تصنيف ${currentGenreName} حالياً`
               }
             </p>
           </div>
@@ -228,4 +209,4 @@ const MangaByType = () => {
   );
 };
 
-export default MangaByType;
+export default MangaByGenre;

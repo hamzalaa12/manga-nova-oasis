@@ -37,6 +37,18 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Categories */}
+          <div>
+            <h3 className="font-semibold mb-4 text-foreground">التصنيفات</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/genre/action" className="text-muted-foreground hover:text-primary transition-colors">أكشن</Link></li>
+              <li><Link to="/genre/romance" className="text-muted-foreground hover:text-primary transition-colors">رومانسية</Link></li>
+              <li><Link to="/genre/comedy" className="text-muted-foreground hover:text-primary transition-colors">كوميديا</Link></li>
+              <li><Link to="/genre/adventure" className="text-muted-foreground hover:text-primary transition-colors">مغامرات</Link></li>
+              <li><Link to="/genre/fantasy" className="text-muted-foreground hover:text-primary transition-colors">فانتازيا</Link></li>
+            </ul>
+          </div>
+
           {/* Contact */}
           <div>
             <h3 className="font-semibold mb-4 text-foreground">تواصل معنا</h3>

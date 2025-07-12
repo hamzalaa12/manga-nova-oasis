@@ -6,6 +6,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import MangaDetails from "./pages/MangaDetails";
 import MangaByType from "./pages/MangaByType";
+import MangaByGenre from "./pages/MangaByGenre";
 import ChapterReader from "./pages/ChapterReader";
 import NotFound from "./pages/NotFound";
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/manga/:id" element={<MangaDetails />} />
           <Route path="/type/:type" element={<MangaByType />} />
+          <Route path="/genre/:genre" element={<MangaByGenre />} />
           <Route path="/read/:id" element={<ChapterReader />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
