@@ -14,7 +14,152 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chapters: {
+        Row: {
+          chapter_number: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          manga_id: string
+          pages: Json[] | null
+          title: string | null
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          chapter_number: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          manga_id: string
+          pages?: Json[] | null
+          title?: string | null
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          chapter_number?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          manga_id?: string
+          pages?: Json[] | null
+          title?: string | null
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chapters_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "chapters_manga_id_fkey"
+            columns: ["manga_id"]
+            isOneToOne: false
+            referencedRelation: "manga"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manga: {
+        Row: {
+          artist: string | null
+          author: string | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          genre: string[] | null
+          id: string
+          manga_type: Database["public"]["Enums"]["manga_type"]
+          rating: number | null
+          release_year: number | null
+          status: Database["public"]["Enums"]["manga_status"]
+          title: string
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          artist?: string | null
+          author?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          genre?: string[] | null
+          id?: string
+          manga_type: Database["public"]["Enums"]["manga_type"]
+          rating?: number | null
+          release_year?: number | null
+          status?: Database["public"]["Enums"]["manga_status"]
+          title: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          artist?: string | null
+          author?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          genre?: string[] | null
+          id?: string
+          manga_type?: Database["public"]["Enums"]["manga_type"]
+          rating?: number | null
+          release_year?: number | null
+          status?: Database["public"]["Enums"]["manga_status"]
+          title?: string
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manga_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +168,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      manga_status: "ongoing" | "completed" | "hiatus" | "cancelled"
+      manga_type: "manga" | "manhwa" | "manhua"
+      user_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +297,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      manga_status: ["ongoing", "completed", "hiatus", "cancelled"],
+      manga_type: ["manga", "manhwa", "manhua"],
+      user_role: ["admin", "user"],
+    },
   },
 } as const
