@@ -33,6 +33,39 @@ const MangaByType = () => {
   const [genreFilter, setGenreFilter] = useState<string>('all');
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
 
+  // قائمة شاملة من التصنيفات الشائعة
+  const commonGenres = [
+    'أكشن', 'Action',
+    'رومانسية', 'Romance', 
+    'كوميديا', 'Comedy',
+    'دراما', 'Drama',
+    'مغامرات', 'Adventure',
+    'فانتازيا', 'Fantasy',
+    'خيال علمي', 'Sci-Fi',
+    'رعب', 'Horror',
+    'غموض', 'Mystery',
+    'إثارة', 'Thriller',
+    'رياضة', 'Sports',
+    'مدرسي', 'School',
+    'حياة يومية', 'Slice of Life',
+    'تاريخي', 'Historical',
+    'سحر', 'Magic',
+    'قتال', 'Martial Arts',
+    'ميكا', 'Mecha',
+    'نفسي', 'Psychological',
+    'خارق للطبيعة', 'Supernatural',
+    'مصاص دماء', 'Vampire',
+    'زومبي', 'Zombie',
+    'طبخ', 'Cooking',
+    'موسيقى', 'Music',
+    'فنون قتالية', 'Fighting',
+    'مافيا', 'Mafia',
+    'جريمة', 'Crime',
+    'عسكري', 'Military',
+    'طبي', 'Medical',
+    'أعمال', 'Business'
+  ];
+
   const typeNames = {
     manga: 'مانجا يابانية',
     manhwa: 'مانهوا كورية', 
@@ -50,8 +83,11 @@ const MangaByType = () => {
   }, [manga, searchTerm, sortBy, statusFilter, genreFilter]);
 
   useEffect(() => {
-    extractAvailableGenres();
-  }, [manga]);
+    // استخدام قائمة التصنيفات الشاملة مع إضافة التصنيفات الموجودة في قاعدة البيانات
+    const dbGenres = manga.flatMap(item => item.genre || []);
+    const allGenres = [...new Set([...commonGenres, ...dbGenres])].filter(Boolean).sort();
+    setAvailableGenres(allGenres);
+  }, [manga, commonGenres]);
 
   const fetchMangaByType = async () => {
     try {
@@ -76,11 +112,6 @@ const MangaByType = () => {
     }
   };
 
-  const extractAvailableGenres = () => {
-    const allGenres = manga.flatMap(item => item.genre || []);
-    const uniqueGenres = [...new Set(allGenres)].filter(Boolean).sort();
-    setAvailableGenres(uniqueGenres);
-  };
 
   const filterAndSortManga = () => {
     let filtered = [...manga];
@@ -94,9 +125,14 @@ const MangaByType = () => {
       );
     }
 
-    // Genre filter
+    // Genre filter - البحث في التصنيفات العربية والإنجليزية
     if (genreFilter !== 'all') {
-      filtered = filtered.filter(item => item.genre?.includes(genreFilter));
+      filtered = filtered.filter(item => 
+        item.genre?.some(genre => 
+          genre.toLowerCase().includes(genreFilter.toLowerCase()) ||
+          genreFilter.toLowerCase().includes(genre.toLowerCase())
+        )
+      );
     }
 
     // Status filter
