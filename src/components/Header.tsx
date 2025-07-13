@@ -25,9 +25,9 @@ const Header = () => {
           
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/" className="text-foreground hover:text-primary transition-colors">الرئيسية</Link>
-            <a href="#" className="text-foreground hover:text-primary transition-colors">مانجا</a>
-            <a href="#" className="text-foreground hover:text-primary transition-colors">مانهوا</a>
-            <a href="#" className="text-foreground hover:text-primary transition-colors">مانها</a>
+            <Link to="/type/manga" className="text-foreground hover:text-primary transition-colors">مانجا</Link>
+            <Link to="/type/manhua" className="text-foreground hover:text-primary transition-colors">مانهوا</Link>
+            <Link to="/type/manhwa" className="text-foreground hover:text-primary transition-colors">مانها</Link>
           </nav>
         </div>
         
