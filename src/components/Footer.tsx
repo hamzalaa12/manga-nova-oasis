@@ -55,7 +55,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center text-muted-foreground">
                 <Mail className="h-4 w-4 mr-2" />
-                info@mangaplus.com
+                hamza232324ya@gmail.com
               </li>
               <li className="flex items-center text-muted-foreground">
                 <MessageCircle className="h-4 w-4 mr-2" />
