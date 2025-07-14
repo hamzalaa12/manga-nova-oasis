@@ -57,7 +57,7 @@ interface Chapter {
 }
 
 const MangaDetails = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const { user, userProfile, isAdmin } = useAuth();
   const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
@@ -65,7 +65,7 @@ const MangaDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (slug) {
+    if (id) {
       fetchMangaDetails();
       fetchChapters();
     }
@@ -76,14 +76,14 @@ const MangaDetails = () => {
       const { data, error } = await supabase
         .from('manga')
         .select('*')
-        .eq('slug', slug)
+        .eq('id', id)
         .single();
 
       if (error) throw error;
       setManga(data);
 
       // Track view using the new system
-      await trackMangaView(data.id);
+      await trackMangaView(id);
     } catch (error) {
       console.error('Error fetching manga details:', error);
     }
