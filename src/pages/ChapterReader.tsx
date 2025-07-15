@@ -439,7 +439,7 @@ const ChapterReader = () => {
                 </h3>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                   {nextChapter ? (
-                    <Link to={`/read/${nextChapter.id}`}>
+                    <Link to={buildChapterUrl(nextChapter, manga)}>
                       <Button
                         size="lg"
                         className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 gap-2"
