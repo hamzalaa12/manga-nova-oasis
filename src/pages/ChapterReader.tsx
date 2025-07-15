@@ -408,7 +408,7 @@ const ChapterReader = () => {
                 />
 
                 {/* Page Number Indicator - Only on hover */}
-                <div className="absolute top-4 right-4 bg-black/60 text-white text-sm px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity">
+                <div className="absolute top-4 right-4 text-white text-sm px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity page-indicator">
                   {index + 1} / {chapter.pages.length}
                 </div>
               </div>
