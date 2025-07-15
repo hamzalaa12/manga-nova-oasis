@@ -418,6 +418,15 @@ const ChapterReader = () => {
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
+            {/* Search Information Card */}
+            <div className="px-4 mb-6">
+              <SearchableTitle
+                mangaTitle={manga.title}
+                chapterNumber={chapter.chapter_number}
+                mangaSlug={manga.slug}
+              />
+            </div>
+
             {/* All Pages Displayed Vertically */}
             {chapter.pages.map((page, index) => (
               <div key={index} className="relative">
