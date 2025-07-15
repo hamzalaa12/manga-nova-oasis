@@ -28,6 +28,7 @@ const AdminPanel = () => {
   const [openMangaDialog, setOpenMangaDialog] = useState(false);
   const [openChapterDialog, setOpenChapterDialog] = useState(false);
   const [updatingSlugs, setUpdatingSlugs] = useState(false);
+  const [updatingChapterSlugs, setUpdatingChapterSlugs] = useState(false);
 
   const handleUpdateSlugs = async () => {
     setUpdatingSlugs(true);
