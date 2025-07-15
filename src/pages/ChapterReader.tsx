@@ -267,10 +267,42 @@ const ChapterReader = () => {
               </h1>
             </div>
 
-            {/* Right Chapter Number */}
-            <div className="bg-gray-700 px-3 py-1 rounded text-sm font-medium">
-              {chapter.chapter_number}
-            </div>
+            {/* Right Chapter Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm font-medium cursor-pointer transition-colors flex items-center gap-1">
+                  {chapter.chapter_number}
+                  <ChevronDown className="h-3 w-3" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-64 max-h-80 overflow-y-auto bg-gray-900/95 backdrop-blur border-gray-700"
+              >
+                {allChapters.map((chapterItem) => (
+                  <DropdownMenuItem
+                    key={chapterItem.id}
+                    className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700/50 p-3 ${
+                      chapterItem.id === chapter.id
+                        ? "bg-gray-700/70 text-white"
+                        : ""
+                    }`}
+                    onClick={() => navigate(`/read/${chapterItem.id}`)}
+                  >
+                    <div className="flex flex-col w-full">
+                      <span className="font-medium">
+                        الفصل {chapterItem.chapter_number}
+                      </span>
+                      {chapterItem.title && (
+                        <span className="text-xs text-gray-400 mt-1">
+                          {chapterItem.title}
+                        </span>
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
