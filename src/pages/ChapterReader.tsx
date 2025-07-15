@@ -312,7 +312,7 @@ const ChapterReader = () => {
 
   const previousChapter = getPreviousChapter();
   const nextChapter = getNextChapter();
-  const mangaUrl = manga.slug ? `/manga/${manga.slug}` : `/manga/${manga.id}`;
+  const mangaUrl = buildMangaUrl(manga);
 
   return (
     <div className="min-h-screen bg-black text-white relative">
