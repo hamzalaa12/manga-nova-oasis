@@ -86,7 +86,10 @@ const MangaDetails = () => {
 
   useEffect(() => {
     if (manga?.id) {
+      console.log("useEffect: manga loaded, fetching chapters for:", manga.id);
       fetchChapters();
+    } else {
+      console.log("useEffect: manga not loaded yet");
     }
   }, [manga?.id]);
 
