@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MangaCard from "@/components/MangaCard";
+import { generateSlug } from "@/lib/slug";
 
 interface Manga {
   id: string;
@@ -96,7 +97,7 @@ const MangaByType = () => {
     "Mafia",
     "جريمة",
     "Crime",
-    "عسكري",
+    "ع��كري",
     "Military",
     "طبي",
     "Medical",
