@@ -68,6 +68,7 @@ interface Chapter {
   is_premium: boolean;
   is_private: boolean;
   price: number;
+  slug?: string;
 }
 
 const MangaDetails = () => {
