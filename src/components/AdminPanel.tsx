@@ -153,7 +153,7 @@ const AdminPanel = () => {
         </DialogContent>
       </Dialog>
 
-      {/* زر تحديث Slugs */}
+      {/* أزرار تحديث Slugs */}
       <Button
         onClick={handleUpdateSlugs}
         disabled={updatingSlugs}
@@ -164,7 +164,20 @@ const AdminPanel = () => {
         <RefreshCw
           className={`h-5 w-5 ml-2 ${updatingSlugs ? "animate-spin" : ""}`}
         />
-        {updatingSlugs ? "جاري التحديث..." : "تحديث روابط SEO"}
+        {updatingSlugs ? "جاري التحديث..." : "تحديث روابط المانجا"}
+      </Button>
+
+      <Button
+        onClick={handleUpdateChapterSlugs}
+        disabled={updatingChapterSlugs}
+        size="lg"
+        variant="outline"
+        className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <RefreshCw
+          className={`h-5 w-5 ml-2 ${updatingChapterSlugs ? "animate-spin" : ""}`}
+        />
+        {updatingChapterSlugs ? "جاري التحديث..." : "تحديث روابط الفصول"}
       </Button>
 
       {/* روابط سريعة للإدارة */}
