@@ -92,22 +92,26 @@ const MangaDetails = () => {
 
   const fetchMangaDetails = async () => {
     try {
-      const paramValue = slug || id;
-      if (!paramValue) return;
+      if (!slug) return;
 
+      const { type, value } = parseSlugOrId(slug);
       let query = supabase.from("manga").select("*");
 
-      if (id) {
-        // إذا كان route مباشر للID
-        query = query.eq("id", id);
-      } else if (slug) {
-        // إذا كان slug، نحتاج لفحص النوع
-        const { type, value } = parseSlugOrId(slug);
-        if (type === "slug") {
-          query = query.eq("slug", value);
-        } else {
-          query = query.eq("id", value);
+      if (type === "slug") {
+        query = query.eq("slug", value);
+      } else {
+        // إذا كان ID قديم، إعادة توجيه للslug
+        const { data: mangaData } = await supabase
+          .from("manga")
+          .select("slug")
+          .eq("id", value)
+          .single();
+
+        if (mangaData?.slug) {
+          window.location.href = `/manga/${mangaData.slug}`;
+          return;
         }
+        query = query.eq("id", value);
       }
 
       const { data, error } = await query.single();
@@ -260,7 +264,7 @@ const MangaDetails = () => {
       if (error) throw error;
 
       toast({
-        title: "تم التحديث!",
+        title: "تم ��لتحديث!",
         description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خاص",
       });
 
