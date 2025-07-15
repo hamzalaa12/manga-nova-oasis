@@ -19,8 +19,50 @@ import { useToast } from "@/hooks/use-toast";
 
 const AdminPanel = () => {
   const { isAdmin } = useAuth();
+  const { toast } = useToast();
   const [openMangaDialog, setOpenMangaDialog] = useState(false);
   const [openChapterDialog, setOpenChapterDialog] = useState(false);
+  const [updatingSlugs, setUpdatingSlugs] = useState(false);
+
+  const handleUpdateSlugs = async () => {
+    setUpdatingSlugs(true);
+    try {
+      toast({
+        title: "بدء التحديث",
+        description: "جاري تحديث روابط المانجا...",
+      });
+
+      const columnExists = await addSlugColumnIfMissing();
+      if (!columnExists) {
+        toast({
+          title: "خطأ",
+          description:
+            "حقل slug غير موجود في قاعدة البيانات. يجب تطبيق migration أولاً.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await updateMangaSlugs();
+
+      toast({
+        title: "تم التحديث!",
+        description: "تم تحديث روابط المانجا بنجاح",
+      });
+
+      // إعادة تحميل الصفحة لتطبيق التغييرات
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating slugs:", error);
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث روابط المانجا",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingSlugs(false);
+    }
+  };
 
   if (!isAdmin) {
     return null;
