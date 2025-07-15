@@ -34,6 +34,7 @@ function App() {
             element={<ChapterReader />}
           />
           <Route path="/read/:id" element={<ChapterReader />} />
+          <Route path="/chapter/:id" element={<ChapterRedirect />} />
           <Route path="/test-slugs" element={<TestSlugs />} />
           <Route path="/all-manga" element={<AllManga />} />
           <Route path="/health-check" element={<HealthCheck />} />
