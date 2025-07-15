@@ -367,7 +367,10 @@ const ChapterReader = () => {
                         ? "bg-gray-700/70 text-white"
                         : ""
                     }`}
-                    onClick={() => navigate(`/read/${chapterItem.id}`)}
+                    onClick={() => {
+                      const chapterUrl = buildChapterUrl(chapterItem, manga);
+                      navigate(chapterUrl);
+                    }}
                   >
                     <div className="flex flex-col w-full">
                       <span className="font-medium">
