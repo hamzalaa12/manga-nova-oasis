@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import MangaCard from "./MangaCard";
 import { supabase } from "@/integrations/supabase/client";
+import { generateSlug } from "@/lib/slug";
 
 interface MangaGridProps {
   title?: string;
