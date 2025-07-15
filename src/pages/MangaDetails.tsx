@@ -126,7 +126,7 @@ const MangaDetails = () => {
         return;
       }
 
-      // إذا فشل بـ ID ونوع الإدخال slug، نحاول بـ slug
+      // إ��ا فشل بـ ID ونوع الإدخال slug، نحاول بـ slug
       if (type === "slug") {
         console.log("ID failed, trying by slug:", value);
         try {
@@ -177,13 +177,18 @@ const MangaDetails = () => {
       }
 
       // إذا فشلت كل المحاولات
-      console.error("Both ID and slug failed:", {
-        idErrorMessage: idError?.message || String(idError),
-        idErrorCode: idError?.code,
-        value,
-        type,
+      console.error("All search methods failed:", {
+        searchValue: value,
+        searchType: type,
+        idError: {
+          message: idError?.message || String(idError),
+          code: idError?.code,
+          details: idError,
+        },
       });
-      throw new Error(`Manga not found: ${value}`);
+
+      // لا نرمي خطأ، بل نترك manga === null ليتم عرض صفحة "غير موجود"
+      console.log("Setting manga to null - will show not found page");
     } catch (error: any) {
       console.error("Error fetching manga details:", error?.message || error);
     }
