@@ -362,12 +362,27 @@ const MangaDetails = () => {
     );
   }
 
-  if (!manga) {
+  if (!manga && !loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">المانجا غير موجودة</div>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">المانجا غير موجودة</h1>
+            <p className="text-muted-foreground mb-4">
+              عذراً، لم نتمكن من العثور على المانجا المطلوبة
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              البحث: <code className="bg-muted px-2 py-1 rounded">{slug}</code>
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-glow transition-colors"
+            >
+              <ArrowRight className="h-4 w-4" />
+              العودة للرئيسية
+            </Link>
+          </div>
         </div>
         <Footer />
       </div>
