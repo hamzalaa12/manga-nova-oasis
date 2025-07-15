@@ -105,30 +105,98 @@ const ChapterReader = () => {
 
   const fetchChapterDetails = async () => {
     try {
-      // Fetch chapter details
-      const { data: chapterData, error: chapterError } = await supabase
-        .from("chapters")
-        .select("*")
-        .eq("id", id)
-        .single();
+      let chapterData = null;
+      let mangaData = null;
 
-      if (chapterError) throw chapterError;
+      if (mangaSlug && chapterSlug) {
+        // New route: /read/:mangaSlug/:chapterSlug
+        console.log("Fetching by slug:", { mangaSlug, chapterSlug });
+
+        // First, find manga by slug
+        const mangaQuery = parseSlugOrId(mangaSlug);
+        let mangaQueryBuilder = supabase.from("manga").select("*");
+
+        if (mangaQuery.type === "slug") {
+          mangaQueryBuilder = mangaQueryBuilder.eq("slug", mangaQuery.value);
+        } else {
+          mangaQueryBuilder = mangaQueryBuilder.eq("id", mangaQuery.value);
+        }
+
+        const { data: foundManga, error: mangaError } =
+          await mangaQueryBuilder.single();
+        if (mangaError || !foundManga) throw new Error("Manga not found");
+
+        mangaData = foundManga;
+
+        // Then, find chapter by slug within this manga
+        const chapterQuery = parseSlugOrId(chapterSlug);
+        let chapterQueryBuilder = supabase
+          .from("chapters")
+          .select("*")
+          .eq("manga_id", foundManga.id);
+
+        if (chapterQuery.type === "slug") {
+          chapterQueryBuilder = chapterQueryBuilder.eq(
+            "slug",
+            chapterQuery.value,
+          );
+        } else {
+          chapterQueryBuilder = chapterQueryBuilder.eq(
+            "id",
+            chapterQuery.value,
+          );
+        }
+
+        const { data: foundChapter, error: chapterError } =
+          await chapterQueryBuilder.single();
+        if (chapterError || !foundChapter) throw new Error("Chapter not found");
+
+        chapterData = foundChapter;
+      } else if (id) {
+        // Old route: /read/:id
+        console.log("Fetching by old ID:", id);
+
+        const { type, value } = parseSlugOrId(id);
+        let chapterQueryBuilder = supabase.from("chapters").select("*");
+
+        if (type === "slug") {
+          chapterQueryBuilder = chapterQueryBuilder.eq("slug", value);
+        } else {
+          chapterQueryBuilder = chapterQueryBuilder.eq("id", value);
+        }
+
+        const { data: foundChapter, error: chapterError } =
+          await chapterQueryBuilder.single();
+        if (chapterError || !foundChapter) throw new Error("Chapter not found");
+
+        chapterData = foundChapter;
+
+        // Fetch manga details
+        const { data: foundManga, error: mangaError } = await supabase
+          .from("manga")
+          .select("*")
+          .eq("id", foundChapter.manga_id)
+          .single();
+
+        if (mangaError || !foundManga) throw new Error("Manga not found");
+        mangaData = foundManga;
+
+        // Redirect to new URL structure if we have slugs
+        if (foundManga.slug && foundChapter.slug) {
+          const newUrl = buildChapterUrl(foundChapter, foundManga);
+          window.history.replaceState(null, "", newUrl);
+        }
+      } else {
+        throw new Error("No valid parameters provided");
+      }
+
       setChapter(chapterData);
-
-      // Fetch manga details
-      const { data: mangaData, error: mangaError } = await supabase
-        .from("manga")
-        .select("id, title, slug")
-        .eq("id", chapterData.manga_id)
-        .single();
-
-      if (mangaError) throw mangaError;
       setManga(mangaData);
 
       // Fetch all chapters for navigation
       const { data: chaptersData, error: chaptersError } = await supabase
         .from("chapters")
-        .select("id, chapter_number, title")
+        .select("id, chapter_number, title, slug")
         .eq("manga_id", chapterData.manga_id)
         .order("chapter_number", { ascending: true });
 
@@ -136,7 +204,7 @@ const ChapterReader = () => {
       setAllChapters(chaptersData || []);
 
       // Track view
-      await trackChapterView(id);
+      await trackChapterView(chapterData.id);
     } catch (error) {
       console.error("Error fetching chapter details:", error);
     } finally {
