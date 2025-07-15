@@ -71,7 +71,7 @@ interface Chapter {
 }
 
 const MangaDetails = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, id } = useParams<{ slug?: string; id?: string }>();
   const { user, userProfile, isAdmin } = useAuth();
   const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
