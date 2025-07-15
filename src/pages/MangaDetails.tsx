@@ -1,17 +1,30 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowRight, Calendar, Eye, User, Bookmark, Play, Edit, Trash2, Lock, DollarSign, MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { parseSlugOrId } from "@/lib/slug";
+import {
+  ArrowRight,
+  Calendar,
+  Eye,
+  User,
+  Bookmark,
+  Play,
+  Edit,
+  Trash2,
+  Lock,
+  DollarSign,
+  MoreHorizontal,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { 
+} from "@/components/ui/dropdown-menu";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -21,15 +34,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
   description: string;
   cover_image_url: string;
@@ -57,7 +71,7 @@ interface Chapter {
 }
 
 const MangaDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const { user, userProfile, isAdmin } = useAuth();
   const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
@@ -65,27 +79,34 @@ const MangaDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
+    if (slug) {
       fetchMangaDetails();
       fetchChapters();
     }
-  }, [id]);
+  }, [slug]);
 
   const fetchMangaDetails = async () => {
     try {
-      const { data, error } = await supabase
-        .from('manga')
-        .select('*')
-        .eq('id', id)
-        .single();
+      if (!slug) return;
+
+      const { type, value } = parseSlugOrId(slug);
+      let query = supabase.from("manga").select("*");
+
+      if (type === "slug") {
+        query = query.eq("slug", value);
+      } else {
+        query = query.eq("id", value);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) throw error;
       setManga(data);
 
       // Track view using the new system
-      await trackMangaView(id);
+      await trackMangaView(data.id);
     } catch (error) {
-      console.error('Error fetching manga details:', error);
+      console.error("Error fetching manga details:", error);
     }
   };
 
@@ -93,39 +114,41 @@ const MangaDetails = () => {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       };
 
       // Add authorization header if user is logged in
       if (sessionData.session?.access_token) {
-        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
       }
 
-      await supabase.functions.invoke('track-view', {
-        body: { 
+      await supabase.functions.invoke("track-view", {
+        body: {
           mangaId: mangaId,
-          type: 'manga'
+          type: "manga",
         },
-        headers
+        headers,
       });
     } catch (error) {
-      console.error('Error tracking view:', error);
+      console.error("Error tracking view:", error);
       // Don't fail the page load if view tracking fails
     }
   };
 
   const fetchChapters = async () => {
     try {
+      if (!manga?.id) return;
+
       const { data, error } = await supabase
-        .from('chapters')
-        .select('*')
-        .eq('manga_id', id)
-        .order('chapter_number', { ascending: true });
+        .from("chapters")
+        .select("*")
+        .eq("manga_id", manga.id)
+        .order("chapter_number", { ascending: true });
 
       if (error) throw error;
       setChapters(data || []);
     } catch (error) {
-      console.error('Error fetching chapters:', error);
+      console.error("Error fetching chapters:", error);
     } finally {
       setLoading(false);
     }
@@ -133,38 +156,50 @@ const MangaDetails = () => {
 
   const getStatusInArabic = (status: string) => {
     switch (status) {
-      case 'ongoing': return 'مستمر';
-      case 'completed': return 'مكتمل';
-      case 'hiatus': return 'متوقف مؤقتاً';
-      case 'cancelled': return 'ملغي';
-      default: return status;
+      case "ongoing":
+        return "مستمر";
+      case "completed":
+        return "مكتمل";
+      case "hiatus":
+        return "متوقف مؤقتاً";
+      case "cancelled":
+        return "ملغي";
+      default:
+        return status;
     }
   };
 
   const getTypeInArabic = (type: string) => {
     switch (type) {
-      case 'manga': return 'مانجا';
-      case 'manhwa': return 'مانهوا';
-      case 'manhua': return 'مانها';
-      default: return type;
+      case "manga":
+        return "مانجا";
+      case "manhwa":
+        return "مانهوا";
+      case "manhua":
+        return "مانها";
+      default:
+        return type;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA');
+    return new Date(dateString).toLocaleDateString("ar-SA");
   };
 
-  const handleDeleteChapter = async (chapterId: string, chapterNumber: number) => {
+  const handleDeleteChapter = async (
+    chapterId: string,
+    chapterNumber: number,
+  ) => {
     try {
       const { error } = await supabase
-        .from('chapters')
+        .from("chapters")
         .delete()
-        .eq('id', chapterId);
+        .eq("id", chapterId);
 
       if (error) throw error;
 
       toast({
-        title: 'تم الحذف!',
+        title: "تم الحذف!",
         description: `تم حذف الفصل ${chapterNumber} بنجاح`,
       });
 
@@ -172,9 +207,9 @@ const MangaDetails = () => {
       fetchChapters();
     } catch (error: any) {
       toast({
-        title: 'خطأ',
-        description: 'فشل في حذف الفصل',
-        variant: 'destructive',
+        title: "خطأ",
+        description: "فشل في حذف الفصل",
+        variant: "destructive",
       });
     }
   };
@@ -182,23 +217,23 @@ const MangaDetails = () => {
   const handleTogglePremium = async (chapterId: string, isPremium: boolean) => {
     try {
       const { error } = await supabase
-        .from('chapters')
+        .from("chapters")
         .update({ is_premium: !isPremium })
-        .eq('id', chapterId);
+        .eq("id", chapterId);
 
       if (error) throw error;
 
       toast({
-        title: 'تم التحديث!',
-        description: isPremium ? 'تم جعل الفصل مجاني' : 'تم جعل الفصل مدفوع',
+        title: "تم التحديث!",
+        description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل مدفوع",
       });
 
       fetchChapters();
     } catch (error: any) {
       toast({
-        title: 'خطأ',
-        description: 'فشل في تحديث حالة الفصل',
-        variant: 'destructive',
+        title: "خطأ",
+        description: "فشل في تحديث حالة الفصل",
+        variant: "destructive",
       });
     }
   };
@@ -206,23 +241,23 @@ const MangaDetails = () => {
   const handleTogglePrivate = async (chapterId: string, isPrivate: boolean) => {
     try {
       const { error } = await supabase
-        .from('chapters')
+        .from("chapters")
         .update({ is_private: !isPrivate })
-        .eq('id', chapterId);
+        .eq("id", chapterId);
 
       if (error) throw error;
 
       toast({
-        title: 'تم التحديث!',
-        description: isPrivate ? 'تم نشر الفصل' : 'تم جعل الفصل خاص',
+        title: "تم التحديث!",
+        description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خاص",
       });
 
       fetchChapters();
     } catch (error: any) {
       toast({
-        title: 'خطأ',
-        description: 'فشل في تحديث حالة الفصل',
-        variant: 'destructive',
+        title: "خطأ",
+        description: "فشل في تحديث حالة الفصل",
+        variant: "destructive",
       });
     }
   };
@@ -254,10 +289,13 @@ const MangaDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Back Button */}
-        <Link to="/" className="inline-flex items-center gap-2 text-primary hover:text-primary-glow transition-colors mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-primary hover:text-primary-glow transition-colors mb-6"
+        >
           <ArrowRight className="h-4 w-4" />
           العودة للرئيسية
         </Link>
@@ -269,15 +307,21 @@ const MangaDetails = () => {
               <CardContent className="p-6">
                 <div className="text-center">
                   <img
-                    src={manga.cover_image_url || '/placeholder.svg'}
+                    src={manga.cover_image_url || "/placeholder.svg"}
                     alt={manga.title}
                     className="w-full h-80 object-cover rounded-lg mb-4"
                   />
                   <h1 className="text-2xl font-bold mb-2">{manga.title}</h1>
-                  
+
                   <div className="flex flex-wrap gap-2 justify-center mb-4">
-                    <Badge variant="secondary">{getTypeInArabic(manga.manga_type)}</Badge>
-                    <Badge variant={manga.status === 'ongoing' ? 'default' : 'outline'}>
+                    <Badge variant="secondary">
+                      {getTypeInArabic(manga.manga_type)}
+                    </Badge>
+                    <Badge
+                      variant={
+                        manga.status === "ongoing" ? "default" : "outline"
+                      }
+                    >
                       {getStatusInArabic(manga.status)}
                     </Badge>
                   </div>
@@ -312,7 +356,11 @@ const MangaDetails = () => {
                       <p className="text-sm font-medium mb-2">التصنيفات:</p>
                       <div className="flex flex-wrap gap-1 justify-center">
                         {manga.genre.map((genre, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="text-xs"
+                          >
                             {genre}
                           </Badge>
                         ))}
@@ -347,7 +395,9 @@ const MangaDetails = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">الفصول ({chapters.length})</h2>
+                  <h2 className="text-xl font-bold">
+                    الفصول ({chapters.length})
+                  </h2>
                   {chapters.length > 0 && (
                     <Link to={`/read/${chapters[0].id}`}>
                       <Button>
@@ -365,7 +415,10 @@ const MangaDetails = () => {
                 ) : (
                   <div className="space-y-2">
                     {chapters.map((chapter) => (
-                      <div key={chapter.id} className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                      <div
+                        key={chapter.id}
+                        className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
                         <div className="flex items-center justify-between">
                           <Link to={`/read/${chapter.id}`} className="flex-1">
                             <div>
@@ -375,7 +428,10 @@ const MangaDetails = () => {
                                   {chapter.title && `: ${chapter.title}`}
                                 </h3>
                                 {chapter.is_premium && (
-                                  <Badge variant="secondary" className="text-xs">
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
                                     <DollarSign className="h-3 w-3 ml-1" />
                                     مدفوع
                                   </Badge>
@@ -394,7 +450,7 @@ const MangaDetails = () => {
                               )}
                             </div>
                           </Link>
-                          
+
                           <div className="flex items-center gap-2">
                             <div className="text-sm text-muted-foreground text-left">
                               <div className="flex items-center gap-1">
@@ -403,7 +459,7 @@ const MangaDetails = () => {
                               </div>
                               <div>{formatDate(chapter.created_at)}</div>
                             </div>
-                            
+
                             {isAdmin && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -412,34 +468,64 @@ const MangaDetails = () => {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleTogglePremium(chapter.id, chapter.is_premium)}>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleTogglePremium(
+                                        chapter.id,
+                                        chapter.is_premium,
+                                      )
+                                    }
+                                  >
                                     <DollarSign className="h-4 w-4 ml-2" />
-                                    {chapter.is_premium ? 'جعله مجاني' : 'جعله مدفوع'}
+                                    {chapter.is_premium
+                                      ? "جعله مجاني"
+                                      : "جعله مدفوع"}
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleTogglePrivate(chapter.id, chapter.is_private)}>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleTogglePrivate(
+                                        chapter.id,
+                                        chapter.is_private,
+                                      )
+                                    }
+                                  >
                                     <Lock className="h-4 w-4 ml-2" />
-                                    {chapter.is_private ? 'نشر الفصل' : 'جعله خاص'}
+                                    {chapter.is_private
+                                      ? "نشر الفصل"
+                                      : "جعله خاص"}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                      <DropdownMenuItem
+                                        onSelect={(e) => e.preventDefault()}
+                                      >
                                         <Trash2 className="h-4 w-4 ml-2" />
                                         حذف الفصل
                                       </DropdownMenuItem>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                       <AlertDialogHeader>
-                                        <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                                        <AlertDialogTitle>
+                                          تأكيد الحذف
+                                        </AlertDialogTitle>
                                         <AlertDialogDescription>
-                                          هل أنت متأكد من حذف الفصل {chapter.chapter_number}؟ 
-                                          هذا الإجراء لا يمكن التراجع عنه.
+                                          هل أنت متأكد من حذف الفصل{" "}
+                                          {chapter.chapter_number}؟ هذا الإجراء
+                                          لا يمكن التراجع عنه.
                                         </AlertDialogDescription>
                                       </AlertDialogHeader>
                                       <AlertDialogFooter>
-                                        <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                                        <AlertDialogAction 
-                                          onClick={() => handleDeleteChapter(chapter.id, chapter.chapter_number)}
+                                        <AlertDialogCancel>
+                                          إلغاء
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() =>
+                                            handleDeleteChapter(
+                                              chapter.id,
+                                              chapter.chapter_number,
+                                            )
+                                          }
                                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                         >
                                           حذف
