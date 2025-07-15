@@ -121,8 +121,8 @@ const MangaDetails = () => {
 
       // Track view using the new system
       await trackMangaView(data.id);
-    } catch (error) {
-      console.error("Error fetching manga details:", error);
+    } catch (error: any) {
+      console.error("Error fetching manga details:", error?.message || error);
     }
   };
 
