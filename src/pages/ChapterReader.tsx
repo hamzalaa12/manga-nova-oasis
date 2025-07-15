@@ -16,6 +16,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  parseSlugOrId,
+  buildMangaUrl,
+  buildChapterUrl,
+  generateChapterSlug,
+} from "@/lib/slug";
 
 interface Chapter {
   id: string;
