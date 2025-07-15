@@ -28,6 +28,10 @@ function App() {
           <Route path="/manga/id/:id" element={<MangaRedirect />} />
           <Route path="/type/:type" element={<MangaByType />} />
           <Route path="/genre/:genre" element={<MangaByGenre />} />
+          <Route
+            path="/read/:mangaSlug/:chapterSlug"
+            element={<ChapterReader />}
+          />
           <Route path="/read/:id" element={<ChapterReader />} />
           <Route path="/test-slugs" element={<TestSlugs />} />
           <Route path="/all-manga" element={<AllManga />} />
