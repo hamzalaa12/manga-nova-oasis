@@ -48,7 +48,11 @@ interface Manga {
 }
 
 const ChapterReader = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, mangaSlug, chapterSlug } = useParams<{
+    id?: string;
+    mangaSlug?: string;
+    chapterSlug?: string;
+  }>();
   const navigate = useNavigate();
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [manga, setManga] = useState<Manga | null>(null);
