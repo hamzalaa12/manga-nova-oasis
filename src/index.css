@@ -48,10 +48,23 @@
     --radius: 0.75rem;
 
     /* Custom gradient system */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(220 13% 8%) 0%, hsl(220 13% 12%) 50%, hsl(200 50% 15%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 13% 14%));
-    
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(220 13% 8%) 0%,
+      hsl(220 13% 12%) 50%,
+      hsl(200 50% 15%) 100%
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--card)),
+      hsl(220 13% 14%)
+    );
+
     /* Shadow system with glow effects */
     --shadow-card: 0 4px 20px -2px hsl(220 13% 4% / 0.3);
     --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
@@ -134,7 +147,7 @@
     background: var(--gradient-card);
     box-shadow: var(--shadow-card);
   }
-  
+
   .manga-card:hover {
     @apply scale-105;
     box-shadow: var(--shadow-glow);
@@ -151,7 +164,7 @@
     background: var(--gradient-primary);
     transition: var(--transition-smooth);
   }
-  
+
   .btn-glow:hover {
     box-shadow: var(--shadow-glow);
     transform: translateY(-2px);
@@ -166,13 +179,146 @@
   .nav-link {
     @apply relative;
   }
-  
+
   .nav-link::after {
     @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
-    content: '';
+    content: "";
   }
-  
+
   .nav-link:hover::after {
     @apply w-full;
+  }
+
+  /* ستايلات خاصة بصفحة القراءة */
+
+  /* إخفاء scrollbar في وضع القراءة */
+  .reader-container::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .reader-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .reader-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+
+  .reader-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  /* تحسين عرض الصور */
+  .reader-page-image {
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  /* تأثير التحميل المتدرج للصور */
+  .reader-page-image {
+    opacity: 0;
+    animation: fadeInImage 0.3s ease forwards;
+  }
+
+  @keyframes fadeInImage {
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* تحسين التمرير السلس */
+  html.reader-mode {
+    scroll-behavior: smooth;
+  }
+
+  /* تحسين أزرار التنقل */
+  .reader-nav-button {
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .reader-nav-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* تحسين dropdown القائمة */
+  .reader-chapter-dropdown {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .reader-chapter-dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .reader-chapter-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  /* تحسين عرض نهاية الفصل */
+  .chapter-end {
+    background: linear-gradient(
+      135deg,
+      rgba(17, 24, 39, 0.8),
+      rgba(31, 41, 55, 0.9)
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* تحسين Loading State */
+  .reader-loading {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* تحسين عرض رقم الصفحة */
+  .page-indicator {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 0.5rem;
+    transition: opacity 0.2s ease;
+  }
+
+  /* تحسين responsive للشاشات الصغيرة */
+  @media (max-width: 768px) {
+    .reader-controls {
+      padding: 0.75rem 1rem;
+    }
+
+    .chapter-end {
+      margin: 1rem;
+      padding: 2rem 1.5rem;
+    }
+  }
+
+  /* تحسين عرض الشاشة الكاملة */
+  @media (min-width: 1200px) {
+    .reader-page-image {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: block;
+    }
   }
 }
