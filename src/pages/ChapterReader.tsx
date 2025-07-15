@@ -399,7 +399,7 @@ const ChapterReader = () => {
                 <img
                   src={page?.url || "/placeholder.svg"}
                   alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
-                  className="w-full h-auto object-contain bg-gray-900"
+                  className="w-full h-auto object-contain bg-gray-900 reader-page-image"
                   loading={index < 2 ? "eager" : "lazy"}
                   style={{
                     maxHeight: "none",
