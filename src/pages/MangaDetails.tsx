@@ -103,28 +103,43 @@ const MangaDetails = () => {
 
       let query = supabase.from("manga").select("*");
 
-      if (type === "slug") {
-        console.log("Querying by slug:", value);
-        // محاولة البحث بـ slug أولاً
-        const { data: slugData, error: slugError } = await supabase
-          .from("manga")
-          .select("*")
-          .eq("slug", value)
-          .single();
+      // نحاول أولاً بـ ID (الطريقة القديمة المضمونة)
+      console.log("Trying to fetch by ID first:", value);
+      const { data: idData, error: idError } = await supabase
+        .from("manga")
+        .select("*")
+        .eq("id", value)
+        .single();
 
-        if (!slugError && slugData) {
-          console.log("Found manga by slug:", slugData.title);
-          setManga(slugData);
-          await trackMangaView(slugData.id);
-          return;
-        }
-
-        console.log("Slug not found, trying as ID:", slugError?.message);
-        query = query.eq("id", value);
-      } else {
-        console.log("Querying by ID:", value);
-        query = query.eq("id", value);
+      if (!idError && idData) {
+        console.log("Found manga by ID:", idData.title);
+        setManga(idData);
+        await trackMangaView(idData.id);
+        return;
       }
+
+      // إذا فشل بـ ID ونوع الإدخال slug، نحاول بـ slug
+      if (type === "slug") {
+        console.log("ID failed, trying by slug:", value);
+        try {
+          const { data: slugData, error: slugError } = await supabase
+            .from("manga")
+            .select("*")
+            .eq("slug", value)
+            .single();
+
+          if (!slugError && slugData) {
+            console.log("Found manga by slug:", slugData.title);
+            setManga(slugData);
+            await trackMangaView(slugData.id);
+            return;
+          }
+        } catch (slugError) {
+          console.log("Slug column might not exist:", slugError);
+        }
+      }
+
+      console.log("Both ID and slug failed:", { idError, value, type });
 
       const { data, error } = await query.single();
 
@@ -378,7 +393,7 @@ const MangaDetails = () => {
                     {manga.artist && manga.artist !== manga.author && (
                       <div className="flex items-center justify-center gap-2">
                         <User className="h-4 w-4" />
-                        ا��رسام: {manga.artist}
+                        الرسام: {manga.artist}
                       </div>
                     )}
                     {manga.release_year && (
