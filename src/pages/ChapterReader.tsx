@@ -234,7 +234,9 @@ const ChapterReader = () => {
         headers,
       });
     } catch (error) {
-      console.error("Error tracking chapter view:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Error tracking chapter view:", errorMessage);
     }
   };
 
