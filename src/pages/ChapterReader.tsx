@@ -8,6 +8,9 @@ import {
   Menu,
   X,
   Eye,
+  Minus,
+  Plus,
+  Monitor,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -460,7 +463,7 @@ const ChapterReader = () => {
         <div className="bg-black/80 backdrop-blur text-white text-xs p-3 rounded-lg border border-white/20">
           <div className="font-medium mb-2">اختصارات لوحة المفاتيح:</div>
           <div className="space-y-1">
-            <div>← / → : التنقل بين الفصول</div>
+            <div>�� / → : التنقل بين الفصول</div>
             <div>Space : تمرير الصفحة</div>
             <div>H : إخفاء/إظهار الأدوات</div>
             <div>Esc : العودة</div>
