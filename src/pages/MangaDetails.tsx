@@ -134,8 +134,37 @@ const MangaDetails = () => {
             await trackMangaView(slugData.id);
             return;
           }
+          console.log("Slug query failed:", slugError?.message);
         } catch (slugError) {
           console.log("Slug column might not exist:", slugError);
+        }
+
+        // آخر محاولة: البحث بالعنوان إذا كان slug مشتق من العنوان
+        console.log("Trying to find by title similarity for slug:", value);
+        try {
+          const { data: allManga, error: allMangaError } = await supabase
+            .from("manga")
+            .select("*");
+
+          if (!allMangaError && allManga) {
+            // البحث عن ��لمانجا التي slug المولد منها يطابق المطلوب
+            const foundManga = allManga.find((manga) => {
+              const generatedSlug = generateSlug(manga.title);
+              return generatedSlug === value;
+            });
+
+            if (foundManga) {
+              console.log(
+                "Found manga by title-generated slug:",
+                foundManga.title,
+              );
+              setManga(foundManga);
+              await trackMangaView(foundManga.id);
+              return;
+            }
+          }
+        } catch (titleError) {
+          console.log("Title search failed:", titleError);
         }
       }
 
@@ -276,7 +305,7 @@ const MangaDetails = () => {
 
       toast({
         title: "تم التحديث!",
-        description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل ��دفوع",
+        description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل مدفوع",
       });
 
       fetchChapters();
