@@ -139,20 +139,9 @@ const MangaDetails = () => {
         }
       }
 
-      console.log("Both ID and slug failed:", { idError, value, type });
-
-      const { data, error } = await query.single();
-
-      if (error) {
-        console.error("Database query error:", error);
-        throw error;
-      }
-
-      console.log("Found manga:", data?.title);
-      setManga(data);
-
-      // Track view using the new system
-      await trackMangaView(data.id);
+      // إذا فشلت كل المحاولات
+      console.error("Both ID and slug failed:", { idError, value, type });
+      throw new Error(`Manga not found: ${value}`);
     } catch (error: any) {
       console.error("Error fetching manga details:", error?.message || error);
     }
@@ -233,7 +222,7 @@ const MangaDetails = () => {
       case "manhwa":
         return "مانهوا";
       case "manhua":
-        return "مانها";
+        return "مانه��";
       default:
         return type;
     }
