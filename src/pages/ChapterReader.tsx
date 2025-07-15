@@ -230,7 +230,7 @@ const ChapterReader = () => {
   const mangaUrl = manga.slug ? `/manga/${manga.slug}` : `/manga/${manga.id}`;
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
+    <div className="min-h-screen bg-black text-white relative reader-container">
       {/* Top Header - Auto-hide */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
