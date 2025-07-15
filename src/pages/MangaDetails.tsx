@@ -140,7 +140,12 @@ const MangaDetails = () => {
       }
 
       // إذا فشلت كل المحاولات
-      console.error("Both ID and slug failed:", { idError, value, type });
+      console.error("Both ID and slug failed:", {
+        idErrorMessage: idError?.message || String(idError),
+        idErrorCode: idError?.code,
+        value,
+        type,
+      });
       throw new Error(`Manga not found: ${value}`);
     } catch (error: any) {
       console.error("Error fetching manga details:", error?.message || error);
@@ -271,7 +276,7 @@ const MangaDetails = () => {
 
       toast({
         title: "تم التحديث!",
-        description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل مدفوع",
+        description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل ��دفوع",
       });
 
       fetchChapters();
