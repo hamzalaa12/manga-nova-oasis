@@ -16,6 +16,10 @@ import {
   updateMangaSlugs,
   addSlugColumnIfMissing,
 } from "@/utils/updateMangaSlugs";
+import {
+  updateChapterSlugs,
+  addChapterSlugColumnIfMissing,
+} from "@/utils/updateChapterSlugs";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminPanel = () => {
