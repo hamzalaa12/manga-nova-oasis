@@ -416,7 +416,7 @@ const ChapterReader = () => {
 
             {/* End of Chapter Navigation */}
             <div className="py-12 text-center">
-              <div className="bg-gray-900/50 rounded-lg p-8 mx-4">
+              <div className="rounded-lg p-8 mx-4 chapter-end">
                 <h3 className="text-xl font-bold mb-4">
                   انتهى الفصل {chapter.chapter_number}
                 </h3>
