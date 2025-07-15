@@ -65,7 +65,7 @@ const MangaDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (slug) {
+    if (id) {
       fetchMangaDetails();
       fetchChapters();
     }
@@ -83,7 +83,7 @@ const MangaDetails = () => {
       setManga(data);
 
       // Track view using the new system
-    await trackMangaView(id);
+      await trackMangaView(id);
     } catch (error) {
       console.error('Error fetching manga details:', error);
     }
