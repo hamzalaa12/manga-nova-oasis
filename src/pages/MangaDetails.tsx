@@ -113,6 +113,14 @@ const MangaDetails = () => {
 
       if (!idError && idData) {
         console.log("Found manga by ID:", idData.title);
+
+        // إذا وُجد بـ ID وكان type === 'slug'، فهذا يعني أن المستخدم أدخل UUID كـ slug
+        // نعيد توجيهه للـ slug الصحيح إذا كان موجود
+        if (type === "slug" && idData.slug) {
+          console.log("Redirecting to proper slug URL:", idData.slug);
+          window.history.replaceState(null, "", `/manga/${idData.slug}`);
+        }
+
         setManga(idData);
         await trackMangaView(idData.id);
         return;
