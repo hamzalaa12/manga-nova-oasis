@@ -97,12 +97,17 @@ const MangaDetails = () => {
     try {
       if (!slug) return;
 
+      console.log("fetchMangaDetails: fetching for slug:", slug);
       const { type, value } = parseSlugOrId(slug);
+      console.log("parseSlugOrId result:", { type, value });
+
       let query = supabase.from("manga").select("*");
 
       if (type === "slug") {
+        console.log("Querying by slug:", value);
         query = query.eq("slug", value);
       } else {
+        console.log("Querying by ID:", value);
         // إذا كان ID قديم، إعادة توجيه للslug
         const { data: mangaData } = await supabase
           .from("manga")
@@ -111,6 +116,7 @@ const MangaDetails = () => {
           .single();
 
         if (mangaData?.slug) {
+          console.log("Found slug for old ID, redirecting to:", mangaData.slug);
           window.location.href = `/manga/${mangaData.slug}`;
           return;
         }
@@ -119,7 +125,28 @@ const MangaDetails = () => {
 
       const { data, error } = await query.single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database query error:", error);
+        // إذا فشل البحث بـ slug، نحاول البحث بـ ID كـ fallback
+        if (type === "slug") {
+          console.log("Slug query failed, trying as ID fallback");
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from("manga")
+            .select("*")
+            .eq("id", value)
+            .single();
+
+          if (!fallbackError && fallbackData) {
+            console.log("Found via ID fallback:", fallbackData.title);
+            setManga(fallbackData);
+            await trackMangaView(fallbackData.id);
+            return;
+          }
+        }
+        throw error;
+      }
+
+      console.log("Found manga:", data?.title);
       setManga(data);
 
       // Track view using the new system
