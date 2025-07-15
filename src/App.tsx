@@ -31,6 +31,7 @@ function App() {
           <Route path="/read/:id" element={<ChapterReader />} />
           <Route path="/test-slugs" element={<TestSlugs />} />
           <Route path="/all-manga" element={<AllManga />} />
+          <Route path="/health-check" element={<HealthCheck />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>
