@@ -130,22 +130,6 @@ const MangaDetails = () => {
 
       if (error) {
         console.error("Database query error:", error);
-        // إذا فشل البحث بـ slug، نحاول البحث بـ ID كـ fallback
-        if (type === "slug") {
-          console.log("Slug query failed, trying as ID fallback");
-          const { data: fallbackData, error: fallbackError } = await supabase
-            .from("manga")
-            .select("*")
-            .eq("id", value)
-            .single();
-
-          if (!fallbackError && fallbackData) {
-            console.log("Found via ID fallback:", fallbackData.title);
-            setManga(fallbackData);
-            await trackMangaView(fallbackData.id);
-            return;
-          }
-        }
         throw error;
       }
 
@@ -394,7 +378,7 @@ const MangaDetails = () => {
                     {manga.artist && manga.artist !== manga.author && (
                       <div className="flex items-center justify-center gap-2">
                         <User className="h-4 w-4" />
-                        الرسام: {manga.artist}
+                        ا��رسام: {manga.artist}
                       </div>
                     )}
                     {manga.release_year && (
