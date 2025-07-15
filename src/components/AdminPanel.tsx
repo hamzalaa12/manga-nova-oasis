@@ -56,7 +56,7 @@ const AdminPanel = () => {
       console.error("Error updating slugs:", error);
       toast({
         title: "خطأ",
-        description: "فشل في تحديث روابط المانجا",
+        description: "فشل في تحديث روابط ال��انجا",
         variant: "destructive",
       });
     } finally {
@@ -106,6 +106,20 @@ const AdminPanel = () => {
           <AddChapterForm onSuccess={() => setOpenChapterDialog(false)} />
         </DialogContent>
       </Dialog>
+
+      {/* زر تحديث Slugs */}
+      <Button
+        onClick={handleUpdateSlugs}
+        disabled={updatingSlugs}
+        size="lg"
+        variant="outline"
+        className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <RefreshCw
+          className={`h-5 w-5 ml-2 ${updatingSlugs ? "animate-spin" : ""}`}
+        />
+        {updatingSlugs ? "جاري التحديث..." : "تحديث روابط SEO"}
+      </Button>
     </div>
   );
 };
