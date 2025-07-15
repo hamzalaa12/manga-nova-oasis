@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { parseSlugOrId } from "@/lib/slug";
+import { parseSlugOrId, generateSlug } from "@/lib/slug";
 import {
   ArrowRight,
   Calendar,
