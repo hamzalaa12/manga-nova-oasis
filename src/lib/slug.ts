@@ -50,3 +50,44 @@ export function parseSlugOrId(slugOrId: string): {
 
   return { type: "slug", value: slugOrId };
 }
+
+/**
+ * توليد slug للفصل
+ * @param title عنوان الفصل (اختياري)
+ * @param chapterNumber رقم الفصل
+ * @returns slug منسق للفصل
+ */
+export function generateChapterSlug(
+  title: string | null,
+  chapterNumber: number,
+): string {
+  if (title && title.trim()) {
+    const titleSlug = generateSlug(title);
+    return titleSlug === "manga" ? `chapter-${chapterNumber}` : titleSlug;
+  }
+  return `chapter-${chapterNumber}`;
+}
+
+/**
+ * بناء URL للمانجا باستخدام slug مع fallback للID
+ * @param manga object المانجا
+ * @returns URL string
+ */
+export function buildMangaUrl(manga: { id: string; slug?: string }): string {
+  return manga.slug ? `/manga/${manga.slug}` : `/manga/${manga.id}`;
+}
+
+/**
+ * بناء URL للفصل باستخدام slug مع fallback للID
+ * @param chapter object الفصل
+ * @param manga object المانجا
+ * @returns URL string
+ */
+export function buildChapterUrl(
+  chapter: { id: string; slug?: string },
+  manga: { id: string; slug?: string },
+): string {
+  const mangaSlug = manga.slug || manga.id;
+  const chapterSlug = chapter.slug || chapter.id;
+  return `/read/${mangaSlug}/${chapterSlug}`;
+}
