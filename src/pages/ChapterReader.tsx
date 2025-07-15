@@ -262,10 +262,12 @@ const ChapterReader = () => {
           navigate(-1);
           break;
         case "ArrowRight":
-          if (nextChapter) navigate(`/read/${nextChapter.id}`);
+          if (nextChapter && manga)
+            navigate(buildChapterUrl(nextChapter, manga));
           break;
         case "ArrowLeft":
-          if (previousChapter) navigate(`/read/${previousChapter.id}`);
+          if (previousChapter && manga)
+            navigate(buildChapterUrl(previousChapter, manga));
           break;
         case " ":
           event.preventDefault();
