@@ -105,21 +105,24 @@ const MangaDetails = () => {
 
       if (type === "slug") {
         console.log("Querying by slug:", value);
-        query = query.eq("slug", value);
-      } else {
-        console.log("Querying by ID:", value);
-        // إذا كان ID قديم، إعادة توجيه للslug
-        const { data: mangaData } = await supabase
+        // محاولة البحث بـ slug أولاً
+        const { data: slugData, error: slugError } = await supabase
           .from("manga")
-          .select("slug")
-          .eq("id", value)
+          .select("*")
+          .eq("slug", value)
           .single();
 
-        if (mangaData?.slug) {
-          console.log("Found slug for old ID, redirecting to:", mangaData.slug);
-          window.location.href = `/manga/${mangaData.slug}`;
+        if (!slugError && slugData) {
+          console.log("Found manga by slug:", slugData.title);
+          setManga(slugData);
+          await trackMangaView(slugData.id);
           return;
         }
+
+        console.log("Slug not found, trying as ID:", slugError?.message);
+        query = query.eq("id", value);
+      } else {
+        console.log("Querying by ID:", value);
         query = query.eq("id", value);
       }
 
