@@ -9,6 +9,11 @@ import MangaByType from "./pages/MangaByType";
 import MangaByGenre from "./pages/MangaByGenre";
 import ChapterReader from "./pages/ChapterReader";
 import NotFound from "./pages/NotFound";
+import MangaRedirect from "./components/MangaRedirect";
+import ChapterRedirect from "./components/ChapterRedirect";
+import TestSlugs from "./pages/TestSlugs";
+import AllManga from "./pages/AllManga";
+import HealthCheck from "./pages/HealthCheck";
 
 const queryClient = new QueryClient();
 
@@ -20,10 +25,19 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/manga/:id" element={<MangaDetails />} />
+          <Route path="/manga/:slug" element={<MangaDetails />} />
+          <Route path="/manga/id/:id" element={<MangaRedirect />} />
           <Route path="/type/:type" element={<MangaByType />} />
           <Route path="/genre/:genre" element={<MangaByGenre />} />
+          <Route
+            path="/read/:mangaSlug/:chapterSlug"
+            element={<ChapterReader />}
+          />
           <Route path="/read/:id" element={<ChapterReader />} />
+          <Route path="/chapter/:id" element={<ChapterRedirect />} />
+          <Route path="/test-slugs" element={<TestSlugs />} />
+          <Route path="/all-manga" element={<AllManga />} />
+          <Route path="/health-check" element={<HealthCheck />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </TooltipProvider>

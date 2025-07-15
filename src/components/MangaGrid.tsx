@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import MangaCard from './MangaCard';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from "react";
+import MangaCard from "./MangaCard";
+import { supabase } from "@/integrations/supabase/client";
+import { generateSlug } from "@/lib/slug";
 
 interface MangaGridProps {
   title?: string;
@@ -9,6 +10,7 @@ interface MangaGridProps {
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
   cover_image_url: string;
   rating: number;
@@ -19,7 +21,10 @@ interface Manga {
   manga_type: string;
 }
 
-const MangaGrid = ({ title = 'الأحدث والأكثر شعبية', showAll = false }: MangaGridProps) => {
+const MangaGrid = ({
+  title = "الأحدث والأكثر شعبية",
+  showAll = false,
+}: MangaGridProps) => {
   const [mangaData, setMangaData] = useState<Manga[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,15 +35,15 @@ const MangaGrid = ({ title = 'الأحدث والأكثر شعبية', showAll =
   const fetchManga = async () => {
     try {
       const { data, error } = await supabase
-        .from('manga')
-        .select('*')
-        .order('updated_at', { ascending: false })
+        .from("manga")
+        .select("*")
+        .order("updated_at", { ascending: false })
         .limit(showAll ? 100 : 12);
 
       if (error) throw error;
       setMangaData(data || []);
     } catch (error) {
-      console.error('Error fetching manga:', error);
+      console.error("Error fetching manga:", error);
     } finally {
       setLoading(false);
     }
@@ -57,18 +62,23 @@ const MangaGrid = ({ title = 'الأحدث والأكثر شعبية', showAll =
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffDays > 0) return `منذ ${diffDays} يوم`;
+    if (diffDays > 0) return `من�� ${diffDays} يوم`;
     if (diffHours > 0) return `منذ ${diffHours} ساعة`;
-    return 'منذ دقائق';
+    return "منذ دقائق";
   };
 
   const getStatusInArabic = (status: string) => {
     switch (status) {
-      case 'ongoing': return 'مستمر';
-      case 'completed': return 'مكتمل';
-      case 'hiatus': return 'متوقف مؤقتاً';
-      case 'cancelled': return 'ملغي';
-      default: return status;
+      case "ongoing":
+        return "مستمر";
+      case "completed":
+        return "مكتمل";
+      case "hiatus":
+        return "متوقف مؤقتاً";
+      case "cancelled":
+        return "ملغي";
+      default:
+        return status;
     }
   };
 
@@ -108,14 +118,15 @@ const MangaGrid = ({ title = 'الأحدث والأكثر شعبية', showAll =
             </button>
           )}
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
           {displayData.map((manga) => (
             <MangaCard
               key={manga.id}
               id={manga.id}
+              slug={manga.slug || generateSlug(manga.title)}
               title={manga.title}
-              cover={manga.cover_image_url || '/placeholder.svg'}
+              cover={manga.cover_image_url || "/placeholder.svg"}
               rating={manga.rating}
               views={formatViews(manga.views_count)}
               status={getStatusInArabic(manga.status)}
