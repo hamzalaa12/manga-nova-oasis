@@ -11,6 +11,7 @@ import ChapterReader from "./pages/ChapterReader";
 import NotFound from "./pages/NotFound";
 import MangaRedirect from "./components/MangaRedirect";
 import TestSlugs from "./pages/TestSlugs";
+import AllManga from "./pages/AllManga";
 
 const queryClient = new QueryClient();
 
