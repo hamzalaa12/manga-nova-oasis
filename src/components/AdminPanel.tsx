@@ -56,7 +56,7 @@ const AdminPanel = () => {
       console.error("Error updating slugs:", error);
       toast({
         title: "خطأ",
-        description: "فشل في تحديث روابط ال��انجا",
+        description: "فشل في تحديث روابط المانجا",
         variant: "destructive",
       });
     } finally {
@@ -120,6 +120,34 @@ const AdminPanel = () => {
         />
         {updatingSlugs ? "جاري التحديث..." : "تحديث روابط SEO"}
       </Button>
+
+      {/* روابط سريعة للإدارة */}
+      <div className="flex flex-col gap-2">
+        <Button
+          asChild
+          size="sm"
+          variant="ghost"
+          className="rounded-full shadow-md"
+        >
+          <Link to="/health-check">فحص الموقع</Link>
+        </Button>
+        <Button
+          asChild
+          size="sm"
+          variant="ghost"
+          className="rounded-full shadow-md"
+        >
+          <Link to="/all-manga">جميع المانجا</Link>
+        </Button>
+        <Button
+          asChild
+          size="sm"
+          variant="ghost"
+          className="rounded-full shadow-md"
+        >
+          <Link to="/test-slugs">اختبار Slugs</Link>
+        </Button>
+      </div>
     </div>
   );
 };
