@@ -50,7 +50,7 @@ const MangaByGenre = () => {
     drama: "دراما",
     horror: "رعب",
     mystery: "غموض",
-    scifi: "خيال علمي",
+    scifi: "خيال ع��مي",
     sports: "رياضة",
   };
 
@@ -210,7 +210,7 @@ const MangaByGenre = () => {
               <MangaCard
                 key={item.id}
                 id={item.id}
-                slug={item.slug}
+                slug={item.slug || generateSlug(item.title)}
                 title={item.title}
                 cover={item.cover_image_url}
                 rating={item.rating || 0}
