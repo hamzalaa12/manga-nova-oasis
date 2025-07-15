@@ -245,7 +245,7 @@ const ChapterReader = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:bg-white/20 gap-2"
+                  className="text-white hover:bg-white/20 gap-2 reader-nav-button"
                 >
                   <ArrowRight className="h-4 w-4" />
                   عودة
