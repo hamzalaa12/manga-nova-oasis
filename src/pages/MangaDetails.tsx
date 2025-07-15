@@ -89,7 +89,8 @@ const MangaDetails = () => {
       console.log("useEffect: manga loaded, fetching chapters for:", manga.id);
       fetchChapters();
     } else {
-      console.log("useEffect: manga not loaded yet");
+      console.log("useEffect: manga not loaded yet or not found");
+      setLoading(false); // تأكد من إيقاف loading إذا لم يتم العثور على manga
     }
   }, [manga?.id]);
 
@@ -126,7 +127,7 @@ const MangaDetails = () => {
         return;
       }
 
-      // إ��ا فشل بـ ID ونوع الإدخال slug، نحاول بـ slug
+      // إذا فشل بـ ID ونوع الإدخال slug، نحاول بـ slug
       if (type === "slug") {
         console.log("ID failed, trying by slug:", value);
         try {
