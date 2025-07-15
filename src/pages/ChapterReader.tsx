@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SearchableTitle } from "@/components/SearchableTitle";
 import { supabase } from "@/integrations/supabase/client";
 import {
   parseSlugOrId,
