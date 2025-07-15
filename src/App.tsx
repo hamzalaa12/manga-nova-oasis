@@ -10,6 +10,7 @@ import MangaByGenre from "./pages/MangaByGenre";
 import ChapterReader from "./pages/ChapterReader";
 import NotFound from "./pages/NotFound";
 import MangaRedirect from "./components/MangaRedirect";
+import ChapterRedirect from "./components/ChapterRedirect";
 import TestSlugs from "./pages/TestSlugs";
 import AllManga from "./pages/AllManga";
 import HealthCheck from "./pages/HealthCheck";
