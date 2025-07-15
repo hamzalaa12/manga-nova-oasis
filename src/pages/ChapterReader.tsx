@@ -206,7 +206,10 @@ const ChapterReader = () => {
       // Track view
       await trackChapterView(chapterData.id);
     } catch (error) {
-      console.error("Error fetching chapter details:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Error fetching chapter details:", errorMessage);
+      console.error("Full error object:", error);
     } finally {
       setLoading(false);
     }
