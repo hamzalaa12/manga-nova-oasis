@@ -52,7 +52,7 @@ const AdminPanel = () => {
       await updateMangaSlugs();
 
       toast({
-        title: "تم التحديث!",
+        title: "تم ��لتحديث!",
         description: "تم تحديث روابط المانجا بنجاح",
       });
 
@@ -67,6 +67,46 @@ const AdminPanel = () => {
       });
     } finally {
       setUpdatingSlugs(false);
+    }
+  };
+
+  const handleUpdateChapterSlugs = async () => {
+    setUpdatingChapterSlugs(true);
+    try {
+      toast({
+        title: "بدء التحديث",
+        description: "جاري تحديث روابط الفصول...",
+      });
+
+      const columnExists = await addChapterSlugColumnIfMissing();
+      if (!columnExists) {
+        toast({
+          title: "خطأ",
+          description:
+            "حقل slug غير موجود في جدول الفصول. يجب تطبيق migration أولاً.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await updateChapterSlugs();
+
+      toast({
+        title: "تم التحديث!",
+        description: "تم تحديث روابط الفصول بنجاح",
+      });
+
+      // إعادة تحميل الصفحة لتطبيق التغييرات
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating chapter slugs:", error);
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث روابط الفصول",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingChapterSlugs(false);
     }
   };
 
