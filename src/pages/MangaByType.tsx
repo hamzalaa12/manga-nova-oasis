@@ -49,7 +49,7 @@ const MangaByType = () => {
     "Action",
     "رومانسية",
     "Romance",
-    "كوميديا",
+    "كوميدي��",
     "Comedy",
     "دراما",
     "Drama",
@@ -112,7 +112,7 @@ const MangaByType = () => {
   };
 
   const currentTypeName =
-    typeNames[type as keyof typeof typeNames] || "جميع القصص";
+    typeNames[type as keyof typeof typeNames] || "جميع ا��قصص";
 
   useEffect(() => {
     fetchMangaByType();
@@ -300,7 +300,7 @@ const MangaByType = () => {
               <MangaCard
                 key={item.id}
                 id={item.id}
-                slug={item.slug}
+                slug={item.slug || generateSlug(item.title)}
                 title={item.title}
                 cover={item.cover_image_url}
                 rating={item.rating || 0}
