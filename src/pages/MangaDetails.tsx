@@ -529,7 +529,10 @@ const MangaDetails = () => {
                         className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex items-center justify-between">
-                          <Link to={`/read/${chapter.id}`} className="flex-1">
+                          <Link
+                            to={buildChapterUrl(chapter, manga)}
+                            className="flex-1"
+                          >
                             <div>
                               <div className="flex items-center gap-2 mb-1">
                                 <h3 className="font-medium">
