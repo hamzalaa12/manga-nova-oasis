@@ -92,15 +92,22 @@ const MangaDetails = () => {
 
   const fetchMangaDetails = async () => {
     try {
-      if (!slug) return;
+      const paramValue = slug || id;
+      if (!paramValue) return;
 
-      const { type, value } = parseSlugOrId(slug);
       let query = supabase.from("manga").select("*");
 
-      if (type === "slug") {
-        query = query.eq("slug", value);
-      } else {
-        query = query.eq("id", value);
+      if (id) {
+        // إذا كان route مباشر للID
+        query = query.eq("id", id);
+      } else if (slug) {
+        // إذا كان slug، نحتاج لفحص النوع
+        const { type, value } = parseSlugOrId(slug);
+        if (type === "slug") {
+          query = query.eq("slug", value);
+        } else {
+          query = query.eq("id", value);
+        }
       }
 
       const { data, error } = await query.single();
