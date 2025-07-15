@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import MangaRedirect from "./components/MangaRedirect";
 import TestSlugs from "./pages/TestSlugs";
 import AllManga from "./pages/AllManga";
+import HealthCheck from "./pages/HealthCheck";
 
 const queryClient = new QueryClient();
 
