@@ -79,10 +79,10 @@ const MangaDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (slug || id) {
+    if (slug) {
       fetchMangaDetails();
     }
-  }, [slug, id]);
+  }, [slug]);
 
   useEffect(() => {
     if (manga?.id) {
