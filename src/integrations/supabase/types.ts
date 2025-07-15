@@ -42,6 +42,7 @@ export type Database = {
           manga_id: string;
           pages?: Json[] | null;
           price?: number | null;
+          slug?: string;
           title?: string | null;
           updated_at?: string;
           views_count?: number | null;
