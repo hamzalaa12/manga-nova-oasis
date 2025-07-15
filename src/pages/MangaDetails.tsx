@@ -153,18 +153,27 @@ const MangaDetails = () => {
 
   const fetchChapters = async () => {
     try {
-      if (!manga?.id) return;
+      if (!manga?.id) {
+        console.log("fetchChapters: manga.id not available yet");
+        return;
+      }
 
+      console.log("fetchChapters: fetching chapters for manga_id:", manga.id);
       const { data, error } = await supabase
         .from("chapters")
         .select("*")
         .eq("manga_id", manga.id)
         .order("chapter_number", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error.message, error);
+        throw error;
+      }
+
+      console.log("fetchChapters: found", data?.length || 0, "chapters");
       setChapters(data || []);
-    } catch (error) {
-      console.error("Error fetching chapters:", error);
+    } catch (error: any) {
+      console.error("Error fetching chapters:", error?.message || error);
     } finally {
       setLoading(false);
     }
