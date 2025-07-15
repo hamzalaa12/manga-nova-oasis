@@ -81,9 +81,14 @@ const MangaDetails = () => {
   useEffect(() => {
     if (slug) {
       fetchMangaDetails();
-      fetchChapters();
     }
   }, [slug]);
+
+  useEffect(() => {
+    if (manga?.id) {
+      fetchChapters();
+    }
+  }, [manga?.id]);
 
   const fetchMangaDetails = async () => {
     try {
