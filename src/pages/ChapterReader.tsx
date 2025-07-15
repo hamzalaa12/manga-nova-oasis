@@ -62,10 +62,10 @@ const ChapterReader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
-    if (id) {
+    if (id || (mangaSlug && chapterSlug)) {
       fetchChapterDetails();
     }
-  }, [id]);
+  }, [id, mangaSlug, chapterSlug]);
 
   // Scroll detection for hiding/showing controls
   useEffect(() => {
