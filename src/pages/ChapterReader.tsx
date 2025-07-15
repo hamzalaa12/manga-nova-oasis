@@ -31,12 +31,14 @@ interface Chapter {
   description: string;
   pages: any[];
   views_count: number;
+  slug?: string;
 }
 
 interface ChapterNav {
   id: string;
   chapter_number: number;
   title: string;
+  slug?: string;
 }
 
 interface Manga {
