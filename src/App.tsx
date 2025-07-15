@@ -9,6 +9,7 @@ import MangaByType from "./pages/MangaByType";
 import MangaByGenre from "./pages/MangaByGenre";
 import ChapterReader from "./pages/ChapterReader";
 import NotFound from "./pages/NotFound";
+import MangaRedirect from "./components/MangaRedirect";
 
 const queryClient = new QueryClient();
 
