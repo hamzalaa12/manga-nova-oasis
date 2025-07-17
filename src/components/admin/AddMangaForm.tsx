@@ -100,7 +100,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "عائلي",
     "أطفال",
     "كبار السن",
-    "فقدان الذاكرة",
+    "فقدان الذا��رة",
     "سفر",
     "حب أول",
     "حب مثلثي",
@@ -156,7 +156,6 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "بحث عن القوة",
     "تدريب قاس",
     "منافسة",
-    "بطولة",
     "حلبة قتال",
   ];
 
