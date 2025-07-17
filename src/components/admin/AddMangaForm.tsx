@@ -33,6 +33,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
   });
   const [genres, setGenres] = useState<string[]>([]);
   const [newGenre, setNewGenre] = useState("");
+  const [genreSearch, setGenreSearch] = useState("");
 
   const availableGenres = [
     "أكشن",
@@ -137,7 +138,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "جن",
     "عفاريت",
     "أشباح",
-    "أرواح شريرة",
+    "أرواح ��ريرة",
     "قوى خاصة",
     "طاقة",
     "تشاكرا",
@@ -339,31 +340,56 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
             </Badge>
           ))}
         </div>
-        <div className="flex gap-2">
-          <Select value={newGenre} onValueChange={setNewGenre}>
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="اختر تصنيف" />
-            </SelectTrigger>
-            <SelectContent className="max-h-60 overflow-y-auto">
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="ابحث عن تصنيف..."
+              value={genreSearch}
+              onChange={(e) => setGenreSearch(e.target.value)}
+              className="flex-1"
+            />
+          </div>
+
+          <div className="max-h-48 overflow-y-auto border rounded-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 p-3">
               {availableGenres
-                .filter((genre) => !genres.includes(genre))
+                .filter(
+                  (genre) =>
+                    !genres.includes(genre) &&
+                    genre.toLowerCase().includes(genreSearch.toLowerCase()),
+                )
                 .map((genre) => (
-                  <SelectItem key={genre} value={genre}>
+                  <Button
+                    key={genre}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      addGenre(genre);
+                      setGenreSearch("");
+                    }}
+                    className="text-right justify-start h-auto py-2 px-3 text-xs"
+                  >
                     {genre}
-                  </SelectItem>
+                  </Button>
                 ))}
-            </SelectContent>
-          </Select>
-          <Button
-            type="button"
-            onClick={() => addGenre(newGenre)}
-            disabled={!newGenre}
-          >
-            إضافة
-          </Button>
+            </div>
+            {availableGenres.filter(
+              (genre) =>
+                !genres.includes(genre) &&
+                genre.toLowerCase().includes(genreSearch.toLowerCase()),
+            ).length === 0 && (
+              <div className="text-center text-muted-foreground py-4 text-sm">
+                {genreSearch
+                  ? "لا توجد تصنيفات مطابقة"
+                  : "جميع التصنيفات مضافة"}
+              </div>
+            )}
+          </div>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
-          يمكنك اختيار عدة تصنيفات للمانجا - تم إضافة أكثر من 80 تصنيف مختلف
+          يمكنك البحث والنقر على التصنيفات لإضافتها - أكثر من 80 تصنيف متاح
         </p>
       </div>
 
