@@ -1,12 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { X, Plus, Upload, Link, FolderOpen } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { X, Plus, Upload, Link, FolderOpen } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddChapterFormProps {
   onSuccess: () => void;
@@ -19,7 +25,7 @@ interface Manga {
 }
 
 interface PageItem {
-  type: 'url' | 'file';
+  type: "url" | "file";
   url?: string;
   file?: File;
   preview?: string;
@@ -30,12 +36,12 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [mangaList, setMangaList] = useState<Manga[]>([]);
   const [formData, setFormData] = useState({
-    mangaId: '',
-    chapterNumber: '',
-    title: '',
-    description: '',
+    mangaId: "",
+    chapterNumber: "",
+    title: "",
+    description: "",
   });
-  const [pages, setPages] = useState<PageItem[]>([{ type: 'url', url: '' }]);
+  const [pages, setPages] = useState<PageItem[]>([{ type: "url", url: "" }]);
 
   useEffect(() => {
     fetchMangaList();
@@ -44,23 +50,23 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   const fetchMangaList = async () => {
     try {
       const { data, error } = await supabase
-        .from('manga')
-        .select('id, title, manga_type')
-        .order('title');
+        .from("manga")
+        .select("id, title, manga_type")
+        .order("title");
 
       if (error) throw error;
       setMangaList(data || []);
     } catch (error: any) {
       toast({
-        title: 'خطأ',
-        description: 'فشل في تحميل قائمة المانجا',
-        variant: 'destructive',
+        title: "خطأ",
+        description: "فشل في تحميل قائمة المانجا",
+        variant: "destructive",
       });
     }
   };
 
   const addPage = () => {
-    setPages([...pages, { type: 'url', url: '' }]);
+    setPages([...pages, { type: "url", url: "" }]);
   };
 
   const removePage = (index: number) => {
@@ -71,7 +77,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
 
   const updatePageUrl = (index: number, url: string) => {
     const newPages = [...pages];
-    newPages[index] = { ...newPages[index], type: 'url', url };
+    newPages[index] = { ...newPages[index], type: "url", url };
     setPages(newPages);
   };
 
@@ -79,9 +85,9 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     const newPages = [...pages];
     if (file) {
       const preview = URL.createObjectURL(file);
-      newPages[index] = { type: 'file', file, preview };
+      newPages[index] = { type: "file", file, preview };
     } else {
-      newPages[index] = { type: 'url', url: '' };
+      newPages[index] = { type: "url", url: "" };
     }
     setPages(newPages);
   };
@@ -89,45 +95,45 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   const togglePageType = (index: number) => {
     const newPages = [...pages];
     const currentPage = newPages[index];
-    if (currentPage.type === 'url') {
-      newPages[index] = { type: 'file' };
+    if (currentPage.type === "url") {
+      newPages[index] = { type: "file" };
     } else {
-      newPages[index] = { type: 'url', url: '' };
+      newPages[index] = { type: "url", url: "" };
     }
     setPages(newPages);
   };
 
   const handleMultipleFiles = (files: FileList | null) => {
     if (!files) return;
-    
+
     const fileArray = Array.from(files);
     const newPages: PageItem[] = fileArray.map((file) => ({
-      type: 'file',
+      type: "file",
       file,
-      preview: URL.createObjectURL(file)
+      preview: URL.createObjectURL(file),
     }));
-    
+
     setPages(newPages);
-    
+
     toast({
-      title: 'تم تحديد الملفات',
+      title: "تم تحديد الملفات",
       description: `تم تحديد ${fileArray.length} صفحة`,
     });
   };
 
   const uploadFile = async (file: File, index: number): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
+    const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}-${index}.${fileExt}`;
     const filePath = `${formData.mangaId}/${formData.chapterNumber}/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
-      .from('chapter-images')
+      .from("chapter-images")
       .upload(filePath, file);
 
     if (uploadError) throw uploadError;
 
     const { data } = supabase.storage
-      .from('chapter-images')
+      .from("chapter-images")
       .getPublicUrl(filePath);
 
     return data.publicUrl;
@@ -138,60 +144,114 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     setIsLoading(true);
 
     try {
+      // Validate form data
+      if (!formData.mangaId) {
+        throw new Error("يجب اختيار مانجا");
+      }
+      if (!formData.chapterNumber || parseFloat(formData.chapterNumber) <= 0) {
+        throw new Error("يجب إدخال رقم فصل صحيح");
+      }
+
+      // Check if chapter number already exists
+      const { data: existingChapter, error: checkError } = await supabase
+        .from("chapters")
+        .select("id")
+        .eq("manga_id", formData.mangaId)
+        .eq("chapter_number", parseFloat(formData.chapterNumber))
+        .single();
+
+      if (checkError && checkError.code !== "PGRST116") {
+        throw checkError;
+      }
+
+      if (existingChapter) {
+        throw new Error(`الفصل رقم ${formData.chapterNumber} موجود بالفعل`);
+      }
+
       // Process pages - upload files and get URLs
       const pageUrls = [];
-      
+
       for (let i = 0; i < pages.length; i++) {
         const page = pages[i];
-        
-        if (page.type === 'file' && page.file) {
-          // Upload file and get URL
-          const url = await uploadFile(page.file, i);
-          pageUrls.push({ url });
-        } else if (page.type === 'url' && page.url && page.url.trim() !== '') {
-          // Use existing URL
-          pageUrls.push({ url: page.url });
+
+        if (page.type === "file" && page.file) {
+          try {
+            // Upload file and get URL
+            const url = await uploadFile(page.file, i);
+            pageUrls.push({ url });
+          } catch (uploadError: any) {
+            throw new Error(
+              `فشل في رفع الصفحة ${i + 1}: ${uploadError.message}`,
+            );
+          }
+        } else if (page.type === "url" && page.url && page.url.trim() !== "") {
+          // Validate URL format
+          try {
+            new URL(page.url);
+            pageUrls.push({ url: page.url.trim() });
+          } catch {
+            throw new Error(`رابط الصفحة ${i + 1} غير صحيح`);
+          }
         }
       }
-      
+
       if (pageUrls.length === 0) {
-        throw new Error('يجب إضافة صفحة واحدة على الأقل');
+        throw new Error("يجب إضافة صفحة واحدة على الأقل");
       }
 
-      const { error } = await supabase
-        .from('chapters')
-        .insert({
-          manga_id: formData.mangaId,
-          chapter_number: parseFloat(formData.chapterNumber),
-          title: formData.title,
-          description: formData.description,
-          pages: pageUrls,
-        });
+      // Insert chapter
+      const { error } = await supabase.from("chapters").insert({
+        manga_id: formData.mangaId,
+        chapter_number: parseFloat(formData.chapterNumber),
+        title: formData.title.trim() || null,
+        description: formData.description.trim() || null,
+        pages: pageUrls,
+      });
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505") {
+          throw new Error("رقم الفصل موجود بالفعل");
+        }
+        throw error;
+      }
+
+      // Reset form
+      setFormData({
+        mangaId: "",
+        chapterNumber: "",
+        title: "",
+        description: "",
+      });
+      setPages([{ type: "url", url: "" }]);
 
       toast({
-        title: 'تم بنجاح!',
-        description: 'تم إضافة الفصل بنجاح',
+        title: "تم بنجاح!",
+        description: "تم إضافة الفصل بنجاح",
       });
 
       onSuccess();
     } catch (error: any) {
+      console.error("Chapter creation error:", error);
       toast({
-        title: 'خطأ',
-        description: error.message,
-        variant: 'destructive',
+        title: "خطأ",
+        description: error.message || "حدث خطأ غير متوقع",
+        variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium mb-2">اختر المانجا *</label>
-        <Select value={formData.mangaId} onValueChange={(value) => setFormData({ ...formData, mangaId: value })}>
+        <Select
+          value={formData.mangaId}
+          onValueChange={(value) =>
+            setFormData({ ...formData, mangaId: value })
+          }
+        >
           <SelectTrigger>
             <SelectValue placeholder="اختر مانجا/مانهوا/مانها" />
           </SelectTrigger>
@@ -217,18 +277,24 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
             type="number"
             step="0.1"
             value={formData.chapterNumber}
-            onChange={(e) => setFormData({ ...formData, chapterNumber: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, chapterNumber: e.target.value })
+            }
             placeholder="1.0"
             required
           />
         </div>
-        
+
         <div>
-          <label className="block text-sm font-medium mb-2">عنوان الفصل</label>
+          <label className="block text-sm font-medium mb-2">
+            عنوان الفصل (اختياري)
+          </label>
           <Input
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="عنوان الفصل (اختياري)"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
+            placeholder="عنوان الفصل - سيظهر في المنتصف إذا تم إضافته"
           />
         </div>
       </div>
@@ -237,7 +303,9 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
         <label className="block text-sm font-medium mb-2">وصف الفصل</label>
         <Textarea
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
           rows={3}
           placeholder="وصف مختصر للفصل (اختياري)"
         />
@@ -261,7 +329,10 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                 id="multiple-files"
               />
               <Button type="button" size="sm" asChild>
-                <label htmlFor="multiple-files" className="cursor-pointer flex items-center">
+                <label
+                  htmlFor="multiple-files"
+                  className="cursor-pointer flex items-center"
+                >
                   <FolderOpen className="h-4 w-4 ml-1" />
                   رفع جميع الصفحات
                 </label>
@@ -269,21 +340,19 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
             </div>
           </div>
         </div>
-        
+
         {pages.length > 0 && (
           <div className="mb-4 p-3 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">
               إجمالي الصفحات: {pages.length}
-              {pages.filter(p => p.type === 'file').length > 0 && 
-                ` | ملفات: ${pages.filter(p => p.type === 'file').length}`
-              }
-              {pages.filter(p => p.type === 'url' && p.url).length > 0 && 
-                ` | روابط: ${pages.filter(p => p.type === 'url' && p.url).length}`
-              }
+              {pages.filter((p) => p.type === "file").length > 0 &&
+                ` | ملفات: ${pages.filter((p) => p.type === "file").length}`}
+              {pages.filter((p) => p.type === "url" && p.url).length > 0 &&
+                ` | روابط: ${pages.filter((p) => p.type === "url" && p.url).length}`}
             </p>
           </div>
         )}
-        
+
         <div className="space-y-4">
           {pages.map((page, index) => (
             <div key={index} className="border rounded-lg p-4 space-y-3">
@@ -296,8 +365,12 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                     size="sm"
                     variant="outline"
                   >
-                    {page.type === 'url' ? <Upload className="h-4 w-4" /> : <Link className="h-4 w-4" />}
-                    {page.type === 'url' ? 'رفع ملف' : 'رابط'}
+                    {page.type === "url" ? (
+                      <Upload className="h-4 w-4" />
+                    ) : (
+                      <Link className="h-4 w-4" />
+                    )}
+                    {page.type === "url" ? "رفع ملف" : "رابط"}
                   </Button>
                   {pages.length > 1 && (
                     <Button
@@ -311,10 +384,10 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                   )}
                 </div>
               </div>
-              
-              {page.type === 'url' ? (
+
+              {page.type === "url" ? (
                 <Input
-                  value={page.url || ''}
+                  value={page.url || ""}
                   onChange={(e) => updatePageUrl(index, e.target.value)}
                   placeholder={`رابط الصفحة ${index + 1}`}
                   className="w-full"
@@ -324,13 +397,15 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => updatePageFile(index, e.target.files?.[0] || null)}
+                    onChange={(e) =>
+                      updatePageFile(index, e.target.files?.[0] || null)
+                    }
                     className="w-full"
                   />
                   {page.preview && (
                     <div className="w-32 h-32 border rounded overflow-hidden">
-                      <img 
-                        src={page.preview} 
+                      <img
+                        src={page.preview}
                         alt={`معاينة الصفحة ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
@@ -346,8 +421,12 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
         </p>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading || !formData.mangaId || !formData.chapterNumber}>
-        {isLoading ? 'جاري الإضافة...' : 'إضافة الفصل'}
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isLoading || !formData.mangaId || !formData.chapterNumber}
+      >
+        {isLoading ? "جاري الإضافة..." : "إضافة الفصل"}
       </Button>
     </form>
   );
