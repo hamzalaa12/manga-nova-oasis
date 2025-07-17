@@ -28,7 +28,7 @@ const MangaGrid = ({
   const [mangaData, setMangaData] = useState<Manga[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 36; // 6 rows × 6 items per row
 
   useEffect(() => {
     fetchManga();
@@ -66,7 +66,7 @@ const MangaGrid = ({
 
     if (diffDays > 0) return `منذ ${diffDays} يوم`;
     if (diffHours > 0) return `منذ ${diffHours} ساعة`;
-    return "م��ذ دقائق";
+    return "منذ دقائق";
   };
 
   const getStatusInArabic = (status: string) => {
