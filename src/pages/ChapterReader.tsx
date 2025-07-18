@@ -419,8 +419,13 @@ const ChapterReader = () => {
           <div className="flex items-center justify-between">
             {/* Next Chapter Button */}
             <div>
-              {nextChapter ? (
-                <Link to={`/read/${nextChapter.id}`}>
+              {nextChapter && manga ? (
+                <Link
+                  to={getChapterUrl(
+                    getMangaSlug(manga),
+                    nextChapter.chapter_number,
+                  )}
+                >
                   <Button
                     variant="default"
                     size="sm"
