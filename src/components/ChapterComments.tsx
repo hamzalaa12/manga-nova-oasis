@@ -315,29 +315,14 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       commentId: string;
       reason: string;
     }) => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-      }
-
-      const { data, error } = await supabase.functions.invoke(
-        "manage-comments",
-        {
-          body: {
-            action: "report",
-            commentId,
-            reason,
-          },
-          headers,
-        },
-      );
+      const { error } = await supabase.from("comment_reports").insert({
+        comment_id: commentId,
+        user_id: user?.id || null,
+        session_id: user ? null : sessionId,
+        reason: reason,
+      });
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       toast({
