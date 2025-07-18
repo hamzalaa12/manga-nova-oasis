@@ -61,7 +61,7 @@ const ChapterCard = ({
             className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
           />
 
-          {/* بادج الفصل مع تأثير جديد */}
+          {/* بادج الفصل ��ع تأثير جديد */}
           <div className="absolute top-2 right-2">
             <Badge
               variant="default"
@@ -71,15 +71,17 @@ const ChapterCard = ({
             </Badge>
           </div>
 
-          {/* بادج جديد مع تأثير نابض */}
-          <div className="absolute top-2 left-2">
-            <Badge
-              variant="secondary"
-              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-lg animate-pulse border border-green-400/50"
-            >
-              جديد
-            </Badge>
-          </div>
+          {/* بادج جديد مع تأثير نابض - فقط للفصول الحديثة */}
+          {isNewChapter() && (
+            <div className="absolute top-2 left-2">
+              <Badge
+                variant="secondary"
+                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-lg animate-pulse border border-green-400/50"
+              >
+                جديد
+              </Badge>
+            </div>
+          )}
 
           {/* بادج مدفوع إن وجد */}
           {is_premium && (
