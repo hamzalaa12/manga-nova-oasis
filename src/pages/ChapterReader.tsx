@@ -86,7 +86,7 @@ const ChapterReader = () => {
       // Fetch manga details
       const { data: mangaData, error: mangaError } = await supabase
         .from("manga")
-        .select("id, title")
+        .select("id, slug, title")
         .eq("id", chapterData.manga_id)
         .single();
 
