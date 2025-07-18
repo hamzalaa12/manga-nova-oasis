@@ -113,9 +113,13 @@ const MangaDetails = () => {
         fetchChaptersForManga(data.id),
         trackMangaView(data.id),
       ]);
-    } catch (error) {
-      console.error("Error fetching manga details:", error);
-    } finally {
+    } catch (error: any) {
+      console.error("Error fetching manga details:", error.message || error);
+      toast({
+        title: "خطأ",
+        description: error.message || "فشل في تحميل تفاصيل المانجا",
+        variant: "destructive",
+      });
       setLoading(false);
     }
   };
