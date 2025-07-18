@@ -1,15 +1,31 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Home, ChevronDown, Info, Eye, Bookmark } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  ChevronDown,
+  Info,
+  Eye,
+  Bookmark,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { supabase } from '@/integrations/supabase/client';
+} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  parseMangaIdentifier,
+  getChapterUrl,
+  getMangaUrl,
+  getMangaSlug,
+} from "@/lib/slug";
 
 interface Chapter {
   id: string;
@@ -50,9 +66,9 @@ const ChapterReader = () => {
     try {
       // Fetch chapter details
       const { data: chapterData, error: chapterError } = await supabase
-        .from('chapters')
-        .select('*')
-        .eq('id', id)
+        .from("chapters")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (chapterError) throw chapterError;
@@ -60,9 +76,9 @@ const ChapterReader = () => {
 
       // Fetch manga details
       const { data: mangaData, error: mangaError } = await supabase
-        .from('manga')
-        .select('id, title')
-        .eq('id', chapterData.manga_id)
+        .from("manga")
+        .select("id, title")
+        .eq("id", chapterData.manga_id)
         .single();
 
       if (mangaError) throw mangaError;
@@ -70,19 +86,18 @@ const ChapterReader = () => {
 
       // Fetch all chapters for navigation
       const { data: chaptersData, error: chaptersError } = await supabase
-        .from('chapters')
-        .select('id, chapter_number, title')
-        .eq('manga_id', chapterData.manga_id)
-        .order('chapter_number', { ascending: true });
+        .from("chapters")
+        .select("id, chapter_number, title")
+        .eq("manga_id", chapterData.manga_id)
+        .order("chapter_number", { ascending: true });
 
       if (chaptersError) throw chaptersError;
       setAllChapters(chaptersData || []);
 
       // Track view using the new system
       await trackChapterView(id);
-
     } catch (error) {
-      console.error('Error fetching chapter details:', error);
+      console.error("Error fetching chapter details:", error);
     } finally {
       setLoading(false);
     }
@@ -92,29 +107,29 @@ const ChapterReader = () => {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       };
 
       // Add authorization header if user is logged in
       if (sessionData.session?.access_token) {
-        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
       }
 
-      await supabase.functions.invoke('track-view', {
-        body: { 
+      await supabase.functions.invoke("track-view", {
+        body: {
           mangaId: chapterId,
-          type: 'chapter'
+          type: "chapter",
         },
-        headers
+        headers,
       });
     } catch (error) {
-      console.error('Error tracking chapter view:', error);
+      console.error("Error tracking chapter view:", error);
       // Don't fail the page load if view tracking fails
     }
   };
 
   const getCurrentChapterIndex = () => {
-    return allChapters.findIndex(ch => ch.id === chapter?.id);
+    return allChapters.findIndex((ch) => ch.id === chapter?.id);
   };
 
   const getPreviousChapter = () => {
@@ -124,21 +139,23 @@ const ChapterReader = () => {
 
   const getNextChapter = () => {
     const currentIndex = getCurrentChapterIndex();
-    return currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
+    return currentIndex < allChapters.length - 1
+      ? allChapters[currentIndex + 1]
+      : null;
   };
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
-        case 'Escape':
+        case "Escape":
           navigate(-1);
           break;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [navigate]);
 
   if (loading) {
@@ -173,23 +190,23 @@ const ChapterReader = () => {
           <div className="flex items-center justify-between">
             {/* Left Action Icons */}
             <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
               >
                 <Info className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
               >
                 <Eye className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
               >
                 <Bookmark className="h-4 w-4" />
@@ -198,7 +215,10 @@ const ChapterReader = () => {
 
             {/* Center Title */}
             <div className="text-center flex-1">
-              <Link to={`/manga/${manga.id}`} className="hover:text-blue-400 transition-colors">
+              <Link
+                to={`/manga/${manga.id}`}
+                className="hover:text-blue-400 transition-colors"
+              >
                 <h1 className="text-lg font-bold text-white hover:text-blue-400">
                   {manga.title} - {chapter.chapter_number}
                 </h1>
@@ -207,7 +227,10 @@ const ChapterReader = () => {
 
             {/* Right Breadcrumb */}
             <div className="text-sm text-gray-400">
-              {chapter.chapter_number} / {manga.title} / <Link to="/" className="hover:text-white">الرئيسية</Link>
+              {chapter.chapter_number} / {manga.title} /{" "}
+              <Link to="/" className="hover:text-white">
+                الرئيسية
+              </Link>
             </div>
           </div>
         </div>
@@ -225,11 +248,15 @@ const ChapterReader = () => {
                   العودة
                 </Button>
               </Link>
-              
+
               {/* Next Chapter Button */}
               {nextChapter && (
                 <Link to={`/read/${nextChapter.id}`}>
-                  <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
                     التالي →
                   </Button>
                 </Link>
@@ -248,28 +275,37 @@ const ChapterReader = () => {
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded min-w-[60px]"
                   >
                     {chapter.chapter_number}
                     <ChevronDown className="h-3 w-3 mr-1" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700"
+                >
                   {allChapters.map((chapterItem) => (
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       key={chapterItem.id}
                       className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700 ${
-                        chapterItem.id === chapter.id ? 'bg-gray-700 text-white' : ''
+                        chapterItem.id === chapter.id
+                          ? "bg-gray-700 text-white"
+                          : ""
                       }`}
                       onClick={() => navigate(`/read/${chapterItem.id}`)}
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium">الفصل {chapterItem.chapter_number}</span>
+                        <span className="font-medium">
+                          الفصل {chapterItem.chapter_number}
+                        </span>
                         {chapterItem.title && (
-                          <span className="text-xs text-gray-400">{chapterItem.title}</span>
+                          <span className="text-xs text-gray-400">
+                            {chapterItem.title}
+                          </span>
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -293,7 +329,7 @@ const ChapterReader = () => {
             {chapter.pages.map((page, index) => (
               <div key={index} className="mb-2">
                 <img
-                  src={page?.url || '/placeholder.svg'}
+                  src={page?.url || "/placeholder.svg"}
                   alt={`صفحة ${index + 1}`}
                   className="w-full max-w-full object-contain bg-gray-900"
                   loading={index < 3 ? "eager" : "lazy"}
@@ -312,18 +348,18 @@ const ChapterReader = () => {
             <div>
               {nextChapter ? (
                 <Link to={`/read/${nextChapter.id}`}>
-                  <Button 
-                    variant="default" 
-                    size="sm" 
+                  <Button
+                    variant="default"
+                    size="sm"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
                   >
                     التالي →
                   </Button>
                 </Link>
               ) : (
-                <Button 
-                  variant="default" 
-                  size="sm" 
+                <Button
+                  variant="default"
+                  size="sm"
                   disabled
                   className="bg-gray-600 text-gray-300 px-6 py-2 rounded-lg font-medium cursor-not-allowed"
                 >
@@ -336,28 +372,37 @@ const ChapterReader = () => {
             <div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg min-w-[60px] font-medium"
                   >
                     {chapter.chapter_number}
                     <ChevronDown className="h-3 w-3 mr-1" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700 mb-2">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700 mb-2"
+                >
                   {allChapters.map((chapterItem) => (
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       key={chapterItem.id}
                       className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700 ${
-                        chapterItem.id === chapter.id ? 'bg-gray-700 text-white' : ''
+                        chapterItem.id === chapter.id
+                          ? "bg-gray-700 text-white"
+                          : ""
                       }`}
                       onClick={() => navigate(`/read/${chapterItem.id}`)}
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium">الفصل {chapterItem.chapter_number}</span>
+                        <span className="font-medium">
+                          الفصل {chapterItem.chapter_number}
+                        </span>
                         {chapterItem.title && (
-                          <span className="text-xs text-gray-400">{chapterItem.title}</span>
+                          <span className="text-xs text-gray-400">
+                            {chapterItem.title}
+                          </span>
                         )}
                       </div>
                     </DropdownMenuItem>
