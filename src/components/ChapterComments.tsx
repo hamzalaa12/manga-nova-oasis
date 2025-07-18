@@ -176,15 +176,31 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         throw new Error("يجب تسجيل الدخول أو انتظار تحميل الجلسة");
       }
 
-      const { error } = await supabase.from("chapter_comments").insert({
-        chapter_id: chapterId,
-        user_id: user?.id || null,
-        parent_id: parentId || null,
-        content: content.trim(),
-        is_spoiler: isSpoiler,
-      });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+
+      if (sessionData.session?.access_token) {
+        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+      }
+
+      const { data, error } = await supabase.functions.invoke(
+        "manage-comments",
+        {
+          body: {
+            action: "create",
+            chapterId,
+            content: content.trim(),
+            parentId: parentId || null,
+            isSpoiler,
+          },
+          headers,
+        },
+      );
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -488,7 +504,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                     <div className="absolute bottom-full left-0 mb-2 bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-xl z-50 max-h-64 overflow-y-auto">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-300">
-                          الإيموجيات
+                          الإ��موجيات
                         </span>
                         <Button
                           type="button"
