@@ -63,10 +63,7 @@ const MangaCard = ({
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
             <span>{rating}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Eye className="h-3 w-3" />
-            <span>{views}</span>
-          </div>
+          <ViewsCounter viewsCount={views} type="manga" className="text-xs" />
         </div>
 
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
