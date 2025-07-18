@@ -230,7 +230,7 @@ const ChapterReader = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
-          <p className="mb-4">الف��ل غير موجود</p>
+          <p className="mb-4">الفصل غير موجود</p>
           <Link to="/">
             <Button variant="outline">العودة للرئيسية</Button>
           </Link>
@@ -361,7 +361,15 @@ const ChapterReader = () => {
                           ? "bg-gray-700 text-white"
                           : ""
                       }`}
-                      onClick={() => navigate(`/read/${chapterItem.id}`)}
+                      onClick={() =>
+                        manga &&
+                        navigate(
+                          getChapterUrl(
+                            getMangaSlug(manga),
+                            chapterItem.chapter_number,
+                          ),
+                        )
+                      }
                     >
                       <div className="flex flex-col">
                         <span className="font-medium">
@@ -458,7 +466,15 @@ const ChapterReader = () => {
                           ? "bg-gray-700 text-white"
                           : ""
                       }`}
-                      onClick={() => navigate(`/read/${chapterItem.id}`)}
+                      onClick={() =>
+                        manga &&
+                        navigate(
+                          getChapterUrl(
+                            getMangaSlug(manga),
+                            chapterItem.chapter_number,
+                          ),
+                        )
+                      }
                     >
                       <div className="flex flex-col">
                         <span className="font-medium">
