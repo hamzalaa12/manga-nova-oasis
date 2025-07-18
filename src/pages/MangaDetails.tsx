@@ -92,7 +92,12 @@ const MangaDetails = () => {
   }, [slug]);
 
   const fetchMangaDetails = async () => {
-    if (!slug) return;
+    if (!slug) {
+      setLoading(false);
+      return;
+    }
+
+    setError(null); // إعادة تعيين حالة الخطأ
 
     try {
       const identifier = parseMangaIdentifier(slug);
