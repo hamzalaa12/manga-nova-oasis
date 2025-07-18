@@ -37,15 +37,15 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="مانجا العرب - اقرأ المانجا والمانهوا مترجمة مجاناً"
-        description="أفضل موقع لقراءة المانجا والمانهوا والمانها مترجمة بجودة عالية. آلاف الفصول المترجمة من أش��ر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير."
+        description="أفضل موقع لقراءة المانجا والمانهوا والمانها مترجمة بجودة عالية. آلاف الفصول المترجمة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير."
         url={currentUrl}
         type="website"
         structuredData={structuredData}
       />
       <Header />
       <Hero />
-      <MangaGrid />
       <ChaptersGrid />
+      <MangaGrid />
       <Footer />
       <AdminPanel />
     </div>
