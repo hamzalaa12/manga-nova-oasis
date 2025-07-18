@@ -131,10 +131,12 @@ const MangaDetails = () => {
         trackMangaView(data.id),
       ]);
     } catch (error: any) {
-      console.error("Error fetching manga details:", error.message || error);
+      const errorMessage = error.message || "فشل في تحميل تفاصيل المانجا";
+      console.error("Error fetching manga details:", errorMessage);
+      setError(errorMessage);
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحميل تفاصيل المانجا",
+        description: errorMessage,
         variant: "destructive",
       });
       setLoading(false);
@@ -591,7 +593,7 @@ const MangaDetails = () => {
 
                 {chapters.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    لا توجد فصول متاحة حالياً
+                    لا توجد فصول متاح�� حالياً
                   </p>
                 ) : (
                   <div className="space-y-2">
