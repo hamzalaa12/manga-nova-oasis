@@ -11,8 +11,6 @@ import { Plus, BookOpen, FileText } from "lucide-react";
 import AddMangaForm from "./admin/AddMangaForm";
 import AddChapterForm from "./admin/AddChapterForm";
 import { useAuth } from "@/hooks/useAuth";
-import { fixMissingSlugs, checkDatabaseHealth } from "@/utils/fixSlugs";
-import { useToast } from "@/hooks/use-toast";
 
 const AdminPanel = () => {
   const { isAdmin } = useAuth();
