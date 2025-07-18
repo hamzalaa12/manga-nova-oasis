@@ -359,7 +359,11 @@ const ChapterReader = () => {
       </div>
 
       {/* Navigation Bar */}
-      <div className="fixed top-16 left-0 right-0 z-40 bg-black/80 backdrop-blur-sm border-b border-white/10">
+      <div
+        className={`fixed top-16 left-0 right-0 z-40 bg-black/80 backdrop-blur-sm border-b border-white/10 transition-transform duration-300 ease-in-out ${
+          showUI ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Left Navigation */}
