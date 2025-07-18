@@ -215,6 +215,18 @@ const ChapterReader = () => {
       : null;
   };
 
+  // Scroll detection for navigation visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // Show navigation when scrolled down more than 100px
+      setShowNavigation(scrollY > 100);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -265,7 +277,7 @@ const ChapterReader = () => {
               variant="outline"
               className="text-white border-white hover:bg-white hover:text-black"
             >
-              العودة للرئيسية
+              العودة للرئيسي��
             </Button>
           </Link>
         </div>
@@ -332,7 +344,7 @@ const ChapterReader = () => {
               </p>
             </div>
 
-            {/* ال��هة اليمنى - منتقي الفصول */}
+            {/* الجهة اليمنى - منتق�� الفصول */}
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -492,7 +504,7 @@ const ChapterReader = () => {
                     size="sm"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   >
-                    ��لتالي
+                    التالي
                     <ChevronLeft className="h-4 w-4 mr-2" />
                   </Button>
                 </Link>
