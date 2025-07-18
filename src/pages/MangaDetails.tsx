@@ -332,7 +332,7 @@ const MangaDetails = () => {
 
       toast({
         title: "تم التحديث!",
-        description: isPrivate ? "تم نشر ��لفصل" : "تم جعل الفصل خاص",
+        description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خاص",
       });
 
       if (manga?.id) {
@@ -442,7 +442,7 @@ const MangaDetails = () => {
             <CardContent className="p-8 text-center">
               <div className="space-y-4">
                 <div className="text-muted-foreground text-6xl">📚</div>
-                <h1 className="text-2xl font-bold">المانجا غي�� موجودة</h1>
+                <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
                 <p className="text-muted-foreground">
                   لم يتم العثور على المانجا المطلوبة
                 </p>
@@ -569,10 +569,12 @@ const MangaDetails = () => {
                         سنة الإصدار: {manga.release_year}
                       </div>
                     )}
-                    <div className="flex items-center justify-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      المشاهدات: {manga.views_count?.toLocaleString() || 0}
-                    </div>
+                    <ViewsCounter
+                      viewsCount={manga.views_count || 0}
+                      type="manga"
+                      showTrending={true}
+                      className="justify-center"
+                    />
                   </div>
 
                   {manga.genre && manga.genre.length > 0 && (
@@ -677,7 +679,7 @@ const MangaDetails = () => {
 
                 {chapters.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    لا توجد فصول متاحة حال��اً
+                    لا توجد فصول متاحة حالياً
                   </p>
                 ) : (
                   <div className="space-y-2">
