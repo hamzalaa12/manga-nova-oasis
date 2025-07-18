@@ -26,6 +26,7 @@ const AdminPanel = () => {
   const { toast } = useToast();
   const [openMangaDialog, setOpenMangaDialog] = useState(false);
   const [openChapterDialog, setOpenChapterDialog] = useState(false);
+  const [openCommentsDialog, setOpenCommentsDialog] = useState(false);
 
   const handleEnsureSlugs = async () => {
     try {
