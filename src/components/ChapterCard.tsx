@@ -57,17 +57,17 @@ const ChapterCard = ({
           <div className="absolute top-2 right-2">
             <Badge
               variant="default"
-              className="bg-gradient-to-r from-primary to-primary-glow text-white text-xs font-bold shadow-lg animate-pulse"
+              className="bg-gradient-to-r from-red-500 via-red-600 to-red-500 text-white text-xs font-bold shadow-lg border border-red-400/50"
             >
-              الفصل {chapter_number}
+              الفصل رقم {chapter_number}
             </Badge>
           </div>
 
-          {/* بادج جديد */}
+          {/* بادج جديد مع تأثير نابض */}
           <div className="absolute top-2 left-2">
             <Badge
               variant="secondary"
-              className="bg-green-500 text-white text-xs font-bold shadow-lg"
+              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-lg animate-pulse border border-green-400/50"
             >
               جديد
             </Badge>
