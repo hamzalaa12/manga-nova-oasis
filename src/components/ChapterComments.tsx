@@ -173,7 +173,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       isSpoiler: boolean;
     }) => {
       if (!user) {
-        throw new Error("يجب تسجيل الدخ��ل لكتابة التعليقات");
+        throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
       }
 
       const { data, error } = await supabase
@@ -225,29 +225,16 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       commentId: string;
       content: string;
     }) => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-      }
-
-      const { data, error } = await supabase.functions.invoke(
-        "manage-comments",
-        {
-          body: {
-            action: "update",
-            commentId,
-            content: content.trim(),
-          },
-          headers,
-        },
-      );
+      const { error } = await supabase
+        .from("chapter_comments")
+        .update({
+          content: content.trim(),
+          edited_at: new Date().toISOString(),
+          edited_by: isAdmin ? user?.id : null,
+        })
+        .eq("id", commentId);
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
