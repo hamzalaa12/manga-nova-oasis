@@ -80,7 +80,7 @@ const ChaptersGrid = ({
   showAll = false,
 }: ChaptersGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = showAll ? 100 : 24;
+  const itemsPerPage = showAll ? 100 : 36;
 
   const {
     data: chaptersData = [],
