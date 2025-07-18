@@ -173,7 +173,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       isSpoiler: boolean;
     }) => {
       if (!user || !user.id) {
-        throw new Error("يجب تسجيل الدخول لكتا��ة التعليقات");
+        throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
       }
 
       console.log("User validation passed:", {
@@ -333,7 +333,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         .eq("comment_id", commentId)
         .eq("user_id", user.id);
 
-      // إضافة الإعجاب الجديد
+      // إضاف�� الإعجاب الجديد
       const { error } = await supabase.from("comment_likes").insert({
         comment_id: commentId,
         user_id: user.id,
@@ -739,18 +739,30 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 </div>
               </div>
 
-              <Button
-                onClick={handleSubmitComment}
-                disabled={!newComment.trim() || addCommentMutation.isPending}
-                className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-              >
-                <Send className="h-4 w-4" />
-                {addCommentMutation.isPending
-                  ? "جاري النشر..."
-                  : replyingTo
-                    ? "إرسال الرد"
-                    : "نشر التعليق"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSubmitComment}
+                  disabled={!newComment.trim() || addCommentMutation.isPending}
+                  className="bg-red-600 hover:bg-red-700 flex items-center gap-2 flex-1"
+                >
+                  <Send className="h-4 w-4" />
+                  {addCommentMutation.isPending
+                    ? "جاري النشر..."
+                    : replyingTo
+                      ? "إرسال الرد"
+                      : "نشر التعليق"}
+                </Button>
+
+                <Button
+                  onClick={handleSubmitCommentFallback}
+                  disabled={!newComment.trim()}
+                  variant="outline"
+                  className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
+                  title="طريقة بديلة للنشر"
+                >
+                  🔄
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
