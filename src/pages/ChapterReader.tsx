@@ -522,6 +522,13 @@ const ChapterReader = () => {
         )}
       </main>
 
+      {/* Chapter Interactions - Reactions and Comments */}
+      {chapter && (
+        <div className="bg-black">
+          <ChapterInteractions chapterId={chapter.id} />
+        </div>
+      )}
+
       {/* Bottom Navigation - Fixed and Minimal */}
       <div
         className={`fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm transition-transform duration-300 ease-in-out ${
