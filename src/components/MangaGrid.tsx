@@ -38,12 +38,14 @@ const MangaGrid = ({
 
   const fetchManga = async () => {
     try {
-      // جلب المزيد من البيانات للسماح بالتنقل بين الصفحات
+      // جلب البيانات المطلوبة فقط لتحسين الأداء
       const { data, error } = await supabase
         .from("manga")
-        .select("*")
+        .select(
+          "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
+        )
         .order("updated_at", { ascending: false })
-        .limit(showAll ? 100 : 200); // جلب المزيد للتنقل بين الصفحات
+        .limit(showAll ? 100 : 200);
 
       if (error) throw error;
       setMangaData(data || []);
