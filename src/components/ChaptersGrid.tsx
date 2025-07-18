@@ -53,7 +53,7 @@ const fetchChaptersData = async (showAll: boolean): Promise<Chapter[]> => {
     )
     .eq("is_private", false)
     .order("created_at", { ascending: false })
-    .limit(showAll ? 100 : 24);
+    .limit(showAll ? 100 : 36);
 
   if (error) throw error;
 
