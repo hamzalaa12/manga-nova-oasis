@@ -3,7 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
@@ -13,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    const { mangaId, type = 'manga' } = await req.json();
-    
+    const { mangaId, type = "manga" } = await req.json();
+
     if (!mangaId) {
       throw new Error("mangaId is required");
     }
@@ -23,7 +24,7 @@ serve(async (req) => {
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
+      { auth: { persistSession: false } },
     );
 
     // Get user from authorization header (if provided)
@@ -43,7 +44,10 @@ serve(async (req) => {
 
     // If no user, create session ID from IP and User-Agent
     if (!userId) {
-      const ip = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "unknown";
+      const ip =
+        req.headers.get("x-forwarded-for") ||
+        req.headers.get("cf-connecting-ip") ||
+        "unknown";
       const userAgent = req.headers.get("user-agent") || "unknown";
       sessionId = `${ip}-${userAgent}`.slice(0, 100); // Limit length
     }
@@ -52,18 +56,18 @@ serve(async (req) => {
     let existingView = null;
     if (userId) {
       const { data } = await supabaseClient
-        .from('manga_views')
-        .select('id')
-        .eq('manga_id', mangaId)
-        .eq('user_id', userId)
+        .from("manga_views")
+        .select("id")
+        .eq("manga_id", mangaId)
+        .eq("user_id", userId)
         .maybeSingle();
       existingView = data;
     } else if (sessionId) {
       const { data } = await supabaseClient
-        .from('manga_views')
-        .select('id')
-        .eq('manga_id', mangaId)
-        .eq('session_id', sessionId)
+        .from("manga_views")
+        .select("id")
+        .eq("manga_id", mangaId)
+        .eq("session_id", sessionId)
         .maybeSingle();
       existingView = data;
     }
@@ -72,11 +76,11 @@ serve(async (req) => {
     if (!existingView) {
       // Insert new view record
       const { error: viewError } = await supabaseClient
-        .from('manga_views')
+        .from("manga_views")
         .insert({
           manga_id: mangaId,
           user_id: userId,
-          session_id: sessionId
+          session_id: sessionId,
         });
 
       if (viewError) {
@@ -85,13 +89,24 @@ serve(async (req) => {
       }
 
       // Increment views count in manga/chapters table
-      const tableName = type === 'chapter' ? 'chapters' : 'manga';
+      const tableName = type === "chapter" ? "chapters" : "manga";
+
+      // First, get the current views count
+      const { data: currentData } = await supabaseClient
+        .from(tableName)
+        .select("views_count")
+        .eq("id", mangaId)
+        .single();
+
+      const currentViews = currentData?.views_count || 0;
+
+      // Update with incremented count
       const { error: updateError } = await supabaseClient
         .from(tableName)
-        .update({ 
-          views_count: supabaseClient.raw('COALESCE(views_count, 0) + 1')
+        .update({
+          views_count: currentViews + 1,
         })
-        .eq('id', mangaId);
+        .eq("id", mangaId);
 
       if (updateError) {
         console.error("Error updating views count:", updateError);
@@ -99,40 +114,41 @@ serve(async (req) => {
       }
 
       return new Response(
-        JSON.stringify({ 
-          success: true, 
+        JSON.stringify({
+          success: true,
           newView: true,
-          message: "View recorded successfully" 
+          message: "View recorded successfully",
+          oldCount: currentViews,
+          newCount: currentViews + 1,
         }),
-        { 
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 200 
-        }
+          status: 200,
+        },
       );
     } else {
       return new Response(
-        JSON.stringify({ 
-          success: true, 
+        JSON.stringify({
+          success: true,
           newView: false,
-          message: "View already recorded for this user/session" 
+          message: "View already recorded for this user/session",
         }),
-        { 
+        {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 200 
-        }
+          status: 200,
+        },
       );
     }
-
   } catch (error) {
     console.error("Error in track-view function:", error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message || "Internal server error" 
+      JSON.stringify({
+        error: error.message || "Internal server error",
       }),
-      { 
+      {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500 
-      }
+        status: 500,
+      },
     );
   }
 });
