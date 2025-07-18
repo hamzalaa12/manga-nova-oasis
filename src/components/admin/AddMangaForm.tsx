@@ -37,8 +37,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
   const [newGenre, setNewGenre] = useState("");
   const [genreSearch, setGenreSearch] = useState("");
 
-  // قائمة شاملة بـ 120+ تصنيف عربي
-  const availableGenres = [
+    // استخدام قائمة التصنيفات المشتركة
     // التصنيفات الأساسية
     "أكشن",
     "مغامرة",
