@@ -91,18 +91,25 @@ const MangaDetails = () => {
   }, [manga?.id]);
 
   const fetchMangaDetails = async () => {
+    if (!slug) return;
+
     try {
-      const { data, error } = await supabase
-        .from("manga")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const identifier = parseMangaIdentifier(slug);
+      let query = supabase.from("manga").select("*");
+
+      if (identifier.type === "slug") {
+        query = query.eq("slug", identifier.value);
+      } else {
+        query = query.eq("id", identifier.value);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) throw error;
       setManga(data);
 
       // Track view using the new system
-      await trackMangaView(id);
+      await trackMangaView(data.id);
     } catch (error) {
       console.error("Error fetching manga details:", error);
     }
