@@ -45,48 +45,58 @@ const ChapterCard = ({
 
   return (
     <Link to={chapterUrl}>
-      <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
+      <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
         <div className="relative overflow-hidden">
           <img
             src={manga.cover_image_url || "/placeholder.svg"}
             alt={manga.title}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
           />
 
-          {/* بادج الفصل */}
+          {/* بادج الفصل مع تأثير جديد */}
           <div className="absolute top-2 right-2">
             <Badge
               variant="default"
-              className="bg-primary text-primary-foreground text-xs font-bold"
+              className="bg-gradient-to-r from-primary to-primary-glow text-white text-xs font-bold shadow-lg animate-pulse"
             >
               الفصل {chapter_number}
             </Badge>
           </div>
 
+          {/* بادج جديد */}
+          <div className="absolute top-2 left-2">
+            <Badge
+              variant="secondary"
+              className="bg-green-500 text-white text-xs font-bold shadow-lg"
+            >
+              جديد
+            </Badge>
+          </div>
+
           {/* بادج مدفوع إن وجد */}
           {is_premium && (
-            <div className="absolute top-2 left-2">
+            <div className="absolute top-10 left-2">
               <Badge
                 variant="secondary"
-                className="bg-yellow-500 text-black text-xs font-bold"
+                className="bg-yellow-500 text-black text-xs font-bold shadow-lg"
               >
                 مدفوع
               </Badge>
             </div>
           )}
 
-          {/* تأثير التدرج */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          {/* تأثير التدرج المحسن */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/90"></div>
 
-          {/* معلومات في الأسفل */}
-          <div className="absolute bottom-2 left-2 right-2 text-white">
-            <div className="flex items-center justify-between text-xs">
+          {/* شريط معلومات في الأسفل */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+            <div className="flex items-center justify-between text-white text-xs">
               <ViewsCounter
                 viewsCount={views_count}
                 type="chapter"
                 className="text-white"
               />
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full">
                 <Clock className="h-3 w-3" />
                 <span>{formatTimeAgo(created_at)}</span>
               </div>
@@ -94,24 +104,24 @@ const ChapterCard = ({
           </div>
         </div>
 
-        <div className="p-3 space-y-2">
+        <div className="p-4 space-y-2">
           {/* عنوان المانجا */}
-          <h3 className="font-medium text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+          <h3 className="font-bold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
             {manga.title}
           </h3>
 
           {/* عنوان الفصل إن وجد */}
           {title && (
-            <p className="text-xs text-muted-foreground line-clamp-1">
+            <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
               {title}
             </p>
           )}
 
           {/* معلومات إضافية */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/50">
             <div className="flex items-center gap-1">
               <BookOpen className="h-3 w-3" />
-              <span>الفصل {chapter_number}</span>
+              <span className="font-medium">الفصل {chapter_number}</span>
             </div>
             {manga.author && (
               <div className="flex items-center gap-1">
