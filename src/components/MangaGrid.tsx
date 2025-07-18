@@ -164,7 +164,7 @@ const MangaGrid = ({
               title={manga.title}
               cover={manga.cover_image_url || "/placeholder.svg"}
               rating={manga.rating}
-              views={formatViews(manga.views_count)}
+              views={manga.views_count}
               status={getStatusInArabic(manga.status)}
               genre={manga.genre?.[0] || manga.manga_type}
               lastUpdate={formatLastUpdate(manga.updated_at)}
@@ -172,7 +172,7 @@ const MangaGrid = ({
           ))}
         </div>
 
-        {/* أزرار التنقل بين الصفحات */}
+        {/* أزرار التنقل بين ا��صفحات */}
         {!showAll && totalPages > 1 && (
           <div className="flex items-center justify-center mt-12 gap-4">
             <Button
