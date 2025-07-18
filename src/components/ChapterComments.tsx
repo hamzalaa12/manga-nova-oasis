@@ -646,7 +646,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
 
   return (
     <div className="bg-gray-900 text-white rounded-lg">
-      {/* منطقة كتابة ��لتعليق */}
+      {/* منطقة كتابة التعليق */}
       <div className="p-6 border-b border-gray-700">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
@@ -850,6 +850,15 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                   title="طريقة بديلة للنشر"
                 >
                   🔄
+                </Button>
+
+                <Button
+                  onClick={testDatabaseAccess}
+                  variant="outline"
+                  className="border-yellow-600 text-yellow-600 hover:bg-yellow-600 hover:text-white"
+                  title="فحص قاعدة البيانات"
+                >
+                  🧪
                 </Button>
               </div>
             </div>
