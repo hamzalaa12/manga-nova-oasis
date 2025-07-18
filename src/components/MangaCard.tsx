@@ -78,7 +78,7 @@ const MangaCard = ({
 
   const mangaSlug = getMangaSlug({ slug, title, id });
 
-  return id || slug ? (
+  return mangaSlug ? (
     <Link to={getMangaUrl(mangaSlug)}>{CardContent}</Link>
   ) : (
     CardContent
