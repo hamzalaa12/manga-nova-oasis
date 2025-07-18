@@ -28,6 +28,10 @@ interface Chapter {
 }
 
 const fetchChaptersData = async (showAll: boolean): Promise<Chapter[]> => {
+  // الحصول على الفصول من آخر 7 أيام أولاً، ثم الباقي
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
   const { data, error } = await supabase
     .from("chapters")
     .select(
@@ -52,7 +56,23 @@ const fetchChaptersData = async (showAll: boolean): Promise<Chapter[]> => {
     .limit(showAll ? 100 : 24);
 
   if (error) throw error;
-  return data || [];
+
+  // ترتيب الفصول: الحديثة أولاً (آخر 7 أيام) ثم الباقي
+  const sortedData = (data || []).sort((a, b) => {
+    const aDate = new Date(a.created_at);
+    const bDate = new Date(b.created_at);
+    const aIsRecent = aDate >= sevenDaysAgo;
+    const bIsRecent = bDate >= sevenDaysAgo;
+
+    // الفصول الحديثة أولاً
+    if (aIsRecent && !bIsRecent) return -1;
+    if (!aIsRecent && bIsRecent) return 1;
+
+    // ضمن نفس الفئة، الأحدث أولاً
+    return bDate.getTime() - aDate.getTime();
+  });
+
+  return sortedData;
 };
 
 const ChaptersGrid = ({
