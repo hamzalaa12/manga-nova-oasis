@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import MangaGrid from "@/components/MangaGrid";
+import ChaptersGrid from "@/components/ChaptersGrid";
 import Footer from "@/components/Footer";
 import AdminPanel from "@/components/AdminPanel";
 import SEO from "@/components/SEO";
@@ -37,7 +38,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="مانجا العرب - اقرأ المانجا والمانهوا مترجمة مجاناً"
-        description="أفضل موقع لقراءة المانجا والمانهوا والمانها مترجمة بجودة عالية. آلاف الفصول المتر��مة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير."
+        description="أفضل موقع لقراءة المانجا والمانهوا والمانها مترجمة بجودة عالية. آلاف الفصول المترجمة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير."
         url={currentUrl}
         type="website"
         structuredData={structuredData}
