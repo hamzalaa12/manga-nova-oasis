@@ -119,6 +119,7 @@ const ChapterReader = () => {
 
   const trackChapterView = async (chapterId: string) => {
     try {
+      console.log("Tracking chapter view for ID:", chapterId);
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -129,13 +130,15 @@ const ChapterReader = () => {
         headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
       }
 
-      await supabase.functions.invoke("track-view", {
+      const response = await supabase.functions.invoke("track-view", {
         body: {
           mangaId: chapterId,
           type: "chapter",
         },
         headers,
       });
+
+      console.log("Track chapter view response:", response);
     } catch (error) {
       console.error("Error tracking chapter view:", error);
       // Don't fail the page load if view tracking fails
