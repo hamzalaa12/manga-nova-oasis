@@ -87,16 +87,6 @@ const AdminPanel = () => {
           <AddChapterForm onSuccess={() => setOpenChapterDialog(false)} />
         </DialogContent>
       </Dialog>
-
-      <Button
-        onClick={handleFixSlugs}
-        size="lg"
-        variant="outline"
-        className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-      >
-        <Settings className="h-5 w-5 ml-2" />
-        إصلاح Slugs
-      </Button>
     </div>
   );
 };
