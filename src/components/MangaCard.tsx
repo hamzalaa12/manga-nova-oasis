@@ -10,7 +10,7 @@ interface MangaCardProps {
   title: string;
   cover: string;
   rating: number;
-  views: string;
+  views: number;
   status: string;
   genre: string;
   lastUpdate: string;
