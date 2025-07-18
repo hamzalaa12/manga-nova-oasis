@@ -47,6 +47,7 @@ const Index = () => {
       <NewChaptersNotification />
       <Hero />
       <MangaGrid />
+      <ChaptersGrid />
       <Footer />
       <AdminPanel />
     </div>
