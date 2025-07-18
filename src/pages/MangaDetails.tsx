@@ -732,11 +732,14 @@ const MangaDetails = () => {
 
                           <div className="flex items-center gap-2">
                             <div className="text-sm text-muted-foreground text-left">
-                              <div className="flex items-center gap-1">
-                                <Eye className="h-3 w-3" />
-                                {chapter.views_count || 0}
+                              <ViewsCounter
+                                viewsCount={chapter.views_count || 0}
+                                type="chapter"
+                                className="text-xs"
+                              />
+                              <div className="mt-1">
+                                {formatDate(chapter.created_at)}
                               </div>
-                              <div>{formatDate(chapter.created_at)}</div>
                             </div>
 
                             {isAdmin && (
