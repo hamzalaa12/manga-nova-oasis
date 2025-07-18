@@ -585,8 +585,13 @@ const MangaDetails = () => {
                   <h2 className="text-xl font-bold">
                     الفصول ({chapters.length})
                   </h2>
-                  {chapters.length > 0 && (
-                    <Link to={`/read/${chapters[0].id}`}>
+                  {chapters.length > 0 && manga && (
+                    <Link
+                      to={getChapterUrl(
+                        getMangaSlug(manga),
+                        chapters[0].chapter_number,
+                      )}
+                    >
                       <Button>
                         <Play className="h-4 w-4 ml-2" />
                         بدء القراءة
