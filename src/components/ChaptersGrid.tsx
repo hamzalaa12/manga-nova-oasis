@@ -135,10 +135,12 @@ const ChaptersGrid = ({
   };
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-16 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-12">
-          <h2 className="text-3xl font-bold">{title}</h2>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            {title}
+          </h2>
           {!showAll && totalPages > 1 && (
             <div className="text-sm text-muted-foreground">
               صفحة {currentPage} من {totalPages}
