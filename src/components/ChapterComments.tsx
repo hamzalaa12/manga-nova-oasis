@@ -172,9 +172,14 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       parentId?: string;
       isSpoiler: boolean;
     }) => {
-      if (!user) {
+      if (!user || !user.id) {
         throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
       }
+
+      console.log("User validation passed:", {
+        userId: user.id,
+        userEmail: user.email,
+      });
 
       console.log("Attempting to insert comment:", {
         chapter_id: chapterId,
@@ -517,7 +522,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="اكتب تعليقك هنا... (Ctrl+Enter للإرسال)"
+                placeholder="اكتب تعليقك هنا... (Ctrl+Enter للإ��سال)"
                 className="bg-gray-800 border-gray-600 text-white min-h-[120px] pr-4 pb-12 resize-none"
                 dir="rtl"
               />
@@ -680,7 +685,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 {addCommentMutation.isPending
                   ? "جاري النشر..."
                   : replyingTo
-                    ? "إرسا�� الرد"
+                    ? "إرسال الرد"
                     : "نشر التعليق"}
               </Button>
             </div>
@@ -862,7 +867,7 @@ const CommentItem = ({
             </DropdownMenu>
           </div>
 
-          {/* محتوى التعليق */}
+          {/* ��حتوى التعليق */}
           <div className="mb-3">
             {comment.is_spoiler && !showSpoiler ? (
               <div className="bg-gray-700 rounded p-3 text-center">
