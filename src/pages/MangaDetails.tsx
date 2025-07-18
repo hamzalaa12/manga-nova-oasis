@@ -43,6 +43,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import SEO from "@/components/SEO";
+import ViewsCounter from "@/components/ViewsCounter";
 
 interface Manga {
   id: string;
@@ -183,6 +185,7 @@ const MangaDetails = () => {
 
   const trackMangaView = async (mangaId: string) => {
     try {
+      console.log("🔍 Tracking manga view for ID:", mangaId);
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -190,19 +193,27 @@ const MangaDetails = () => {
 
       if (sessionData.session?.access_token) {
         headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+        console.log("👤 User is logged in");
+      } else {
+        console.log("👤 Anonymous user");
       }
 
-      await supabase.functions.invoke("track-view", {
+      const response = await supabase.functions.invoke("track-view", {
         body: {
           mangaId: mangaId,
           type: "manga",
         },
         headers,
       });
+
+      console.log("✅ Track view response:", response);
+
+      // Force refresh the page data to see updated count
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error: any) {
-      if (error.status !== 404 && error.status !== 500) {
-        console.warn("Error tracking view:", error.message || error);
-      }
+      console.error("❌ Error tracking view:", error);
     }
   };
 
@@ -456,8 +467,62 @@ const MangaDetails = () => {
     );
   }
 
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
+  // إنشاء structured data للمانجا
+  const structuredData = manga
+    ? {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        "@id": currentUrl,
+        name: manga.title,
+        description:
+          manga.description || `اقرأ مانجا ${manga.title} مترجمة بجودة عالية`,
+        image: manga.cover_image_url,
+        author: {
+          "@type": "Person",
+          name: manga.author || "غير محدد",
+        },
+        genre: manga.genre || [],
+        inLanguage: "ar",
+        dateCreated: manga.created_at,
+        aggregateRating: manga.rating
+          ? {
+              "@type": "AggregateRating",
+              ratingValue: manga.rating,
+              ratingCount: manga.views_count || 1,
+              bestRating: 5,
+              worstRating: 1,
+            }
+          : undefined,
+        interactionStatistic: {
+          "@type": "InteractionCounter",
+          interactionType: "https://schema.org/ReadAction",
+          userInteractionCount: manga.views_count || 0,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "مانجا العرب",
+          url: typeof window !== "undefined" ? window.location.origin : "",
+        },
+      }
+    : undefined;
+
   return (
     <div className="min-h-screen bg-background">
+      {manga && (
+        <SEO
+          title={`${manga.title} - مانجا العرب`}
+          description={
+            manga.description ||
+            `اقرأ مانجا ${manga.title} مترجمة بجودة عالية. ${manga.author ? `بقلم ${manga.author}` : ""} ${manga.genre && manga.genre.length > 0 ? `تصنيف: ${manga.genre.slice(0, 3).join("، ")}` : ""}`
+          }
+          image={manga.cover_image_url || undefined}
+          url={currentUrl}
+          type="article"
+          structuredData={structuredData}
+        />
+      )}
       <Header />
 
       <main className="container mx-auto px-4 py-8">
@@ -513,10 +578,12 @@ const MangaDetails = () => {
                         سنة الإصدار: {manga.release_year}
                       </div>
                     )}
-                    <div className="flex items-center justify-center gap-2">
-                      <Eye className="h-4 w-4" />
-                      المشاهدات: {manga.views_count?.toLocaleString() || 0}
-                    </div>
+                    <ViewsCounter
+                      viewsCount={manga.views_count || 0}
+                      type="manga"
+                      showTrending={true}
+                      className="justify-center"
+                    />
                   </div>
 
                   {manga.genre && manga.genre.length > 0 && (
@@ -643,8 +710,8 @@ const MangaDetails = () => {
                             className="flex-1"
                           >
                             <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-medium">
+                              <div className="flex items-center justify-center gap-2 mb-1">
+                                <h3 className="font-medium text-center">
                                   الفصل {chapter.chapter_number}
                                   {chapter.title && `: ${chapter.title}`}
                                 </h3>
@@ -674,11 +741,14 @@ const MangaDetails = () => {
 
                           <div className="flex items-center gap-2">
                             <div className="text-sm text-muted-foreground text-left">
-                              <div className="flex items-center gap-1">
-                                <Eye className="h-3 w-3" />
-                                {chapter.views_count || 0}
+                              <ViewsCounter
+                                viewsCount={chapter.views_count || 0}
+                                type="chapter"
+                                className="text-xs"
+                              />
+                              <div className="mt-1">
+                                {formatDate(chapter.created_at)}
                               </div>
-                              <div>{formatDate(chapter.created_at)}</div>
                             </div>
 
                             {isAdmin && (

@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { X, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { createSlug } from "@/lib/slug";
+import { AVAILABLE_GENRES } from "@/constants/genres";
 
 interface AddMangaFormProps {
   onSuccess: () => void;
@@ -35,191 +37,12 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
   const [newGenre, setNewGenre] = useState("");
   const [genreSearch, setGenreSearch] = useState("");
 
-  // قائمة شاملة بـ 120+ تصنيف عربي
-  const availableGenres = [
-    // التصنيفات الأساسية
-    "أكشن",
-    "مغامرة",
-    "كوميديا",
-    "دراما",
-    "خيال",
-    "رومانسي",
-    "رعب",
-    "غموض",
-    "نفسي",
-    "خارق للطبيعة",
-    "شريحة من الحياة",
-    "رياضة",
-    "تاريخي",
-    "مدرسي",
-    "خيال علمي",
-    "فانتازيا",
-    "إثارة",
-    "تشويق",
-    "حربي",
-    "عسكري",
-    "فنون قتالية",
-
-    // التصنيفات الثقافية والتقليدية
-    "ساموراي",
-    "نينجا",
-    "ميكا",
-    "روبوت",
-    "فضاء",
-    "سايبر بانك",
-    "ستيم بانك",
-    "ديستوبيا",
-    "يوتوبيا",
-    "مصاصي دماء",
-    "مستذئبين",
-    "شياطين",
-    "ملائكة",
-    "سحر",
-    "شعوذة",
-    "كيمياء",
-    "طب",
-    "هندسة",
-    "تكنولوجيا",
-    "حاسوب",
-    "ألعاب",
-
-    // التكنولوجيا والمستقبل
-    "واقع افتراضي",
-    "وا��ع معزز",
-    "ذكاء اصطناعي",
-    "آلات",
-    "أندرويد",
-    "سايبورغ",
-    "زومبي",
-    "أشباح",
-    "أرواح شريرة",
-    "عوالم موازية",
-    "سفر عبر الوقت",
-    "سفر عبر الأبعاد",
-
-    // القوى والقتال
-    "قوى خارقة",
-    "محاربين",
-    "سحرة",
-    "مشعوذين",
-    "كهنة",
-    "آلهة",
-    "أساطير",
-    "ملاحم",
-    "بطولات",
-    "مهام",
-    "بحث عن الكنز",
-    "قراصنة",
-    "بحارة",
-    "طيران",
-
-    // الحياة اليومية والهوايات
-    "طبخ",
-    "تسوق",
-    "موضة",
-    "جمال",
-    "صحة",
-    "لياقة",
-    "يوغا",
-    "تأمل",
-    "موسيقى",
-    "رقص",
-    "مسرح",
-    "سينما",
-    "تلفزيون",
-    "راديو",
-    "كتب",
-    "شعر",
-
-    // العلوم والأكاديمية
-    "أدب",
-    "فلسفة",
-    "علم نفس",
-    "اجتماع",
-    "سياسة",
-    "اقتصاد",
-    "قانون",
-    "عدالة",
-    "جريمة",
-    "تحقيق",
-    "بوليسي",
-    "جاسوسية",
-    "مخابرات",
-    "سري",
-
-    // المشاعر والعلاقات
-    "مؤامرة",
-    "خيانة",
-    "انتقام",
-    "شرف",
-    "كرامة",
-    "صداقة",
-    "ولاء",
-    "حب",
-    "زواج",
-    "ع��ئلة",
-    "أطفال",
-    "مراهقين",
-    "شباب",
-    "كبار السن",
-    "أجيال",
-
-    // تصنيفات إضافية جديدة
-    "طبيعة",
-    "بيئة",
-    "حيوانات",
-    "نباتات",
-    "طقس",
-    "فصول السنة",
-    "سفر",
-    "سياحة",
-    "تاريخ قديم",
-    "حضارات",
-    "أثار",
-    "متاحف",
-    "فن",
-    "رسم",
-    "نحت",
-    "تصوير",
-    "رياضة قتالية",
-    "كرة قدم",
-    "كرة سلة",
-    "تنس",
-    "سباحة",
-    "جري",
-    "دراجات",
-    "صيد",
-    "قنص",
-    "بناء",
-    "هندسة معمارية",
-    "ديكور",
-    "تصميم",
-    "برمجة",
-    "تطوير",
-    "تجارة",
-    "استثمار",
-    "بنوك",
-    "عملات",
-    "أسهم",
-    "بورصة",
-    "شركات",
-    "أعمال",
-    "صحافة",
-    "إعلام",
-    "تقارير",
-    "أخبار",
-    "توثيق",
-    "بحث",
-    "دراسة",
-    "تعليم",
-  ];
-
   // فلترة التصنيفات حسب البحث
   const filteredGenres = useMemo(() => {
     const searchTerm = genreSearch.toLowerCase().trim();
-    if (!searchTerm) return availableGenres;
+    if (!searchTerm) return AVAILABLE_GENRES;
 
-    return availableGenres.filter(
+    return AVAILABLE_GENRES.filter(
       (genre) =>
         genre.toLowerCase().includes(searchTerm) && !genres.includes(genre),
     );
@@ -237,14 +60,41 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     setGenres(genres.filter((genre) => genre !== genreToRemove));
   };
 
+  const generateUniqueSlug = async (title: string): Promise<string> => {
+    const baseSlug = createSlug(title);
+    let finalSlug = baseSlug;
+    let counter = 0;
+
+    // التأكد من أن الـ slug فريد
+    while (true) {
+      const { data: existing } = await supabase
+        .from("manga")
+        .select("id")
+        .eq("slug", finalSlug);
+
+      if (!existing || existing.length === 0) {
+        break; // الـ slug متاح
+      }
+
+      counter++;
+      finalSlug = `${baseSlug}-${counter}`;
+    }
+
+    return finalSlug;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // إنشاء slug فريد للمانجا
+      const slug = await generateUniqueSlug(formData.title);
+
       const { error } = await supabase.from("manga").insert([
         {
           title: formData.title,
+          slug: slug,
           description: formData.description,
           cover_image_url: formData.coverImageUrl,
           manga_type: formData.mangaType as any,
@@ -454,13 +304,13 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
                 <SelectValue placeholder="أو اختر من القائمة الكاملة" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {availableGenres
-                  .filter((genre) => !genres.includes(genre))
-                  .map((genre) => (
-                    <SelectItem key={genre} value={genre}>
-                      {genre}
-                    </SelectItem>
-                  ))}
+                {AVAILABLE_GENRES.filter(
+                  (genre) => !genres.includes(genre),
+                ).map((genre) => (
+                  <SelectItem key={genre} value={genre}>
+                    {genre}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Button
