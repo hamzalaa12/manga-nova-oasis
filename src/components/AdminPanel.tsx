@@ -37,7 +37,7 @@ const AdminPanel = () => {
       }
     } catch (error) {
       toast({
-        title: "خطأ",
+        title: "��طأ",
         description: "فشل في إصلاح الـ slugs",
         variant: "destructive",
       });
@@ -86,6 +86,16 @@ const AdminPanel = () => {
           <AddChapterForm onSuccess={() => setOpenChapterDialog(false)} />
         </DialogContent>
       </Dialog>
+
+      <Button
+        onClick={handleEnsureSlugs}
+        size="lg"
+        variant="outline"
+        className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+      >
+        <Settings className="h-5 w-5 ml-2" />
+        إصلاح Slugs
+      </Button>
     </div>
   );
 };
