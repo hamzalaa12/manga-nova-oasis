@@ -118,7 +118,7 @@ const MangaDetails = () => {
 
       if (error) {
         if (error.code === "PGRST116" && identifier.type === "slug") {
-          // إذا لم نجد بالـ slug، نحاول البحث بالعنوان كـ fallback
+          // إذا لم نجد بالـ slug، نحاول ال��حث بالعنوان كـ fallback
           console.log("Slug not found, trying to search by title...");
           try {
             const { data: titleData, error: titleError } = await supabase
@@ -128,6 +128,12 @@ const MangaDetails = () => {
               .limit(1);
 
             if (titleError || !titleData || titleData.length === 0) {
+              // عرض المانجا المتاحة للمساعدة في debugging
+              const { data: allManga } = await supabase
+                .from("manga")
+                .select("id, slug, title")
+                .limit(10);
+              console.log("Available manga for debugging:", allManga);
               throw new Error("المانجا غير موجودة");
             }
 
