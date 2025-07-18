@@ -434,7 +434,7 @@ const MangaDetails = () => {
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
                               الفصول المرتبطة بها أيضاً. هذا الإجراء لا يمكن
-                              ��لتراجع عنه.
+                              التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -640,6 +640,16 @@ const MangaDetails = () => {
           </div>
         </div>
       </main>
+
+      {/* مودال تحرير المانجا */}
+      {manga && (
+        <EditMangaDialog
+          manga={manga}
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onMangaUpdated={fetchMangaDetails}
+        />
+      )}
 
       <Footer />
     </div>
