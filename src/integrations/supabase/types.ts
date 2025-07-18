@@ -126,6 +126,7 @@ export type Database = {
           manga_type?: Database["public"]["Enums"]["manga_type"];
           rating?: number | null;
           release_year?: number | null;
+          slug?: string | null;
           status?: Database["public"]["Enums"]["manga_status"];
           title?: string;
           updated_at?: string;
