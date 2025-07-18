@@ -90,7 +90,7 @@ const MangaDetails = () => {
   }, [slug]);
 
   const fetchMangaDetails = async () => {
-    if (!id) {
+    if (!slug) {
       setLoading(false);
       return;
     }
@@ -98,11 +98,16 @@ const MangaDetails = () => {
     setError(null);
 
     try {
-      const { data, error } = await supabase
-        .from("manga")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const identifier = parseMangaIdentifier(slug);
+      let query = supabase.from("manga").select("*");
+
+      if (identifier.type === "slug") {
+        query = query.eq("slug", identifier.value);
+      } else {
+        query = query.eq("id", identifier.value);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) {
         if (error.code === "PGRST116") {
@@ -204,7 +209,7 @@ const MangaDetails = () => {
       case "manhwa":
         return "مانهوا";
       case "manhua":
-        return "��انها";
+        return "مانها";
       default:
         return type;
     }
@@ -418,7 +423,7 @@ const MangaDetails = () => {
                 <div className="text-muted-foreground text-6xl">📚</div>
                 <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
                 <p className="text-muted-foreground">
-                  لم يتم العثور على الم��نجا المطلوبة
+                  لم يتم العثور على المانجا المطلوبة
                 </p>
                 <Button onClick={() => navigate("/")} variant="outline">
                   العودة للرئيسية
