@@ -453,8 +453,8 @@ const ChapterReader = () => {
                     size="sm"
                     className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 px-4 py-2 rounded-lg font-medium w-full"
                   >
-                    <ArrowLeft className="h-4 w-4 ml-2" />
-                    التالي
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                    السابق
                   </Button>
                 </Link>
               ) : (
@@ -464,8 +464,8 @@ const ChapterReader = () => {
                   disabled
                   className="bg-gray-800 border-gray-700 text-gray-500 px-4 py-2 rounded-lg font-medium cursor-not-allowed w-full"
                 >
-                  <ArrowLeft className="h-4 w-4 ml-2" />
-                  التالي
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                  السابق
                 </Button>
               )}
             </div>
@@ -491,8 +491,8 @@ const ChapterReader = () => {
                     size="sm"
                     className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium w-full"
                   >
-                    السابق
-                    <ArrowRight className="h-4 w-4 mr-2" />
+                    التالي
+                    <ArrowLeft className="h-4 w-4 mr-2" />
                   </Button>
                 </Link>
               ) : (
@@ -502,8 +502,8 @@ const ChapterReader = () => {
                   disabled
                   className="bg-gray-800 text-gray-400 px-4 py-2 rounded-lg font-medium cursor-not-allowed w-full"
                 >
-                  السابق
-                  <ArrowRight className="h-4 w-4 mr-2" />
+                  التالي
+                  <ArrowLeft className="h-4 w-4 mr-2" />
                 </Button>
               )}
             </div>
