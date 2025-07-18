@@ -330,7 +330,7 @@ const MangaDetails = () => {
       if (error) throw error;
 
       toast({
-        title: "تم التحديث!",
+        title: "تم ا��تحديث!",
         description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل مدفوع",
       });
 
@@ -498,12 +498,25 @@ const MangaDetails = () => {
                 <div className="text-destructive text-6xl">⚠️</div>
                 <h1 className="text-2xl font-bold">حدث خطأ</h1>
                 <p className="text-muted-foreground">{error}</p>
-                <Button
-                  onClick={() => window.location.reload()}
-                  variant="outline"
-                >
-                  إعادة المحاولة
-                </Button>
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="outline"
+                  >
+                    إعادة المحاولة
+                  </Button>
+                  {isAdmin && (
+                    <Button
+                      onClick={async () => {
+                        await fixMissingSlugs();
+                        window.location.reload();
+                      }}
+                      variant="secondary"
+                    >
+                      إصلاح Slugs
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
