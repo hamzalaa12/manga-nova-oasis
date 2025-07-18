@@ -215,11 +215,12 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
 
       if (error) {
         console.error("Comment insertion error details:", {
-          error,
+          error: JSON.stringify(error, null, 2),
           code: error.code,
           message: error.message,
           details: error.details,
           hint: error.hint,
+          full_error: error,
         });
 
         // Provide more specific error messages
@@ -228,10 +229,15 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
           errorMessage = "الفصل غير موجود أو غير صالح";
         } else if (error.code === "23505") {
           errorMessage = "التعليق مكرر";
+        } else if (error.code === "42501") {
+          errorMessage = "ليس لديك صلاحية لنشر التعليقات";
+        } else if (error.code === "42P01") {
+          errorMessage = "جدول التعليقات غير موجود";
         } else if (error.message) {
-          errorMessage = error.message;
+          errorMessage = `خطأ في قاعدة البيانات: ${error.message}`;
         }
 
+        console.error("Throwing error with message:", errorMessage);
         throw new Error(errorMessage);
       }
 
@@ -514,7 +520,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
     "🥺",
     "😤",
     "🤯",
-    "🙄",
+    "��",
     "😏",
     "🤩",
     "😇",
@@ -777,12 +783,12 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-400">
-            <p>يجب تسجيل الدخول لكتابة التعليقات</p>
+            <p>يجب تسجيل الدخول ��كتابة التعليقات</p>
           </div>
         )}
       </div>
 
-      {/* قائمة ا��تعليقات */}
+      {/* قائمة التعليقات */}
       <div className="p-6">
         {isLoading ? (
           <div className="space-y-4">
