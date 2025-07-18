@@ -44,6 +44,7 @@ import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { fixMissingSlugs, checkDatabaseHealth } from "@/utils/fixSlugs";
 
 interface Manga {
   id: string;
