@@ -207,11 +207,6 @@ const MangaDetails = () => {
       });
 
       console.log("✅ Track view response:", response);
-
-      // Force refresh the page data to see updated count
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error: any) {
       console.error("❌ Error tracking view:", error);
     }
