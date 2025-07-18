@@ -185,6 +185,7 @@ const MangaDetails = () => {
 
   const trackMangaView = async (mangaId: string) => {
     try {
+      console.log("Tracking manga view for ID:", mangaId);
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -194,17 +195,17 @@ const MangaDetails = () => {
         headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
       }
 
-      await supabase.functions.invoke("track-view", {
+      const response = await supabase.functions.invoke("track-view", {
         body: {
           mangaId: mangaId,
           type: "manga",
         },
         headers,
       });
+
+      console.log("Track view response:", response);
     } catch (error: any) {
-      if (error.status !== 404 && error.status !== 500) {
-        console.warn("Error tracking view:", error.message || error);
-      }
+      console.error("Error tracking view:", error);
     }
   };
 
