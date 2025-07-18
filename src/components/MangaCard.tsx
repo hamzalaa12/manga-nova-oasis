@@ -53,7 +53,7 @@ const MangaCard = ({
         </div>
       </div>
 
-      <div className="p-3 space-y-2">
+      <div className="p-3 space-y-2 text-center">
         <h3 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
