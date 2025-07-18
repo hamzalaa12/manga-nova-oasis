@@ -208,6 +208,56 @@ const ChapterReader = () => {
       : null;
   };
 
+  // Scroll detection for auto-hide UI
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY < 50) {
+      // Near top of page, always show UI
+      setShowUI(true);
+      setScrollDirection("up");
+    } else if (Math.abs(currentScrollY - lastScrollY.current) > 10) {
+      // Only update if scrolled more than 10px to avoid jitter
+      if (currentScrollY > lastScrollY.current) {
+        // Scrolling down - hide UI
+        setScrollDirection("down");
+        setShowUI(false);
+      } else {
+        // Scrolling up - show UI
+        setScrollDirection("up");
+        setShowUI(true);
+      }
+    }
+
+    lastScrollY.current = currentScrollY;
+
+    // Clear existing timeout
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+
+    // Show UI after user stops scrolling for 2 seconds
+    scrollTimeout.current = setTimeout(() => {
+      setShowUI(true);
+    }, 2000);
+  }, []);
+
+  // Scroll event listener
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
+  }, [handleScroll]);
+
+  // Touch/click events to toggle UI visibility
+  const handleUIToggle = useCallback(() => {
+    setShowUI(!showUI);
+  }, [showUI]);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -215,12 +265,16 @@ const ChapterReader = () => {
         case "Escape":
           navigate(-1);
           break;
+        case " ": // Spacebar to toggle UI
+          event.preventDefault();
+          handleUIToggle();
+          break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [navigate]);
+  }, [navigate, handleUIToggle]);
 
   if (loading) {
     return (
