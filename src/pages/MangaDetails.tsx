@@ -264,7 +264,7 @@ const MangaDetails = () => {
       fetchChapters();
     } catch (error: any) {
       toast({
-        title: "خ��أ",
+        title: "خطأ",
         description: "فشل في تحديث حالة الفصل",
         variant: "destructive",
       });
@@ -412,7 +412,12 @@ const MangaDetails = () => {
                   {/* أدوات الأدمن */}
                   {isAdmin && (
                     <div className="flex gap-2 mt-4">
-                      <Button variant="outline" className="flex-1" size="sm">
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        size="sm"
+                        onClick={() => setIsEditDialogOpen(true)}
+                      >
                         <Edit className="h-4 w-4 ml-2" />
                         تحرير
                       </Button>
@@ -429,7 +434,7 @@ const MangaDetails = () => {
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
                               الفصول المرتبطة بها أيضاً. هذا الإجراء لا يمكن
-                              التراجع عنه.
+                              ��لتراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -488,7 +493,7 @@ const MangaDetails = () => {
 
                 {chapters.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    لا توجد فص��ل متاحة حالياً
+                    لا توجد فصول متاحة حالياً
                   </p>
                 ) : (
                   <div className="space-y-2">
