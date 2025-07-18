@@ -16,6 +16,7 @@ import MangaCard from "@/components/MangaCard";
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
   description: string;
   cover_image_url: string;
