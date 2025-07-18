@@ -14,6 +14,7 @@ import { X, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { createSlug } from "@/lib/slug";
+import { AVAILABLE_GENRES } from "@/constants/genres";
 
 interface AddMangaFormProps {
   onSuccess: () => void;
@@ -84,7 +85,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "حاسوب",
     "ألعاب",
 
-    // التكنولوجيا والمستقبل
+    // التكنولوجيا والمستقب��
     "واقع افتراضي",
     "وا��ع معزز",
     "ذكاء اصطناعي",
@@ -110,7 +111,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "بطولات",
     "مهام",
     "بحث عن الكنز",
-    "قرا��نة",
+    "قراصنة",
     "بحارة",
     "طيران",
 
@@ -143,7 +144,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "عدالة",
     "جريمة",
     "تحقيق",
-    "بوليسي",
+    "بو��يسي",
     "جاسوسية",
     "مخابرات",
     "سري",
@@ -173,7 +174,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "طقس",
     "فصول السنة",
     "سفر",
-    "سياح��",
+    "سياحة",
     "تاريخ قديم",
     "حضارات",
     "أثار",
