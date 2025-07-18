@@ -5,6 +5,7 @@ import { getMangaUrl, getMangaSlug } from "@/lib/slug";
 
 interface MangaCardProps {
   id?: string;
+  slug?: string;
   title: string;
   cover: string;
   rating: number;
