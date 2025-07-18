@@ -114,10 +114,30 @@ const MangaDetails = () => {
       if (error) throw error;
       setManga(data);
 
-      // Track view using the new system
-      await trackMangaView(data.id);
+      // جلب الفصول والتتبع في نفس الوقت
+      await Promise.all([
+        fetchChaptersForManga(data.id),
+        trackMangaView(data.id),
+      ]);
     } catch (error) {
       console.error("Error fetching manga details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchChaptersForManga = async (mangaId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("chapters")
+        .select("*")
+        .eq("manga_id", mangaId)
+        .order("chapter_number", { ascending: true });
+
+      if (error) throw error;
+      setChapters(data || []);
+    } catch (error) {
+      console.error("Error fetching chapters:", error);
     }
   };
 
