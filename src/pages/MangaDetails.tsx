@@ -71,7 +71,7 @@ interface Chapter {
 }
 
 const MangaDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const { user, userProfile, isAdmin } = useAuth();
   const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
@@ -79,11 +79,16 @@ const MangaDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
+    if (slug) {
       fetchMangaDetails();
+    }
+  }, [slug]);
+
+  useEffect(() => {
+    if (manga?.id) {
       fetchChapters();
     }
-  }, [id]);
+  }, [manga?.id]);
 
   const fetchMangaDetails = async () => {
     try {
@@ -258,7 +263,7 @@ const MangaDetails = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">جار�� التحميل...</div>
+          <div className="text-center">جاري التحميل...</div>
         </div>
         <Footer />
       </div>
@@ -333,7 +338,7 @@ const MangaDetails = () => {
                     {manga.release_year && (
                       <div className="flex items-center justify-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        سنة ال��صدار: {manga.release_year}
+                        سنة الإصدار: {manga.release_year}
                       </div>
                     )}
                     <div className="flex items-center justify-center gap-2">
