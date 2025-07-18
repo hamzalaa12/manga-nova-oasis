@@ -114,7 +114,7 @@ const MangaDetails = () => {
   };
 
   const fetchMangaDetails = async () => {
-    if (!slug) {
+    if (!id) {
       setLoading(false);
       return;
     }
