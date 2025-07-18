@@ -66,6 +66,18 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         content: content.trim(),
       });
 
+      // Check if chapter exists first
+      const { data: chapterExists, error: chapterError } = await supabase
+        .from("chapters")
+        .select("id")
+        .eq("id", chapterId)
+        .single();
+
+      if (chapterError || !chapterExists) {
+        console.error("Chapter not found:", chapterError);
+        throw new Error("الفصل غير موجود");
+      }
+
       const { data, error } = await supabase
         .from("chapter_comments")
         .insert({
@@ -200,9 +212,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
               >
                 <Send className="h-4 w-4" />
-                {addCommentMutation.isPending
-                  ? "جاري النشر..."
-                  : "نشر التع��يق"}
+                {addCommentMutation.isPending ? "جاري النشر..." : "نشر التعليق"}
               </Button>
             </div>
           </div>
