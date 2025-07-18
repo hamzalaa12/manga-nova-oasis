@@ -15,7 +15,6 @@ interface MangaCardProps {
 
 const MangaCard = ({
   id,
-  slug,
   title,
   cover,
   rating,
