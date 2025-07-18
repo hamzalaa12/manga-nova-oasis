@@ -406,6 +406,43 @@ const MangaDetails = () => {
                     <Bookmark className="h-4 w-4 ml-2" />
                     إضافة للمفضلة
                   </Button>
+
+                  {/* أدوات الأدمن */}
+                  {isAdmin && (
+                    <div className="flex gap-2 mt-4">
+                      <Button variant="outline" className="flex-1" size="sm">
+                        <Edit className="h-4 w-4 ml-2" />
+                        تحرير
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm">
+                            <Trash2 className="h-4 w-4 ml-2" />
+                            حذف
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
+                              الفصول المرتبطة بها أيضاً. هذا الإجراء لا يمكن
+                              التراجع ��نه.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={handleDeleteManga}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              حذف المانجا
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -488,7 +525,7 @@ const MangaDetails = () => {
                                 {chapter.is_private && (
                                   <Badge variant="outline" className="text-xs">
                                     <Lock className="h-3 w-3 ml-1" />
-                                    خا��
+                                    خاص
                                   </Badge>
                                 )}
                               </div>
