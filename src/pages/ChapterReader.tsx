@@ -457,21 +457,34 @@ const ChapterReader = () => {
       </div>
 
       {/* Main Content - Vertical Layout */}
-      <main className="pt-32 pb-20">
+      <main
+        className={`transition-all duration-300 ease-in-out ${
+          showUI ? "pt-32 pb-20" : "pt-4 pb-4"
+        }`}
+      >
+        {/* Click overlay for UI toggle */}
+        <div
+          className="fixed inset-0 z-10"
+          onClick={handleUIToggle}
+          style={{ pointerEvents: showUI ? "none" : "auto" }}
+        />
+
         {chapter.pages.length === 0 ? (
           <div className="flex items-center justify-center min-h-[80vh]">
             <p className="text-gray-400">لا توجد صفحات في هذا الفصل</p>
           </div>
         ) : (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
             {/* All Pages Displayed Vertically */}
             {chapter.pages.map((page, index) => (
-              <div key={index} className="mb-2">
+              <div key={index} className="mb-1 sm:mb-2">
                 <img
                   src={page?.url || "/placeholder.svg"}
                   alt={`صفحة ${index + 1}`}
-                  className="w-full max-w-full object-contain bg-gray-900"
+                  className="w-full max-w-full object-contain bg-gray-900 rounded-sm sm:rounded-md"
                   loading={index < 3 ? "eager" : "lazy"}
+                  onClick={handleUIToggle}
+                  style={{ cursor: showUI ? "default" : "pointer" }}
                 />
               </div>
             ))}
