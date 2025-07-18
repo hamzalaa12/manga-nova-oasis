@@ -172,35 +172,28 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       parentId?: string;
       isSpoiler: boolean;
     }) => {
-      if (!user && !sessionId) {
-        throw new Error("يجب تسجيل الدخول أو انتظار تحميل الجلسة");
+      if (!user) {
+        throw new Error("يجب تسجيل الدخ��ل لكتابة التعليقات");
       }
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
+      const { data, error } = await supabase
+        .from("chapter_comments")
+        .insert({
+          chapter_id: chapterId,
+          user_id: user.id,
+          parent_id: parentId || null,
+          content: content.trim(),
+          is_spoiler: isSpoiler,
+        })
+        .select()
+        .single();
 
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+      if (error) {
+        console.error("Comment insertion error:", error);
+        throw new Error(error.message || "فشل في نشر التعليق");
       }
 
-      const { data, error } = await supabase.functions.invoke(
-        "manage-comments",
-        {
-          body: {
-            action: "create",
-            chapterId,
-            content: content.trim(),
-            parentId: parentId || null,
-            isSpoiler,
-          },
-          headers,
-        },
-      );
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
