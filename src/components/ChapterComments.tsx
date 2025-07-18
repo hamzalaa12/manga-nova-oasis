@@ -119,7 +119,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       const commentsMap = new Map();
       const rootComments: Comment[] = [];
 
-      // جل�� إعجابات المستخدم
+      // جلب إعجابات المستخدم
       let userLikes: any[] = [];
       if (user) {
         const { data: likesData } = await supabase
@@ -283,29 +283,21 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         throw new Error("يجب تسجيل الدخول");
       }
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
+      // حذف الإعجاب السابق إن وجد
+      await supabase
+        .from("comment_likes")
+        .delete()
+        .eq("comment_id", commentId)
+        .eq("user_id", user.id);
 
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-      }
-
-      const { data, error } = await supabase.functions.invoke(
-        "manage-comments",
-        {
-          body: {
-            action: "like",
-            commentId,
-            isLike,
-          },
-          headers,
-        },
-      );
+      // إضافة الإعجاب الجديد
+      const { error } = await supabase.from("comment_likes").insert({
+        comment_id: commentId,
+        user_id: user.id,
+        is_like: isLike,
+      });
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -663,7 +655,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-400">
-            <p>يجب تسجيل الدخول لكت��بة التعليقات</p>
+            <p>يجب تسجيل الدخول لكتابة التعليقات</p>
           </div>
         )}
       </div>
