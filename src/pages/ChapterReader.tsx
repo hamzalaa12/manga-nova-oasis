@@ -137,6 +137,57 @@ const ChapterReader = () => {
     }
   };
 
+  const fetchChapterBySlugAndNumber = async () => {
+    if (!slug || !chapterParam) return;
+
+    try {
+      const chapterNumber = parseFloat(chapterParam);
+      const identifier = parseMangaIdentifier(slug);
+
+      // First, find the manga by slug or ID
+      let mangaQuery = supabase.from("manga").select("id, slug, title");
+
+      if (identifier.type === "slug") {
+        mangaQuery = mangaQuery.eq("slug", identifier.value);
+      } else {
+        mangaQuery = mangaQuery.eq("id", identifier.value);
+      }
+
+      const { data: mangaData, error: mangaError } = await mangaQuery.single();
+
+      if (mangaError) throw mangaError;
+      setManga(mangaData);
+
+      // Then find the chapter by manga_id and chapter_number
+      const { data: chapterData, error: chapterError } = await supabase
+        .from("chapters")
+        .select("*")
+        .eq("manga_id", mangaData.id)
+        .eq("chapter_number", chapterNumber)
+        .single();
+
+      if (chapterError) throw chapterError;
+      setChapter(chapterData);
+
+      // Fetch all chapters for navigation
+      const { data: chaptersData, error: chaptersError } = await supabase
+        .from("chapters")
+        .select("id, chapter_number, title")
+        .eq("manga_id", mangaData.id)
+        .order("chapter_number", { ascending: true });
+
+      if (chaptersError) throw chaptersError;
+      setAllChapters(chaptersData || []);
+
+      // Track chapter view
+      await trackChapterView(chapterData.id);
+    } catch (error) {
+      console.error("Error fetching chapter by slug and number:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getCurrentChapterIndex = () => {
     return allChapters.findIndex((ch) => ch.id === chapter?.id);
   };
