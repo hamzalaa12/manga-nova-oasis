@@ -264,7 +264,6 @@ const MangaByGenre = () => {
               <MangaCard
                 key={item.id}
                 id={item.id}
-                slug={item.slug}
                 title={item.title}
                 cover={item.cover_image_url}
                 rating={item.rating || 0}
