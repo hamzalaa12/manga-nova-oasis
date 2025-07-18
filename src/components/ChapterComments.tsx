@@ -384,9 +384,81 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
     },
   });
 
+  // Fallback comment submission method
+  const handleSubmitCommentFallback = async () => {
+    if (!newComment.trim()) {
+      toast({
+        title: "خطأ",
+        description: "الرجاء كتابة تعليق",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "خطأ",
+        description: "يجب تسجيل الدخول لكتابة التعليقات",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      console.log("🔄 Using fallback comment submission method");
+
+      // Simple direct insertion
+      const commentData = {
+        chapter_id: chapterId,
+        user_id: user.id,
+        parent_id: replyingTo || null,
+        content: newComment.trim(),
+        is_spoiler: isSpoiler,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log("💾 Inserting comment data:", commentData);
+
+      const { error } = await supabase
+        .from("chapter_comments")
+        .insert(commentData);
+
+      if (error) {
+        console.error("❌ Fallback insertion error:", error);
+        throw error;
+      }
+
+      console.log("✅ Comment inserted successfully with fallback method");
+
+      // Reset form
+      setNewComment("");
+      setIsSpoiler(false);
+      setReplyingTo(null);
+
+      // Refresh comments
+      queryClient.invalidateQueries({
+        queryKey: ["chapter-comments", chapterId],
+      });
+
+      toast({
+        title: "✅ تم النشر!",
+        description: "تم نشر تعليقك بنجاح",
+      });
+    } catch (error: any) {
+      console.error("❌ Fallback comment submission failed:", error);
+      toast({
+        title: "❌ خطأ في النشر",
+        description: error.message || "فشل في نشر التعليق",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmitComment = () => {
     if (!newComment.trim()) return;
 
+    // Try the mutation first, fallback on error
     addCommentMutation.mutate({
       content: newComment,
       parentId: replyingTo || undefined,
@@ -522,7 +594,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="اكتب تعليقك هنا... (Ctrl+Enter للإ��سال)"
+                placeholder="اكتب تعليقك هنا... (Ctrl+Enter للإرسال)"
                 className="bg-gray-800 border-gray-600 text-white min-h-[120px] pr-4 pb-12 resize-none"
                 dir="rtl"
               />
@@ -790,7 +862,7 @@ const CommentItem = ({
     >
       <Card className="bg-gray-800 border-gray-700 hover:bg-gray-800/80 transition-colors">
         <CardContent className="p-4">
-          {/* رأس التعليق */}
+          {/* ر��س التعليق */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-blue-400">
@@ -867,7 +939,7 @@ const CommentItem = ({
             </DropdownMenu>
           </div>
 
-          {/* ��حتوى التعليق */}
+          {/* محتوى التعليق */}
           <div className="mb-3">
             {comment.is_spoiler && !showSpoiler ? (
               <div className="bg-gray-700 rounded p-3 text-center">
