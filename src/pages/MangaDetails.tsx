@@ -43,6 +43,7 @@ import Footer from "@/components/Footer";
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
   description: string;
   cover_image_url: string;
@@ -257,7 +258,7 @@ const MangaDetails = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">جاري التحميل...</div>
+          <div className="text-center">جار�� التحميل...</div>
         </div>
         <Footer />
       </div>
@@ -332,7 +333,7 @@ const MangaDetails = () => {
                     {manga.release_year && (
                       <div className="flex items-center justify-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        سنة الإصدار: {manga.release_year}
+                        سنة ال��صدار: {manga.release_year}
                       </div>
                     )}
                     <div className="flex items-center justify-center gap-2">
