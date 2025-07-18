@@ -1,10 +1,18 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, BookOpen, FileText } from 'lucide-react';
-import AddMangaForm from './admin/AddMangaForm';
-import AddChapterForm from './admin/AddChapterForm';
-import { useAuth } from '@/hooks/useAuth';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Plus, BookOpen, FileText, Settings } from "lucide-react";
+import AddMangaForm from "./admin/AddMangaForm";
+import AddChapterForm from "./admin/AddChapterForm";
+import { useAuth } from "@/hooks/useAuth";
+import { fixMissingSlugs, checkDatabaseHealth } from "@/utils/fixSlugs";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminPanel = () => {
   const { isAdmin } = useAuth();
@@ -19,8 +27,8 @@ const AdminPanel = () => {
     <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
       <Dialog open={openMangaDialog} onOpenChange={setOpenMangaDialog}>
         <DialogTrigger asChild>
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <BookOpen className="h-5 w-5 ml-2" />
@@ -37,8 +45,8 @@ const AdminPanel = () => {
 
       <Dialog open={openChapterDialog} onOpenChange={setOpenChapterDialog}>
         <DialogTrigger asChild>
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             variant="secondary"
             className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           >
