@@ -232,16 +232,29 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       commentId: string;
       content: string;
     }) => {
-      const { error } = await supabase
-        .from("chapter_comments")
-        .update({
-          content: content.trim(),
-          edited_at: new Date().toISOString(),
-          edited_by: isAdmin ? user?.id : null,
-        })
-        .eq("id", commentId);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+
+      if (sessionData.session?.access_token) {
+        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+      }
+
+      const { data, error } = await supabase.functions.invoke(
+        "manage-comments",
+        {
+          body: {
+            action: "update",
+            commentId,
+            content: content.trim(),
+          },
+          headers,
+        },
+      );
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -504,7 +517,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                     <div className="absolute bottom-full left-0 mb-2 bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-xl z-50 max-h-64 overflow-y-auto">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-300">
-                          الإ��موجيات
+                          الإيموجيات
                         </span>
                         <Button
                           type="button"
