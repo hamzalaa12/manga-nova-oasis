@@ -108,7 +108,7 @@ const MangaDetails = () => {
         query = query.eq("id", identifier.value);
       }
 
-      const { data, error } = await query.single();
+      let { data, error } = await query.single();
 
       if (error) {
         if (error.code === "PGRST116" && identifier.type === "slug") {
@@ -413,7 +413,7 @@ const MangaDetails = () => {
                   onClick={() => window.location.reload()}
                   variant="outline"
                 >
-                  إعادة المحاولة
+                  إعادة المح��ولة
                 </Button>
               </div>
             </CardContent>
