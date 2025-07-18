@@ -43,6 +43,14 @@ const ChapterCard = ({
 
   const chapterUrl = getChapterUrl(getMangaSlug(manga), chapter_number);
 
+  // تحديد إذا كان الفصل جديد (آخر 3 أيام)
+  const isNewChapter = () => {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    const chapterDate = new Date(created_at);
+    return chapterDate >= threeDaysAgo;
+  };
+
   return (
     <Link to={chapterUrl}>
       <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
