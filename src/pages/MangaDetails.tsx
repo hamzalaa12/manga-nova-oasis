@@ -141,11 +141,13 @@ const MangaDetails = () => {
   };
 
   const fetchChapters = async () => {
+    if (!manga?.id) return;
+
     try {
       const { data, error } = await supabase
         .from("chapters")
         .select("*")
-        .eq("manga_id", id)
+        .eq("manga_id", manga.id)
         .order("chapter_number", { ascending: true });
 
       if (error) throw error;
