@@ -269,6 +269,33 @@ const MangaDetails = () => {
     }
   };
 
+  const handleDeleteManga = async () => {
+    if (!manga?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from("manga")
+        .delete()
+        .eq("id", manga.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "تم الحذف!",
+        description: "تم حذف المانجا بنجاح",
+      });
+
+      // العودة للصفحة الرئيسية
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "خطأ",
+        description: "فشل في حذف المانجا",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -461,7 +488,7 @@ const MangaDetails = () => {
                                 {chapter.is_private && (
                                   <Badge variant="outline" className="text-xs">
                                     <Lock className="h-3 w-3 ml-1" />
-                                    خاص
+                                    خا��
                                   </Badge>
                                 )}
                               </div>
