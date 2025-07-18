@@ -84,10 +84,10 @@ const MangaDetails = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (id) {
+    if (slug) {
       fetchMangaDetails();
     }
-  }, [id]);
+  }, [slug]);
 
   const fetchMangaDetails = async () => {
     if (!id) {
@@ -204,7 +204,7 @@ const MangaDetails = () => {
       case "manhwa":
         return "مانهوا";
       case "manhua":
-        return "مانها";
+        return "��انها";
       default:
         return type;
     }
@@ -262,7 +262,7 @@ const MangaDetails = () => {
       }
     } catch (error: any) {
       toast({
-        title: "خط��",
+        title: "خطأ",
         description: "فشل في حذف الفصل",
         variant: "destructive",
       });
@@ -418,7 +418,7 @@ const MangaDetails = () => {
                 <div className="text-muted-foreground text-6xl">📚</div>
                 <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
                 <p className="text-muted-foreground">
-                  لم يتم ا��عثور على المانجا المطلوبة
+                  لم يتم العثور على الم��نجا المطلوبة
                 </p>
                 <Button onClick={() => navigate("/")} variant="outline">
                   العودة للرئيسية
