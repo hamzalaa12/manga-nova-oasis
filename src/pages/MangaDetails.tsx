@@ -91,6 +91,27 @@ const MangaDetails = () => {
     }
   }, [slug]);
 
+  const checkDatabaseState = async () => {
+    try {
+      // التحقق من حالة قاعدة البيانات
+      const { count: totalManga } = await supabase
+        .from("manga")
+        .select("*", { count: "exact", head: true });
+
+      const { data: slugStats } = await supabase
+        .from("manga")
+        .select("slug")
+        .not("slug", "is", null);
+
+      console.log("Database state:", {
+        totalManga,
+        mangaWithSlugs: slugStats?.length || 0,
+      });
+    } catch (error) {
+      console.warn("Could not check database state:", error);
+    }
+  };
+
   const fetchMangaDetails = async () => {
     if (!slug) {
       setLoading(false);
@@ -137,7 +158,7 @@ const MangaDetails = () => {
               throw new Error("المانجا غير موجودة");
             }
 
-            // استخدم أول نتيجة من البحث بالعنوان
+            // ا��تخدم أول نتيجة من البحث بالعنوان
             data = titleData[0];
             console.log("Found by title:", data);
           } catch (fallbackError) {
@@ -798,7 +819,7 @@ const MangaDetails = () => {
                                         </AlertDialogTitle>
                                         <AlertDialogDescription>
                                           هل أنت متأكد من حذف الفصل{" "}
-                                          {chapter.chapter_number}؟ هذا الإجراء
+                                          {chapter.chapter_number}؟ ه��ا الإجراء
                                           لا يمكن التراجع عنه.
                                         </AlertDialogDescription>
                                       </AlertDialogHeader>
