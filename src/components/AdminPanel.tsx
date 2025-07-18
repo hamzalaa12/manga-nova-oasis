@@ -7,10 +7,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, BookOpen, FileText } from "lucide-react";
+import { Plus, BookOpen, FileText, Settings } from "lucide-react";
 import AddMangaForm from "./admin/AddMangaForm";
 import AddChapterForm from "./admin/AddChapterForm";
 import { useAuth } from "@/hooks/useAuth";
+import { ensureMangaHasSlugs } from "@/utils/ensureSlugs";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminPanel = () => {
   const { isAdmin } = useAuth();
