@@ -422,8 +422,16 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         .insert(commentData);
 
       if (error) {
-        console.error("❌ Fallback insertion error:", error);
-        throw error;
+        console.error("❌ Fallback insertion error:", {
+          error: JSON.stringify(error, null, 2),
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw new Error(
+          error.message || `Database error: ${error.code || "Unknown"}`,
+        );
       }
 
       console.log("✅ Comment inserted successfully with fallback method");
@@ -520,7 +528,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
     "🥺",
     "😤",
     "🤯",
-    "��",
+    "🙄",
     "😏",
     "🤩",
     "😇",
