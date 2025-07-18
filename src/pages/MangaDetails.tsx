@@ -73,6 +73,7 @@ interface Chapter {
 
 const MangaDetails = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { user, userProfile, isAdmin } = useAuth();
   const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
@@ -303,7 +304,7 @@ const MangaDetails = () => {
           className="inline-flex items-center gap-2 text-primary hover:text-primary-glow transition-colors mb-6"
         >
           <ArrowRight className="h-4 w-4" />
-          ال��ودة للرئيسية
+          العودة للرئيسية
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
