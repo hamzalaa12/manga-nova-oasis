@@ -185,7 +185,7 @@ const MangaDetails = () => {
 
   const trackMangaView = async (mangaId: string) => {
     try {
-      console.log("Tracking manga view for ID:", mangaId);
+      console.log("🔍 Tracking manga view for ID:", mangaId);
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -193,6 +193,9 @@ const MangaDetails = () => {
 
       if (sessionData.session?.access_token) {
         headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+        console.log("👤 User is logged in");
+      } else {
+        console.log("👤 Anonymous user");
       }
 
       const response = await supabase.functions.invoke("track-view", {
@@ -203,9 +206,14 @@ const MangaDetails = () => {
         headers,
       });
 
-      console.log("Track view response:", response);
+      console.log("✅ Track view response:", response);
+
+      // Force refresh the page data to see updated count
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error: any) {
-      console.error("Error tracking view:", error);
+      console.error("❌ Error tracking view:", error);
     }
   };
 
@@ -280,7 +288,7 @@ const MangaDetails = () => {
       if (error) throw error;
 
       toast({
-        title: "تم الح��ف!",
+        title: "تم الحذف!",
         description: `تم حذف الفصل ${chapterNumber} بنجاح`,
       });
 
@@ -672,7 +680,7 @@ const MangaDetails = () => {
                     >
                       <Button>
                         <Play className="h-4 w-4 ml-2" />
-                        بدء ��لقراءة
+                        بدء القراءة
                       </Button>
                     </Link>
                   )}
