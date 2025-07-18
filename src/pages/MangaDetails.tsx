@@ -113,7 +113,7 @@ const MangaDetails = () => {
         console.log("Searching by ID:", identifier.value);
       }
 
-      const { data, error } = await query.single();
+      let { data, error } = await query.single();
       console.log("Query result:", { data, error });
 
       if (error) {
