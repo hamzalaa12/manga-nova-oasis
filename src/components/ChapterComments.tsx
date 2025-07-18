@@ -176,6 +176,14 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
       }
 
+      console.log("Attempting to insert comment:", {
+        chapter_id: chapterId,
+        user_id: user.id,
+        parent_id: parentId || null,
+        content: content.trim(),
+        is_spoiler: isSpoiler,
+      });
+
       const { data, error } = await supabase
         .from("chapter_comments")
         .insert({
@@ -189,10 +197,28 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         .single();
 
       if (error) {
-        console.error("Comment insertion error:", error);
-        throw new Error(error.message || "فشل في نشر التعليق");
+        console.error("Comment insertion error details:", {
+          error,
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+
+        // Provide more specific error messages
+        let errorMessage = "فشل في نشر التعليق";
+        if (error.code === "23503") {
+          errorMessage = "الفصل غير موجود أو غير صالح";
+        } else if (error.code === "23505") {
+          errorMessage = "التعليق مكرر";
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        throw new Error(errorMessage);
       }
 
+      console.log("Comment inserted successfully:", data);
       return data;
     },
     onSuccess: () => {
@@ -244,7 +270,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       setEditContent("");
       toast({
         title: "تم التحديث!",
-        description: "تم تعديل التعليق بنجاح",
+        description: "تم تعديل التعليق ��نجاح",
       });
     },
   });
