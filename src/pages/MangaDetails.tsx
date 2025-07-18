@@ -117,11 +117,31 @@ const MangaDetails = () => {
       console.log("Query result:", { data, error });
 
       if (error) {
-        if (error.code === "PGRST116") {
-          // No rows returned
+        if (error.code === "PGRST116" && identifier.type === "slug") {
+          // إذا لم نجد بالـ slug، نحاول البحث بالعنوان كـ fallback
+          console.log("Slug not found, trying to search by title...");
+          try {
+            const { data: titleData, error: titleError } = await supabase
+              .from("manga")
+              .select("*")
+              .ilike("title", `%${identifier.value.replace(/-/g, " ")}%`)
+              .limit(1);
+
+            if (titleError || !titleData || titleData.length === 0) {
+              throw new Error("المانجا غير موجودة");
+            }
+
+            // استخدم أول نتيجة من البحث بالعنوان
+            data = titleData[0];
+            console.log("Found by title:", data);
+          } catch (fallbackError) {
+            throw new Error("المانجا غير موجودة");
+          }
+        } else if (error.code === "PGRST116") {
           throw new Error("المانجا غير موجودة");
+        } else {
+          throw error;
         }
-        throw error;
       }
 
       if (!data) {
