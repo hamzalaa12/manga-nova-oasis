@@ -230,7 +230,7 @@ const ChapterReader = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
-          <p className="mb-4">الفصل غير موجود</p>
+          <p className="mb-4">الف��ل غير موجود</p>
           <Link to="/">
             <Button variant="outline">العودة للرئيسية</Button>
           </Link>
@@ -310,8 +310,13 @@ const ChapterReader = () => {
               </Link>
 
               {/* Next Chapter Button */}
-              {nextChapter && (
-                <Link to={`/read/${nextChapter.id}`}>
+              {nextChapter && manga && (
+                <Link
+                  to={getChapterUrl(
+                    getMangaSlug(manga),
+                    nextChapter.chapter_number,
+                  )}
+                >
                   <Button
                     variant="default"
                     size="sm"
