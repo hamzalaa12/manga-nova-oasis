@@ -319,21 +319,29 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         throw new Error("يجب تسجيل الدخول");
       }
 
-      // حذف الإعج��ب السابق إن وجد
-      await supabase
-        .from("comment_likes")
-        .delete()
-        .eq("comment_id", commentId)
-        .eq("user_id", user.id);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
 
-      // إضافة الإعجاب الجديد
-      const { error } = await supabase.from("comment_likes").insert({
-        comment_id: commentId,
-        user_id: user.id,
-        is_like: isLike,
-      });
+      if (sessionData.session?.access_token) {
+        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+      }
+
+      const { data, error } = await supabase.functions.invoke(
+        "manage-comments",
+        {
+          body: {
+            action: "like",
+            commentId,
+            isLike,
+          },
+          headers,
+        },
+      );
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
