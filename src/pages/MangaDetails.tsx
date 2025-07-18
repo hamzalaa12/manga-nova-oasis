@@ -80,6 +80,7 @@ const MangaDetails = () => {
   const [manga, setManga] = useState<Manga | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     if (slug) {
@@ -263,7 +264,7 @@ const MangaDetails = () => {
       fetchChapters();
     } catch (error: any) {
       toast({
-        title: "خطأ",
+        title: "خ��أ",
         description: "فشل في تحديث حالة الفصل",
         variant: "destructive",
       });
@@ -314,7 +315,7 @@ const MangaDetails = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">ال��انجا غير موجودة</div>
+          <div className="text-center">المانجا غير موجودة</div>
         </div>
         <Footer />
       </div>
@@ -479,7 +480,7 @@ const MangaDetails = () => {
                     >
                       <Button>
                         <Play className="h-4 w-4 ml-2" />
-                        بدء ��لقراءة
+                        بدء القراءة
                       </Button>
                     </Link>
                   )}
@@ -487,7 +488,7 @@ const MangaDetails = () => {
 
                 {chapters.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    لا توجد فصول متاحة حالياً
+                    لا توجد فص��ل متاحة حالياً
                   </p>
                 ) : (
                   <div className="space-y-2">
