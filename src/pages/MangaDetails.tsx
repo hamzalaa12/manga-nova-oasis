@@ -124,6 +124,13 @@ const MangaDetails = () => {
       const identifier = parseMangaIdentifier(slug);
       console.log("Looking for manga with identifier:", identifier);
 
+      // التحقق من المانجا المتاحة
+      const { data: availableManga } = await supabase
+        .from("manga")
+        .select("id, slug, title")
+        .limit(5);
+      console.log("Sample available manga:", availableManga);
+
       let query = supabase.from("manga").select("*");
 
       if (identifier.type === "slug") {
@@ -155,7 +162,7 @@ const MangaDetails = () => {
                 .select("id, slug, title")
                 .limit(10);
               console.log("Available manga for debugging:", allManga);
-              throw new Error("المانجا غير موجودة");
+              throw new Error("المانجا غير موج��دة");
             }
 
             // ا��تخدم أول نتيجة من البحث بالعنوان
