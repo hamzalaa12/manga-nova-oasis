@@ -139,7 +139,7 @@ const MangaDetails = () => {
       }
 
       if (!data) {
-        throw new Error("لم يتم العثور على بيانات المانجا");
+        throw new Error("لم يتم العثور على بي��نات المانجا");
       }
 
       setManga(data);
@@ -606,10 +606,7 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-                  <Button className="w-full mt-4">
-                    <Bookmark className="h-4 w-4 ml-2" />
-                    إضافة للمفضلة
-                  </Button>
+                  <FavoriteButton mangaId={manga.id} className="w-full mt-4" />
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-4">
