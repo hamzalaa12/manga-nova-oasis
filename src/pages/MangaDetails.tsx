@@ -44,6 +44,7 @@ import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
+import ViewsCounter from "@/components/ViewsCounter";
 
 interface Manga {
   id: string;
@@ -331,7 +332,7 @@ const MangaDetails = () => {
 
       toast({
         title: "تم التحديث!",
-        description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خاص",
+        description: isPrivate ? "تم نشر ��لفصل" : "تم جعل الفصل خاص",
       });
 
       if (manga?.id) {
@@ -441,7 +442,7 @@ const MangaDetails = () => {
             <CardContent className="p-8 text-center">
               <div className="space-y-4">
                 <div className="text-muted-foreground text-6xl">📚</div>
-                <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
+                <h1 className="text-2xl font-bold">المانجا غي�� موجودة</h1>
                 <p className="text-muted-foreground">
                   لم يتم العثور على المانجا المطلوبة
                 </p>
@@ -676,7 +677,7 @@ const MangaDetails = () => {
 
                 {chapters.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    لا توجد فصول متاحة حالياً
+                    لا توجد فصول متاحة حال��اً
                   </p>
                 ) : (
                   <div className="space-y-2">
