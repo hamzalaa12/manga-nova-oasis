@@ -58,7 +58,7 @@ const MangaCard = ({
           {title}
         </h3>
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
             <span>{rating}</span>
@@ -66,7 +66,7 @@ const MangaCard = ({
           <ViewsCounter viewsCount={views} type="manga" className="text-xs" />
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
           <span>{lastUpdate}</span>
         </div>
