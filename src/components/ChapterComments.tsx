@@ -381,6 +381,58 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
     },
   });
 
+  // Test database access function
+  const testDatabaseAccess = async () => {
+    try {
+      console.log("🧪 Testing database access...");
+
+      // Test 1: Check if we can read from chapter_comments
+      const { data: existingComments, error: readError } = await supabase
+        .from("chapter_comments")
+        .select("id")
+        .limit(1);
+
+      console.log("📖 Read test:", {
+        success: !readError,
+        error: readError ? JSON.stringify(readError, null, 2) : null,
+        count: existingComments?.length || 0,
+      });
+
+      // Test 2: Check if the chapter exists
+      const { data: chapterExists, error: chapterError } = await supabase
+        .from("chapters")
+        .select("id, title")
+        .eq("id", chapterId)
+        .single();
+
+      console.log("📚 Chapter test:", {
+        exists: !!chapterExists,
+        chapterId,
+        chapterTitle: chapterExists?.title,
+        error: chapterError ? JSON.stringify(chapterError, null, 2) : null,
+      });
+
+      // Test 3: Check user session
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log("👤 User session test:", {
+        hasSession: !!sessionData.session,
+        userId: sessionData.session?.user?.id,
+        userEmail: sessionData.session?.user?.email,
+        accessToken: sessionData.session?.access_token ? "Present" : "Missing",
+      });
+
+      toast({
+        title: "🧪 تشخيص قاعدة البيانات",
+        description: "تم فحص الاتصال - راجع وحدة التحكم للتفاصيل",
+      });
+    } catch (error: any) {
+      console.error("🚫 Database access test failed:", {
+        error: JSON.stringify(error, null, 2),
+        message: error?.message,
+      });
+    }
+  };
+
   // Fallback comment submission method
   const handleSubmitCommentFallback = async () => {
     if (!newComment.trim()) {
@@ -448,7 +500,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
 
       toast({
         title: "✅ تم النشر!",
-        description: "ت�� نشر تعليقك بنجاح",
+        description: "تم نشر تعليقك بنجاح",
       });
     } catch (error: any) {
       console.error("❌ Fallback comment submission failed:", {
@@ -594,7 +646,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
 
   return (
     <div className="bg-gray-900 text-white rounded-lg">
-      {/* منطقة كتابة التعليق */}
+      {/* منطقة كتابة ��لتعليق */}
       <div className="p-6 border-b border-gray-700">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
@@ -856,7 +908,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
   );
 };
 
-// مكون التعلي�� الفردي
+// مكون التعليق الفردي
 interface CommentItemProps {
   comment: Comment;
   user: any;
