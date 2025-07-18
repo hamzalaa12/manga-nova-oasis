@@ -105,7 +105,7 @@ const ChaptersGrid = ({
             <h2 className="text-3xl font-bold">{title}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-            {Array.from({ length: showAll ? 18 : 12 }).map((_, index) => (
+            {Array.from({ length: showAll ? 18 : 18 }).map((_, index) => (
               <MangaCardSkeleton key={index} />
             ))}
           </div>
