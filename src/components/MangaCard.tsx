@@ -77,6 +77,13 @@ const MangaCard = ({
   );
 
   const mangaSlug = getMangaSlug({ slug, title, id });
+  console.log("MangaCard debug:", {
+    slug,
+    title,
+    id,
+    mangaSlug,
+    url: getMangaUrl(mangaSlug),
+  });
 
   return id || slug ? (
     <Link to={getMangaUrl(mangaSlug)}>{CardContent}</Link>
