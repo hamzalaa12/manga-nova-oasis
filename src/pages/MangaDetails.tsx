@@ -236,7 +236,9 @@ const MangaDetails = () => {
         description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل مدفوع",
       });
 
-      fetchChapters();
+      if (manga?.id) {
+        fetchChaptersForManga(manga.id);
+      }
     } catch (error: any) {
       toast({
         title: "خطأ",
@@ -257,10 +259,12 @@ const MangaDetails = () => {
 
       toast({
         title: "تم التحديث!",
-        description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خ��ص",
+        description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خاص",
       });
 
-      fetchChapters();
+      if (manga?.id) {
+        fetchChaptersForManga(manga.id);
+      }
     } catch (error: any) {
       toast({
         title: "خطأ",
