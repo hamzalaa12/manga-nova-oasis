@@ -20,6 +20,8 @@ serve(async (req) => {
       throw new Error("mangaId is required");
     }
 
+    console.log(`Processing ${type} view for ID: ${mangaId}`);
+
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -37,6 +39,7 @@ serve(async (req) => {
         const token = authHeader.replace("Bearer ", "");
         const { data: userData } = await supabaseClient.auth.getUser(token);
         userId = userData.user?.id || null;
+        console.log("User ID:", userId);
       } catch (error) {
         console.log("Could not get user from token:", error);
       }
@@ -49,89 +52,82 @@ serve(async (req) => {
         req.headers.get("cf-connecting-ip") ||
         "unknown";
       const userAgent = req.headers.get("user-agent") || "unknown";
-      sessionId = `${ip}-${userAgent}`.slice(0, 100); // Limit length
+      sessionId = `${ip}-${userAgent}`.slice(0, 100);
+      console.log("Session ID:", sessionId);
     }
 
     // Check if view already exists
     let existingView = null;
-    if (userId) {
-      const { data } = await supabaseClient
-        .from("manga_views")
-        .select("id")
-        .eq("manga_id", mangaId)
-        .eq("user_id", userId)
-        .maybeSingle();
-      existingView = data;
-    } else if (sessionId) {
-      const { data } = await supabaseClient
-        .from("manga_views")
-        .select("id")
-        .eq("manga_id", mangaId)
-        .eq("session_id", sessionId)
-        .maybeSingle();
-      existingView = data;
+    try {
+      if (userId) {
+        const { data } = await supabaseClient
+          .from("manga_views")
+          .select("id")
+          .eq("manga_id", mangaId)
+          .eq("user_id", userId)
+          .maybeSingle();
+        existingView = data;
+      } else if (sessionId) {
+        const { data } = await supabaseClient
+          .from("manga_views")
+          .select("id")
+          .eq("manga_id", mangaId)
+          .eq("session_id", sessionId)
+          .maybeSingle();
+        existingView = data;
+      }
+    } catch (error) {
+      console.log("Error checking existing view:", error);
     }
 
-    // If view doesn't exist, add it and increment counter
+    console.log("Existing view:", existingView);
+
+    // If view doesn't exist, add it
     if (!existingView) {
-      // Insert new view record
-      const { error: viewError } = await supabaseClient
-        .from("manga_views")
-        .insert({
-          manga_id: mangaId,
-          user_id: userId,
-          session_id: sessionId,
-        });
+      try {
+        // Insert new view record - let the trigger handle the counter update
+        const { error: viewError } = await supabaseClient
+          .from("manga_views")
+          .insert({
+            manga_id: mangaId,
+            user_id: userId,
+            session_id: sessionId,
+          });
 
-      if (viewError) {
-        console.error("Error inserting view:", viewError);
-        // Continue anyway - maybe view was added by another request
+        if (viewError) {
+          console.error("Error inserting view:", viewError);
+          throw viewError;
+        }
+
+        console.log("View recorded successfully");
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            newView: true,
+            message: "View recorded successfully",
+            mangaId: mangaId,
+            type: type,
+            userId: userId,
+            sessionId: sessionId,
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          },
+        );
+      } catch (error) {
+        console.error("Error processing new view:", error);
+        throw error;
       }
-
-      // Increment views count in manga/chapters table
-      const tableName = type === "chapter" ? "chapters" : "manga";
-
-      // First, get the current views count
-      const { data: currentData } = await supabaseClient
-        .from(tableName)
-        .select("views_count")
-        .eq("id", mangaId)
-        .single();
-
-      const currentViews = currentData?.views_count || 0;
-
-      // Update with incremented count
-      const { error: updateError } = await supabaseClient
-        .from(tableName)
-        .update({
-          views_count: currentViews + 1,
-        })
-        .eq("id", mangaId);
-
-      if (updateError) {
-        console.error("Error updating views count:", updateError);
-        throw updateError;
-      }
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          newView: true,
-          message: "View recorded successfully",
-          oldCount: currentViews,
-          newCount: currentViews + 1,
-        }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 200,
-        },
-      );
     } else {
+      console.log("View already exists");
       return new Response(
         JSON.stringify({
           success: true,
           newView: false,
           message: "View already recorded for this user/session",
+          existingViewId: existingView.id,
         }),
         {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -144,6 +140,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: error.message || "Internal server error",
+        details: error.toString(),
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
