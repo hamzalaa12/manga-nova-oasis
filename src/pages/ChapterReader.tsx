@@ -64,6 +64,7 @@ const ChapterReader = () => {
   const [manga, setManga] = useState<Manga | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showNavigation, setShowNavigation] = useState(false);
 
   useEffect(() => {
     if (slug && chapterParam) {
@@ -331,7 +332,7 @@ const ChapterReader = () => {
               </p>
             </div>
 
-            {/* الجهة اليمنى - منتقي الفصول */}
+            {/* ال��هة اليمنى - منتقي الفصول */}
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -491,7 +492,7 @@ const ChapterReader = () => {
                     size="sm"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   >
-                    التالي
+                    ��لتالي
                     <ChevronLeft className="h-4 w-4 mr-2" />
                   </Button>
                 </Link>
