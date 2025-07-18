@@ -166,7 +166,6 @@ const MangaGrid = ({
             <MangaCard
               key={manga.id}
               id={manga.id}
-              slug={manga.slug}
               title={manga.title}
               cover={manga.cover_image_url || "/placeholder.svg"}
               rating={manga.rating}
