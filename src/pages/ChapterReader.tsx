@@ -377,29 +377,35 @@ const ChapterReader = () => {
           showUI ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
             {/* Left Navigation */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <Link to={getMangaUrl(getMangaSlug(manga))}>
-                <Button variant="ghost" size="sm" className="hover:bg-white/10">
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                  العودة
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hover:bg-white/10 text-xs sm:text-sm px-2 sm:px-3"
+                >
+                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
+                  <span className="hidden sm:inline">العودة</span>
+                  <span className="sm:hidden">←</span>
                 </Button>
               </Link>
 
-              {/* Next Chapter Button */}
+              {/* Next Chapter Button - Hidden on mobile nav */}
               {nextChapter && manga && (
                 <Link
                   to={getChapterUrl(
                     getMangaSlug(manga),
                     nextChapter.chapter_number,
                   )}
+                  className="hidden sm:block"
                 >
                   <Button
                     variant="default"
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm"
                   >
                     التالي →
                   </Button>
@@ -407,11 +413,13 @@ const ChapterReader = () => {
               )}
             </div>
 
-            {/* Center Chapter Info */}
-            <div className="text-center">
-              <p className="text-sm text-gray-400">
+            {/* Center Chapter Info - Simplified on mobile */}
+            <div className="text-center flex-1 px-2">
+              <p className="text-xs sm:text-sm text-gray-400 truncate">
                 الفصل {chapter.chapter_number}
-                {chapter.title && `: ${chapter.title}`}
+                {chapter.title && (
+                  <span className="hidden sm:inline">: {chapter.title}</span>
+                )}
               </p>
             </div>
 
@@ -422,7 +430,7 @@ const ChapterReader = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded min-w-[60px]"
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-2 sm:px-4 py-2 rounded min-w-[40px] sm:min-w-[60px] text-xs sm:text-sm"
                   >
                     {chapter.chapter_number}
                     <ChevronDown className="h-3 w-3 mr-1" />
