@@ -480,7 +480,11 @@ const ChapterReader = () => {
       </main>
 
       {/* Bottom Navigation - Fixed and Minimal */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm">
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm transition-transform duration-300 ease-in-out ${
+          showUI ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Next Chapter Button */}
