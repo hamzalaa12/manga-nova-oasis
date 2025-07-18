@@ -320,13 +320,14 @@ const ChapterReader = () => {
               >
                 <Info className="h-3 w-3 lg:h-4 lg:w-4" />
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
-              >
+              <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/20">
                 <Eye className="h-3 w-3 lg:h-4 lg:w-4" />
-              </Button>
+                <ViewsCounter
+                  viewsCount={chapter?.views_count || 0}
+                  type="chapter"
+                  className="text-white text-xs"
+                />
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
