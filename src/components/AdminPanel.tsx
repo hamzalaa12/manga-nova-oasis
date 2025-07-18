@@ -16,8 +16,33 @@ import { useToast } from "@/hooks/use-toast";
 
 const AdminPanel = () => {
   const { isAdmin } = useAuth();
+  const { toast } = useToast();
   const [openMangaDialog, setOpenMangaDialog] = useState(false);
   const [openChapterDialog, setOpenChapterDialog] = useState(false);
+
+  const handleEnsureSlugs = async () => {
+    try {
+      const success = await ensureMangaHasSlugs();
+      if (success) {
+        toast({
+          title: "تم الإصلاح!",
+          description: "تم التأكد من وجود slugs لجميع المانجا",
+        });
+      } else {
+        toast({
+          title: "خطأ",
+          description: "فشل في إصلاح الـ slugs",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "فشل في إصلاح الـ slugs",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!isAdmin) {
     return null;
