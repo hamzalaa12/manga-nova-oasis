@@ -519,10 +519,10 @@ const ChapterReader = () => {
           showUI ? "translate-y-0" : "translate-y-full"
         }`}
       >
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
+          <div className="flex items-center justify-between gap-2">
             {/* Next Chapter Button */}
-            <div>
+            <div className="flex-1">
               {nextChapter && manga ? (
                 <Link
                   to={getChapterUrl(
@@ -533,7 +533,7 @@ const ChapterReader = () => {
                   <Button
                     variant="default"
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-6 py-2 rounded-lg font-medium text-xs sm:text-sm w-full sm:w-auto"
                   >
                     التالي →
                   </Button>
@@ -543,7 +543,7 @@ const ChapterReader = () => {
                   variant="default"
                   size="sm"
                   disabled
-                  className="bg-gray-600 text-gray-300 px-6 py-2 rounded-lg font-medium cursor-not-allowed"
+                  className="bg-gray-600 text-gray-300 px-3 sm:px-6 py-2 rounded-lg font-medium cursor-not-allowed text-xs sm:text-sm w-full sm:w-auto"
                 >
                   التالي →
                 </Button>
@@ -551,13 +551,13 @@ const ChapterReader = () => {
             </div>
 
             {/* Chapter Selector */}
-            <div>
+            <div className="flex-shrink-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg min-w-[60px] font-medium"
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-2 sm:px-4 py-2 rounded-lg min-w-[50px] sm:min-w-[60px] font-medium text-xs sm:text-sm"
                   >
                     {chapter.chapter_number}
                     <ChevronDown className="h-3 w-3 mr-1" />
