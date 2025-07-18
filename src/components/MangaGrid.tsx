@@ -24,38 +24,40 @@ interface Manga {
   manga_type: string;
 }
 
+const fetchMangaData = async (showAll: boolean): Promise<Manga[]> => {
+  const { data, error } = await supabase
+    .from("manga")
+    .select(
+      "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
+    )
+    .order("updated_at", { ascending: false })
+    .limit(showAll ? 100 : 200);
+
+  if (error) throw error;
+  return data || [];
+};
+
 const MangaGrid = ({
   title = "الأحدث والأكثر شعبية",
   showAll = false,
 }: MangaGridProps) => {
-  const [mangaData, setMangaData] = useState<Manga[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = showAll ? 100 : 36; // 6x6 للصفحة الرئيسية
+  const itemsPerPage = showAll ? 100 : 36;
 
-  useEffect(() => {
-    fetchManga();
-  }, []);
+  const {
+    data: mangaData = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["manga-grid", showAll],
+    queryFn: () => fetchMangaData(showAll),
+    staleTime: 5 * 60 * 1000, // 5 دقائق
+    gcTime: 10 * 60 * 1000, // 10 دقائق
+  });
 
-  const fetchManga = async () => {
-    try {
-      // جلب البيانات المطلوبة فقط لتحسين الأداء
-      const { data, error } = await supabase
-        .from("manga")
-        .select(
-          "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
-        )
-        .order("updated_at", { ascending: false })
-        .limit(showAll ? 100 : 200);
-
-      if (error) throw error;
-      setMangaData(data || []);
-    } catch (error) {
-      console.error("Error fetching manga:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (error) {
+    console.error("Error fetching manga:", error);
+  }
 
   const formatViews = (count: number) => {
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
