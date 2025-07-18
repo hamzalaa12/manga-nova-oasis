@@ -510,18 +510,6 @@ const ChapterReader = () => {
           </div>
         </div>
       </div>
-
-      {/* مؤشر التقدم */}
-      <div className="fixed top-16 left-0 right-0 z-40">
-        <div className="h-1 bg-gray-800">
-          <div
-            className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300"
-            style={{
-              width: `${((getCurrentChapterIndex() + 1) / allChapters.length) * 100}%`,
-            }}
-          />
-        </div>
-      </div>
     </div>
   );
 };
