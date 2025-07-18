@@ -122,28 +122,11 @@ const MangaDetails = () => {
     setError(null); // إعا��ة تعيين حالة الخطأ
 
     try {
-      const identifier = parseMangaIdentifier(slug);
-      console.log("Looking for manga with identifier:", identifier);
-
-      // التحقق من المانجا المتاحة
-      const { data: availableManga } = await supabase
+      const { data, error } = await supabase
         .from("manga")
-        .select("id, slug, title")
-        .limit(5);
-      console.log("Sample available manga:", availableManga);
-
-      let query = supabase.from("manga").select("*");
-
-      if (identifier.type === "slug") {
-        query = query.eq("slug", identifier.value);
-        console.log("Searching by slug:", identifier.value);
-      } else {
-        query = query.eq("id", identifier.value);
-        console.log("Searching by ID:", identifier.value);
-      }
-
-      let { data, error } = await query.single();
-      console.log("Query result:", { data, error });
+        .select("*")
+        .eq("id", id)
+        .single();
 
       if (error) {
         if (error.code === "PGRST116" && identifier.type === "slug") {
