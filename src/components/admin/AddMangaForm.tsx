@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { createSlug } from "@/lib/slug";
 
 interface AddMangaFormProps {
   onSuccess: () => void;
@@ -95,7 +96,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "أرواح شريرة",
     "عوالم موازية",
     "سفر عبر الوقت",
-    "سفر عبر الأبعاد",
+    "سفر عبر الأب��اد",
 
     // القوى والقتال
     "قوى خارقة",
