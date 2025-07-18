@@ -210,7 +210,9 @@ const MangaDetails = () => {
       });
 
       // Refresh chapters list
-      fetchChapters();
+      if (manga?.id) {
+        fetchChaptersForManga(manga.id);
+      }
     } catch (error: any) {
       toast({
         title: "خطأ",
@@ -255,7 +257,7 @@ const MangaDetails = () => {
 
       toast({
         title: "تم التحديث!",
-        description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خاص",
+        description: isPrivate ? "تم نشر الفصل" : "تم جعل الفصل خ��ص",
       });
 
       fetchChapters();
