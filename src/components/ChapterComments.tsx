@@ -233,10 +233,19 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         description: "تم نشر تعليقك بنجاح",
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error("Comment mutation error:", error);
+
+      let errorMessage = "فشل في نشر التعليق";
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      }
+
       toast({
-        title: "خطأ",
-        description: "فشل في نشر التعليق",
+        title: "خطأ في نشر التعليق",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -316,7 +325,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         .eq("comment_id", commentId)
         .eq("user_id", user.id);
 
-      // إضافة الإعجاب الجديد
+      // إضافة ��لإعجاب الجديد
       const { error } = await supabase.from("comment_likes").insert({
         comment_id: commentId,
         user_id: user.id,
