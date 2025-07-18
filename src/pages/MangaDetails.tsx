@@ -143,7 +143,7 @@ const MangaDetails = () => {
     }
   };
 
-  const fetchChaptersForManga = async (mangaId: string) => {
+  const fetchChaptersForManga = async (mangaId: string, retryCount = 0) => {
     try {
       const { data, error } = await supabase
         .from("chapters")
@@ -154,6 +154,13 @@ const MangaDetails = () => {
       if (error) throw error;
       setChapters(data || []);
     } catch (error: any) {
+      // إعادة المحاولة مرة واحدة إذا كان خطأ مؤقت
+      if (retryCount === 0 && (error.status === 500 || error.status === 503)) {
+        console.warn("Retrying chapters fetch...");
+        setTimeout(() => fetchChaptersForManga(mangaId, retryCount + 1), 1000);
+        return;
+      }
+
       console.error("Error fetching chapters:", error.message || error);
       toast({
         title: "خطأ",
