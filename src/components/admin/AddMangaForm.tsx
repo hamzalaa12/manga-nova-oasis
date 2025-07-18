@@ -1,12 +1,18 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { X, Search } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddMangaFormProps {
   onSuccess: () => void;
@@ -16,32 +22,219 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    coverImageUrl: '',
-    mangaType: '',
-    status: 'ongoing',
-    author: '',
-    artist: '',
+    title: "",
+    description: "",
+    coverImageUrl: "",
+    mangaType: "",
+    status: "ongoing",
+    author: "",
+    artist: "",
     releaseYear: new Date().getFullYear(),
   });
   const [genres, setGenres] = useState<string[]>([]);
-  const [newGenre, setNewGenre] = useState('');
+  const [newGenre, setNewGenre] = useState("");
+  const [genreSearch, setGenreSearch] = useState("");
 
+  // قائمة شاملة بـ 120+ تصنيف عربي
   const availableGenres = [
-    'أكشن', 'مغامرة', 'كوميديا', 'دراما', 'خيال', 'رومانسي', 'رعب', 'غموض', 
-    'نفسي', 'خارق للطبيعة', 'شريحة من الحياة', 'رياضة', 'تاريخي', 'مدرسي'
+    // التصنيفات الأساسية
+    "أكشن",
+    "مغامرة",
+    "كوميديا",
+    "دراما",
+    "خيال",
+    "رومانسي",
+    "رعب",
+    "غموض",
+    "نفسي",
+    "خارق للطبيعة",
+    "شريحة من الحياة",
+    "رياضة",
+    "تاريخي",
+    "مدرسي",
+    "خيال علمي",
+    "فانتازيا",
+    "إثارة",
+    "تشويق",
+    "حربي",
+    "عسكري",
+    "فنون قتالية",
+
+    // التصنيفات الثقافية والتقليدية
+    "ساموراي",
+    "نينجا",
+    "ميكا",
+    "روبوت",
+    "فضاء",
+    "سايبر بانك",
+    "ستيم بانك",
+    "ديستوبيا",
+    "يوتوبيا",
+    "مصاصي دماء",
+    "مستذئبين",
+    "شياطين",
+    "ملائكة",
+    "سحر",
+    "شعوذة",
+    "كيمياء",
+    "طب",
+    "هندسة",
+    "تكنولوجيا",
+    "حاسوب",
+    "ألعاب",
+
+    // التكنولوجيا والمستقبل
+    "واقع افتراضي",
+    "وا��ع معزز",
+    "ذكاء اصطناعي",
+    "آلات",
+    "أندرويد",
+    "سايبورغ",
+    "زومبي",
+    "أشباح",
+    "أرواح شريرة",
+    "عوالم موازية",
+    "سفر عبر الوقت",
+    "سفر عبر الأبعاد",
+
+    // القوى والقتال
+    "قوى خارقة",
+    "محاربين",
+    "سحرة",
+    "مشعوذين",
+    "كهنة",
+    "آلهة",
+    "أساطير",
+    "ملاحم",
+    "بطولات",
+    "مهام",
+    "بحث عن الكنز",
+    "قراصنة",
+    "بحارة",
+    "طيران",
+
+    // الحياة اليومية والهوايات
+    "طبخ",
+    "تسوق",
+    "موضة",
+    "جمال",
+    "صحة",
+    "لياقة",
+    "يوغا",
+    "تأمل",
+    "موسيقى",
+    "رقص",
+    "مسرح",
+    "سينما",
+    "تلفزيون",
+    "راديو",
+    "كتب",
+    "شعر",
+
+    // العلوم والأكاديمية
+    "أدب",
+    "فلسفة",
+    "علم نفس",
+    "اجتماع",
+    "سياسة",
+    "اقتصاد",
+    "قانون",
+    "عدالة",
+    "جريمة",
+    "تحقيق",
+    "بوليسي",
+    "جاسوسية",
+    "مخابرات",
+    "سري",
+
+    // المشاعر والعلاقات
+    "مؤامرة",
+    "خيانة",
+    "انتقام",
+    "شرف",
+    "كرامة",
+    "صداقة",
+    "ولاء",
+    "حب",
+    "زواج",
+    "ع��ئلة",
+    "أطفال",
+    "مراهقين",
+    "شباب",
+    "كبار السن",
+    "أجيال",
+
+    // تصنيفات إضافية جديدة
+    "طبيعة",
+    "بيئة",
+    "حيوانات",
+    "نباتات",
+    "طقس",
+    "فصول السنة",
+    "سفر",
+    "سياحة",
+    "تاريخ قديم",
+    "حضارات",
+    "أثار",
+    "متاحف",
+    "فن",
+    "رسم",
+    "نحت",
+    "تصوير",
+    "رياضة قتالية",
+    "كرة قدم",
+    "كرة سلة",
+    "تنس",
+    "سباحة",
+    "جري",
+    "دراجات",
+    "صيد",
+    "قنص",
+    "بناء",
+    "هندسة معمارية",
+    "ديكور",
+    "تصميم",
+    "برمجة",
+    "تطوير",
+    "تجارة",
+    "استثمار",
+    "بنوك",
+    "عملات",
+    "أسهم",
+    "بورصة",
+    "شركات",
+    "أعمال",
+    "صحافة",
+    "إعلام",
+    "تقارير",
+    "أخبار",
+    "توثيق",
+    "بحث",
+    "دراسة",
+    "تعليم",
   ];
+
+  // فلترة التصنيفات حسب البحث
+  const filteredGenres = useMemo(() => {
+    const searchTerm = genreSearch.toLowerCase().trim();
+    if (!searchTerm) return availableGenres;
+
+    return availableGenres.filter(
+      (genre) =>
+        genre.toLowerCase().includes(searchTerm) && !genres.includes(genre),
+    );
+  }, [genreSearch, genres]);
 
   const addGenre = (genre: string) => {
     if (genre && !genres.includes(genre)) {
       setGenres([...genres, genre]);
-      setNewGenre('');
+      setNewGenre("");
+      setGenreSearch("");
     }
   };
 
   const removeGenre = (genreToRemove: string) => {
-    setGenres(genres.filter(genre => genre !== genreToRemove));
+    setGenres(genres.filter((genre) => genre !== genreToRemove));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,9 +242,8 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('manga')
-        .insert([{
+      const { error } = await supabase.from("manga").insert([
+        {
           title: formData.title,
           description: formData.description,
           cover_image_url: formData.coverImageUrl,
@@ -61,21 +253,22 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
           author: formData.author,
           artist: formData.artist,
           release_year: formData.releaseYear,
-        }]);
+        },
+      ]);
 
       if (error) throw error;
 
       toast({
-        title: 'تم بنجاح!',
-        description: 'تم إضافة المانجا بنجاح',
+        title: "تم بنجاح!",
+        description: "تم إضافة المانجا بنجاح",
       });
 
       onSuccess();
     } catch (error: any) {
       toast({
-        title: 'خطأ',
+        title: "خطأ",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
 
@@ -89,14 +282,21 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
           <label className="block text-sm font-medium mb-2">العنوان *</label>
           <Input
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             required
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-2">النوع *</label>
-          <Select value={formData.mangaType} onValueChange={(value) => setFormData({ ...formData, mangaType: value })}>
+          <Select
+            value={formData.mangaType}
+            onValueChange={(value) =>
+              setFormData({ ...formData, mangaType: value })
+            }
+          >
             <SelectTrigger>
               <SelectValue placeholder="اختر النوع" />
             </SelectTrigger>
@@ -113,16 +313,22 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
         <label className="block text-sm font-medium mb-2">الوصف</label>
         <Textarea
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
           rows={4}
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">رابط صورة الغلاف</label>
+        <label className="block text-sm font-medium mb-2">
+          رابط صورة الغلاف
+        </label>
         <Input
           value={formData.coverImageUrl}
-          onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, coverImageUrl: e.target.value })
+          }
           placeholder="https://example.com/cover.jpg"
         />
       </div>
@@ -132,15 +338,19 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
           <label className="block text-sm font-medium mb-2">المؤلف</label>
           <Input
             value={formData.author}
-            onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, author: e.target.value })
+            }
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-2">الرسام</label>
           <Input
             value={formData.artist}
-            onChange={(e) => setFormData({ ...formData, artist: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, artist: e.target.value })
+            }
           />
         </div>
       </div>
@@ -151,15 +361,25 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
           <Input
             type="number"
             value={formData.releaseYear}
-            onChange={(e) => setFormData({ ...formData, releaseYear: parseInt(e.target.value) })}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                releaseYear: parseInt(e.target.value),
+              })
+            }
             min="1900"
             max={new Date().getFullYear() + 1}
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-2">الحالة</label>
-          <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+          <Select
+            value={formData.status}
+            onValueChange={(value) =>
+              setFormData({ ...formData, status: value })
+            }
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -175,43 +395,87 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
 
       <div>
         <label className="block text-sm font-medium mb-2">التصنيفات</label>
+
+        {/* عرض التصنيفات المختارة */}
         <div className="flex flex-wrap gap-2 mb-3">
           {genres.map((genre) => (
             <Badge key={genre} variant="secondary" className="text-sm">
               {genre}
-              <X 
-                className="h-3 w-3 mr-1 cursor-pointer" 
+              <X
+                className="h-3 w-3 mr-1 cursor-pointer"
                 onClick={() => removeGenre(genre)}
               />
             </Badge>
           ))}
         </div>
-        <div className="flex gap-2">
-          <Select value={newGenre} onValueChange={setNewGenre}>
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="اختر تصنيف" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableGenres
-                .filter(genre => !genres.includes(genre))
-                .map((genre) => (
-                  <SelectItem key={genre} value={genre}>{genre}</SelectItem>
-                ))
-              }
-            </SelectContent>
-          </Select>
-          <Button 
-            type="button" 
-            onClick={() => addGenre(newGenre)}
-            disabled={!newGenre}
-          >
-            إضافة
-          </Button>
+
+        {/* صندوق البحث في التصنيفات */}
+        <div className="space-y-3">
+          <div className="relative">
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              value={genreSearch}
+              onChange={(e) => setGenreSearch(e.target.value)}
+              placeholder="ابحث عن تصنيف..."
+              className="pr-10"
+            />
+          </div>
+
+          {/* قائمة التصنيفات المفلترة */}
+          {genreSearch && (
+            <div className="max-h-48 overflow-y-auto border rounded-md p-2 bg-background">
+              {filteredGenres.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {filteredGenres.slice(0, 12).map((genre) => (
+                    <Button
+                      key={genre}
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => addGenre(genre)}
+                      className="justify-start text-right h-8"
+                    >
+                      {genre}
+                    </Button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  لا توجد تصنيفات مطابقة للبحث
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* طريقة الاختيار التقليدية */}
+          <div className="flex gap-2">
+            <Select value={newGenre} onValueChange={setNewGenre}>
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="أو اختر من القائمة الكاملة" />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {availableGenres
+                  .filter((genre) => !genres.includes(genre))
+                  .map((genre) => (
+                    <SelectItem key={genre} value={genre}>
+                      {genre}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              onClick={() => addGenre(newGenre)}
+              disabled={!newGenre}
+            >
+              إضافة
+            </Button>
+          </div>
         </div>
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? 'جاري الإضافة...' : 'إضافة المانجا'}
+        {isLoading ? "جاري الإضافة..." : "إضافة المانجا"}
       </Button>
     </form>
   );
