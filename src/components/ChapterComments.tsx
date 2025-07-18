@@ -448,13 +448,26 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
 
       toast({
         title: "✅ تم النشر!",
-        description: "تم نشر تعليقك بنجاح",
+        description: "ت�� نشر تعليقك بنجاح",
       });
     } catch (error: any) {
-      console.error("❌ Fallback comment submission failed:", error);
+      console.error("❌ Fallback comment submission failed:", {
+        error: JSON.stringify(error, null, 2),
+        message: error?.message,
+        stack: error?.stack,
+        name: error?.name,
+      });
+
+      let errorMessage = "فشل في نشر التعليق";
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      }
+
       toast({
         title: "❌ خطأ في النشر",
-        description: error.message || "فشل في نشر التعليق",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -791,7 +804,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-400">
-            <p>يجب تسجيل الدخول ��كتابة التعليقات</p>
+            <p>يجب تسجيل الدخول لكتابة التعليقات</p>
           </div>
         )}
       </div>
@@ -843,7 +856,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
   );
 };
 
-// مكون التعليق الفردي
+// مكون التعلي�� الفردي
 interface CommentItemProps {
   comment: Comment;
   user: any;
