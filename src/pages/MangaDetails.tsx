@@ -160,25 +160,6 @@ const MangaDetails = () => {
     }
   };
 
-  const fetchChapters = async () => {
-    if (!manga?.id) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("chapters")
-        .select("*")
-        .eq("manga_id", manga.id)
-        .order("chapter_number", { ascending: true });
-
-      if (error) throw error;
-      setChapters(data || []);
-    } catch (error) {
-      console.error("Error fetching chapters:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getStatusInArabic = (status: string) => {
     switch (status) {
       case "ongoing":
