@@ -45,6 +45,7 @@ interface ChapterNav {
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
 }
 
