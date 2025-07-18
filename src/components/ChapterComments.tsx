@@ -60,6 +60,12 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
       }
 
+      console.log("Inserting comment with data:", {
+        chapter_id: chapterId,
+        user_id: user.id,
+        content: content.trim(),
+      });
+
       const { data, error } = await supabase
         .from("chapter_comments")
         .insert({
@@ -76,8 +82,24 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         .single();
 
       if (error) {
-        console.error("Error inserting comment:", error);
-        throw new Error("فشل في نشر التعليق");
+        console.error("Error inserting comment:", {
+          error: JSON.stringify(error, null, 2),
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+
+        let errorMessage = "فشل في نشر التعليق";
+        if (error.code === "23503") {
+          errorMessage = "الفصل غير موجود";
+        } else if (error.code === "42501") {
+          errorMessage = "ليس لديك صلاحية للتعليق";
+        } else if (error.message) {
+          errorMessage = `خطأ: ${error.message}`;
+        }
+
+        throw new Error(errorMessage);
       }
 
       return data;
@@ -117,7 +139,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       });
       toast({
         title: "تم الحذف!",
-        description: "تم ح��ف التعليق بنجاح",
+        description: "تم حذف التعليق بنجاح",
       });
     },
   });
@@ -178,7 +200,9 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
               >
                 <Send className="h-4 w-4" />
-                {addCommentMutation.isPending ? "جاري النشر..." : "نشر التعليق"}
+                {addCommentMutation.isPending
+                  ? "جاري النشر..."
+                  : "نشر التع��يق"}
               </Button>
             </div>
           </div>
