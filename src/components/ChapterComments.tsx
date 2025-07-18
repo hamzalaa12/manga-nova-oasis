@@ -272,12 +272,28 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
   // حذف تعليق
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: string) => {
-      const { error } = await supabase
-        .from("chapter_comments")
-        .update({ is_deleted: true })
-        .eq("id", commentId);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+
+      if (sessionData.session?.access_token) {
+        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+      }
+
+      const { data, error } = await supabase.functions.invoke(
+        "manage-comments",
+        {
+          body: {
+            action: "delete",
+            commentId,
+          },
+          headers,
+        },
+      );
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -303,7 +319,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         throw new Error("يجب تسجيل الدخول");
       }
 
-      // حذف الإعجاب السابق إن وجد
+      // حذف الإعج��ب السابق إن وجد
       await supabase
         .from("comment_likes")
         .delete()
