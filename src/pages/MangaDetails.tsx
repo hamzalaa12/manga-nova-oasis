@@ -43,6 +43,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import SEO from "@/components/SEO";
 
 interface Manga {
   id: string;
