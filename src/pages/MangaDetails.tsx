@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Calendar,
@@ -12,6 +12,7 @@ import {
   Lock,
   DollarSign,
   MoreHorizontal,
+  Settings,
 } from "lucide-react";
 import { parseMangaIdentifier, getChapterUrl, getMangaSlug } from "@/lib/slug";
 import { Button } from "@/components/ui/button";
@@ -302,7 +303,7 @@ const MangaDetails = () => {
           className="inline-flex items-center gap-2 text-primary hover:text-primary-glow transition-colors mb-6"
         >
           <ArrowRight className="h-4 w-4" />
-          العودة للرئيسية
+          ال��ودة للرئيسية
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
