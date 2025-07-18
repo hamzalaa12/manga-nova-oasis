@@ -73,7 +73,7 @@ interface Chapter {
 }
 
 const MangaDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, userProfile, isAdmin } = useAuth();
   const { toast } = useToast();
@@ -262,7 +262,7 @@ const MangaDetails = () => {
       }
     } catch (error: any) {
       toast({
-        title: "خطأ",
+        title: "خط��",
         description: "فشل في حذف الفصل",
         variant: "destructive",
       });
@@ -418,7 +418,7 @@ const MangaDetails = () => {
                 <div className="text-muted-foreground text-6xl">📚</div>
                 <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
                 <p className="text-muted-foreground">
-                  لم يتم العثور على المانجا المطلوبة
+                  لم يتم ا��عثور على المانجا المطلوبة
                 </p>
                 <Button onClick={() => navigate("/")} variant="outline">
                   العودة للرئيسية
