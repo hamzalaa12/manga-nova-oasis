@@ -25,6 +25,8 @@ import {
   Italic,
   Underline,
   Smile,
+  Send,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -86,6 +88,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [sessionId, setSessionId] = useState<string>("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -330,6 +333,75 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
     });
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // منع أي تداخل مع مفتاح Space
+    if (e.key === " ") {
+      e.stopPropagation();
+    }
+
+    // Enter + Ctrl لإرسال التعليق
+    if (e.key === "Enter" && e.ctrlKey) {
+      e.preventDefault();
+      handleSubmitComment();
+    }
+  };
+
+  const insertEmoji = (emoji: string) => {
+    const textarea = document.getElementById(
+      "comment-textarea",
+    ) as HTMLTextAreaElement;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      const before = text.substring(0, start);
+      const after = text.substring(end, text.length);
+      setNewComment(before + emoji + after);
+
+      // إعادة تعيين موضع المؤشر
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+        textarea.focus();
+      }, 0);
+    }
+    setShowEmojiPicker(false);
+  };
+
+  const quickEmojis = [
+    "😀",
+    "😂",
+    "😍",
+    "😢",
+    "😡",
+    "😮",
+    "👍",
+    "👎",
+    "❤️",
+    "🔥",
+    "💯",
+    "🎉",
+    "😅",
+    "🤔",
+    "����",
+    "💔",
+    "🤣",
+    "😊",
+    "😎",
+    "🥺",
+    "😤",
+    "🤯",
+    "🙄",
+    "😏",
+    "🤩",
+    "😇",
+    "🤗",
+    "😱",
+    "🤐",
+    "🤨",
+    "😴",
+    "🥳",
+  ];
+
   const handleEditComment = (commentId: string) => {
     if (!editContent.trim()) return;
 
@@ -353,6 +425,22 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
     return "الآن";
   };
 
+  // إغلاق منتقي الإيموجي عند النقر خارجه
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".emoji-picker-container")) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showEmojiPicker]);
+
   return (
     <div className="bg-gray-900 text-white rounded-lg">
       {/* منطقة كتابة التعليق */}
@@ -367,30 +455,150 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
 
         {user ? (
           <div className="space-y-4">
-            <div className="relative">
+            <div className="relative emoji-picker-container">
               <Textarea
+                id="comment-textarea"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="اكتب تعليقك هنا..."
-                className="bg-gray-800 border-gray-600 text-white min-h-[100px] pr-12"
+                onKeyDown={handleKeyDown}
+                placeholder="اكتب تعليقك هنا... (Ctrl+Enter للإرسال)"
+                className="bg-gray-800 border-gray-600 text-white min-h-[120px] pr-4 pb-12 resize-none"
                 dir="rtl"
               />
 
-              {/* أزرار التنسيق */}
+              {/* أزرار التنسيق والإيموجي */}
               <div className="absolute bottom-2 left-2 flex gap-1">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Smile className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <div className="relative">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 hover:bg-gray-700"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowEmojiPicker(!showEmojiPicker);
+                    }}
+                  >
+                    <Smile className="h-4 w-4" />
+                  </Button>
+
+                  {/* منتقي الإيموجي */}
+                  {showEmojiPicker && (
+                    <div className="absolute bottom-full left-0 mb-2 bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-xl z-50 max-h-64 overflow-y-auto">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-gray-300">
+                          الإيموجيات
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => setShowEmojiPicker(false)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-8 gap-1 w-64">
+                        {quickEmojis.map((emoji, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="h-8 w-8 text-lg hover:bg-gray-700 rounded transition-colors flex items-center justify-center"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              insertEmoji(emoji);
+                            }}
+                            title={emoji}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-gray-700"
+                  title="نص عريض"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const textarea = document.getElementById(
+                      "comment-textarea",
+                    ) as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const text = textarea.value;
+                      const before = text.substring(0, start);
+                      const after = text.substring(end, text.length);
+                      const selectedText = text.substring(start, end);
+                      setNewComment(
+                        before + "**" + selectedText + "**" + after,
+                      );
+                      setTimeout(() => {
+                        textarea.focus();
+                        textarea.selectionStart = start + 2;
+                        textarea.selectionEnd = end + 2;
+                      }, 0);
+                    }
+                  }}
+                >
                   <Bold className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-gray-700"
+                  title="نص مائل"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const textarea = document.getElementById(
+                      "comment-textarea",
+                    ) as HTMLTextAreaElement;
+                    if (textarea) {
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      const text = textarea.value;
+                      const before = text.substring(0, start);
+                      const after = text.substring(end, text.length);
+                      const selectedText = text.substring(start, end);
+                      setNewComment(before + "*" + selectedText + "*" + after);
+                      setTimeout(() => {
+                        textarea.focus();
+                        textarea.selectionStart = start + 1;
+                        textarea.selectionEnd = end + 1;
+                      }, 0);
+                    }
+                  }}
+                >
                   <Italic className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Underline className="h-4 w-4" />
-                </Button>
               </div>
+
+              {/* إشعار الرد */}
+              {replyingTo && (
+                <div className="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                  <span>الرد على تعليق</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-4 w-4 p-0 text-white hover:bg-blue-700"
+                    onClick={() => setReplyingTo(null)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -410,9 +618,14 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
               <Button
                 onClick={handleSubmitComment}
                 disabled={!newComment.trim() || addCommentMutation.isPending}
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
               >
-                {addCommentMutation.isPending ? "جاري النشر..." : "نشر"}
+                <Send className="h-4 w-4" />
+                {addCommentMutation.isPending
+                  ? "جاري النشر..."
+                  : replyingTo
+                    ? "إرسال الرد"
+                    : "نشر التعليق"}
               </Button>
             </div>
           </div>
@@ -503,11 +716,18 @@ const CommentItem = ({
   const canEdit = isOwner || isAdmin;
   const canDelete = isOwner || isAdmin;
 
+  // تحويل التنسيق البسيط إلى HTML
+  const formatContent = (content: string) => {
+    return content
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>");
+  };
+
   return (
     <div
       className={`${level > 0 ? "ml-8 border-l-2 border-gray-700 pl-4" : ""}`}
     >
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="bg-gray-800 border-gray-700 hover:bg-gray-800/80 transition-colors">
         <CardContent className="p-4">
           {/* رأس التعليق */}
           <div className="flex items-center justify-between mb-3">
@@ -530,18 +750,29 @@ const CommentItem = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-gray-700"
+                >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onReply(comment.id)}>
+              <DropdownMenuContent
+                align="end"
+                className="bg-gray-800 border-gray-600"
+              >
+                <DropdownMenuItem
+                  onClick={() => onReply(comment.id)}
+                  className="hover:bg-gray-700"
+                >
                   <Reply className="h-4 w-4 mr-2" />
                   رد
                 </DropdownMenuItem>
                 {canEdit && (
                   <DropdownMenuItem
                     onClick={() => onEdit(comment.id, comment.content)}
+                    className="hover:bg-gray-700"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     تعديل
@@ -552,7 +783,7 @@ const CommentItem = ({
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => onDelete(comment.id)}
-                      className="text-red-600"
+                      className="text-red-600 hover:bg-gray-700"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       حذف
@@ -564,7 +795,7 @@ const CommentItem = ({
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => onReport(comment.id, "محتوى مسيء")}
-                      className="text-yellow-600"
+                      className="text-yellow-600 hover:bg-gray-700"
                     >
                       <Flag className="h-4 w-4 mr-2" />
                       إبلاغ
@@ -595,9 +826,12 @@ const CommentItem = ({
                 </Button>
               </div>
             ) : (
-              <p className="text-gray-100 leading-relaxed whitespace-pre-wrap">
-                {comment.content}
-              </p>
+              <div
+                className="text-gray-100 leading-relaxed whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{
+                  __html: formatContent(comment.content),
+                }}
+              />
             )}
           </div>
 
@@ -605,10 +839,10 @@ const CommentItem = ({
           <div className="flex items-center gap-4 text-sm">
             <button
               onClick={() => onLike(comment.id, true)}
-              className={`flex items-center gap-1 transition-colors ${
+              className={`flex items-center gap-1 transition-colors px-2 py-1 rounded ${
                 comment.userLike === "like"
-                  ? "text-green-500"
-                  : "text-gray-400 hover:text-green-500"
+                  ? "text-green-500 bg-green-500/20"
+                  : "text-gray-400 hover:text-green-500 hover:bg-green-500/10"
               }`}
             >
               <ThumbsUp className="h-4 w-4" />
@@ -617,19 +851,27 @@ const CommentItem = ({
 
             <button
               onClick={() => onLike(comment.id, false)}
-              className={`flex items-center gap-1 transition-colors ${
+              className={`flex items-center gap-1 transition-colors px-2 py-1 rounded ${
                 comment.userLike === "dislike"
-                  ? "text-red-500"
-                  : "text-gray-400 hover:text-red-500"
+                  ? "text-red-500 bg-red-500/20"
+                  : "text-gray-400 hover:text-red-500 hover:bg-red-500/10"
               }`}
             >
               <ThumbsDown className="h-4 w-4" />
               {comment.dislike_count}
             </button>
 
+            <button
+              onClick={() => onReply(comment.id)}
+              className="flex items-center gap-1 text-gray-400 hover:text-blue-500 transition-colors px-2 py-1 rounded hover:bg-blue-500/10"
+            >
+              <Reply className="h-4 w-4" />
+              رد
+            </button>
+
             {comment.report_count > 0 && isAdmin && (
-              <span className="text-yellow-500 text-xs">
-                <Flag className="h-3 w-3 inline mr-1" />
+              <span className="text-yellow-500 text-xs flex items-center gap-1">
+                <Flag className="h-3 w-3" />
                 {comment.report_count} بلاغات
               </span>
             )}
@@ -640,10 +882,11 @@ const CommentItem = ({
             <div className="mt-4">
               <button
                 onClick={() => setShowReplies(!showReplies)}
-                className="text-blue-400 text-sm hover:underline mb-3"
+                className="text-blue-400 text-sm hover:underline mb-3 flex items-center gap-1"
               >
                 {showReplies ? "إخفاء" : "إظهار"} الردود (
                 {comment.replies.length})
+                <Reply className="h-3 w-3" />
               </button>
 
               {showReplies && (
