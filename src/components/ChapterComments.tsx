@@ -333,7 +333,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         .eq("comment_id", commentId)
         .eq("user_id", user.id);
 
-      // إضاف�� الإعجاب الجديد
+      // إضافة الإعجاب الجديد
       const { error } = await supabase.from("comment_likes").insert({
         comment_id: commentId,
         user_id: user.id,
@@ -577,6 +577,16 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
           </Badge>
         </h3>
 
+        {/* Debug Information */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="mb-4 p-2 bg-gray-800 rounded text-xs text-gray-400">
+            <div>Chapter ID: {chapterId}</div>
+            <div>User ID: {user?.id || "Not logged in"}</div>
+            <div>User Email: {user?.email || "N/A"}</div>
+            <div>Session ID: {sessionId || "N/A"}</div>
+          </div>
+        )}
+
         {user ? (
           <div className="space-y-4">
             <div className="relative emoji-picker-container">
@@ -772,7 +782,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         )}
       </div>
 
-      {/* قائمة التعليقات */}
+      {/* قائمة ا��تعليقات */}
       <div className="p-6">
         {isLoading ? (
           <div className="space-y-4">
