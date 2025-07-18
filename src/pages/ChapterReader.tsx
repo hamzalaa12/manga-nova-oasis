@@ -119,7 +119,7 @@ const ChapterReader = () => {
 
   const trackChapterView = async (chapterId: string) => {
     try {
-      console.log("Tracking chapter view for ID:", chapterId);
+      console.log("📖 Tracking chapter view for ID:", chapterId);
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -128,6 +128,9 @@ const ChapterReader = () => {
       // Add authorization header if user is logged in
       if (sessionData.session?.access_token) {
         headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+        console.log("👤 User is logged in for chapter");
+      } else {
+        console.log("👤 Anonymous user reading chapter");
       }
 
       const response = await supabase.functions.invoke("track-view", {
@@ -138,9 +141,9 @@ const ChapterReader = () => {
         headers,
       });
 
-      console.log("Track chapter view response:", response);
+      console.log("✅ Track chapter view response:", response);
     } catch (error) {
-      console.error("Error tracking chapter view:", error);
+      console.error("❌ Error tracking chapter view:", error);
       // Don't fail the page load if view tracking fails
     }
   };
@@ -497,7 +500,7 @@ const ChapterReader = () => {
 
         {chapter.pages.length === 0 ? (
           <div className="flex items-center justify-center min-h-[80vh]">
-            <p className="text-gray-400">لا توجد صفحات في هذا الفصل</p>
+            <p className="text-gray-400">لا توجد صفحات في ه��ا الفصل</p>
           </div>
         ) : (
           <div className="max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
