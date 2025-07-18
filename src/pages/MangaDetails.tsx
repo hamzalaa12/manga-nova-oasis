@@ -13,6 +13,7 @@ import {
   DollarSign,
   MoreHorizontal,
 } from "lucide-react";
+import { parseMangaIdentifier, getChapterUrl, getMangaSlug } from "@/lib/slug";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
