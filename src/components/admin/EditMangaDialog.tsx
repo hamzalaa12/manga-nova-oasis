@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -335,7 +335,7 @@ const EditMangaDialog = ({
                 name="rating"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>التقييم (0-10)</FormLabel>
+                    <FormLabel>��لتقييم (0-10)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
