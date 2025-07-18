@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import MangaCard from "./MangaCard";
+import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -11,6 +13,7 @@ interface MangaGridProps {
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
   cover_image_url: string;
   rating: number;
@@ -21,36 +24,40 @@ interface Manga {
   manga_type: string;
 }
 
+const fetchMangaData = async (showAll: boolean): Promise<Manga[]> => {
+  const { data, error } = await supabase
+    .from("manga")
+    .select(
+      "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
+    )
+    .order("updated_at", { ascending: false })
+    .limit(showAll ? 100 : 200);
+
+  if (error) throw error;
+  return data || [];
+};
+
 const MangaGrid = ({
   title = "الأحدث والأكثر شعبية",
   showAll = false,
 }: MangaGridProps) => {
-  const [mangaData, setMangaData] = useState<Manga[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = showAll ? 100 : 36; // 6x6 للصفحة الرئيسية
+  const itemsPerPage = showAll ? 100 : 36;
 
-  useEffect(() => {
-    fetchManga();
-  }, []);
+  const {
+    data: mangaData = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["manga-grid", showAll],
+    queryFn: () => fetchMangaData(showAll),
+    staleTime: 5 * 60 * 1000, // 5 دقائق
+    gcTime: 10 * 60 * 1000, // 10 دقائق
+  });
 
-  const fetchManga = async () => {
-    try {
-      // جلب المزيد من البيانات للسماح بالتنقل بين الصفحات
-      const { data, error } = await supabase
-        .from("manga")
-        .select("*")
-        .order("updated_at", { ascending: false })
-        .limit(showAll ? 100 : 200); // جلب المزيد للتنقل بين الصفحات
-
-      if (error) throw error;
-      setMangaData(data || []);
-    } catch (error) {
-      console.error("Error fetching manga:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (error) {
+    console.error("Error fetching manga:", error);
+  }
 
   const formatViews = (count: number) => {
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
@@ -89,13 +96,33 @@ const MangaGrid = ({
     return (
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center">جاري التحميل...</div>
+          <div className="flex items-center justify-between mb-12">
+            <h2 className="text-3xl font-bold">{title}</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+            {Array.from({ length: showAll ? 18 : 12 }).map((_, index) => (
+              <MangaCardSkeleton key={index} />
+            ))}
+          </div>
         </div>
       </section>
     );
   }
 
-  if (mangaData.length === 0) {
+  if (error) {
+    return (
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold mb-4">{title}</h2>
+            <p className="text-muted-foreground">حدث خطأ في تحميل البيانات</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!loading && mangaData.length === 0) {
     return (
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -139,6 +166,7 @@ const MangaGrid = ({
             <MangaCard
               key={manga.id}
               id={manga.id}
+              slug={manga.slug}
               title={manga.title}
               cover={manga.cover_image_url || "/placeholder.svg"}
               rating={manga.rating}

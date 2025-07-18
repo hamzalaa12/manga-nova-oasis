@@ -16,6 +16,7 @@ import MangaCard from "@/components/MangaCard";
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
   description: string;
   cover_image_url: string;
@@ -60,7 +61,7 @@ const MangaByGenre = () => {
     thriller: "إثارة",
     war: "حربي",
     military: "عسكري",
-    "martial-arts": "فنون قتالية",
+    "martial-arts": "فنون ��تالية",
 
     // التصنيفات الثقافية
     samurai: "ساموراي",
@@ -263,6 +264,7 @@ const MangaByGenre = () => {
               <MangaCard
                 key={item.id}
                 id={item.id}
+                slug={item.slug}
                 title={item.title}
                 cover={item.cover_image_url}
                 rating={item.rating || 0}

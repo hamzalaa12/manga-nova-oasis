@@ -16,6 +16,7 @@ import MangaCard from "@/components/MangaCard";
 
 interface Manga {
   id: string;
+  slug: string;
   title: string;
   description: string;
   cover_image_url: string;
@@ -119,7 +120,7 @@ const MangaByType = () => {
     "بحارة",
     "طيران",
 
-    // الحياة اليومية والهوايات
+    // الحياة اليومية والهو��يات
     "طبخ",
     "تسوق",
     "موضة",
@@ -238,7 +239,7 @@ const MangaByType = () => {
   }, [manga, searchTerm, sortBy, statusFilter, genreFilter]);
 
   useEffect(() => {
-    // استخدام قائمة التصنيفات العربية مع إضافة التصنيفات الموجودة في قاعدة البيانات (فلترة التصنيفات الإنجليزية)
+    // استخدام قائمة التصنيفات العربية مع إضافة التصنيفات الموجودة في قاعدة البيانات (فلت��ة التصنيفات الإنجليزية)
     const dbGenres = manga
       .flatMap((item) => item.genre || [])
       .filter(
@@ -421,6 +422,7 @@ const MangaByType = () => {
               <MangaCard
                 key={item.id}
                 id={item.id}
+                slug={item.slug}
                 title={item.title}
                 cover={item.cover_image_url}
                 rating={item.rating || 0}
