@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,9 +29,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AVAILABLE_GENRES } from "@/constants/genres";
 
 interface Manga {
   id: string;
@@ -71,25 +72,6 @@ const formSchema = z.object({
   rating: z.number().min(0).max(10).optional(),
 });
 
-const AVAILABLE_GENRES = [
-  "أكشن",
-  "مغامرات",
-  "كوميديا",
-  "دراما",
-  "خيال",
-  "رعب",
-  "رومانسي",
-  "خارق للطبيعة",
-  "إثارة",
-  "غموض",
-  "رياضي",
-  "حياة مدرسية",
-  "تاريخي",
-  "ع��مي خيالي",
-  "سحر",
-  "قتال",
-];
-
 const EditMangaDialog = ({
   manga,
   open,
@@ -102,6 +84,7 @@ const EditMangaDialog = ({
     manga.genre || [],
   );
   const [newGenre, setNewGenre] = useState("");
+  const [genreSearch, setGenreSearch] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -118,11 +101,24 @@ const EditMangaDialog = ({
     },
   });
 
+  // فلترة التصنيفات حسب البحث
+  const filteredGenres = useMemo(() => {
+    const searchTerm = genreSearch.toLowerCase().trim();
+    if (!searchTerm) return AVAILABLE_GENRES;
+
+    return AVAILABLE_GENRES.filter(
+      (genre) =>
+        genre.toLowerCase().includes(searchTerm) &&
+        !selectedGenres.includes(genre),
+    );
+  }, [genreSearch, selectedGenres]);
+
   const addGenre = (genre: string) => {
     if (genre && !selectedGenres.includes(genre)) {
       setSelectedGenres([...selectedGenres, genre]);
     }
     setNewGenre("");
+    setGenreSearch("");
   };
 
   const removeGenre = (genre: string) => {
@@ -380,30 +376,68 @@ const EditMangaDialog = ({
               </div>
 
               {/* إضافة تصنيف جديد */}
-              <div className="flex gap-2">
-                <Select value={newGenre} onValueChange={setNewGenre}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="اختر تصنيف" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {AVAILABLE_GENRES.filter(
-                      (genre) => !selectedGenres.includes(genre),
-                    ).map((genre) => (
-                      <SelectItem key={genre} value={genre}>
-                        {genre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => addGenre(newGenre)}
-                  disabled={!newGenre}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+              <div className="space-y-3">
+                {/* صندوق البحث في الت��نيفات */}
+                <div className="relative">
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    value={genreSearch}
+                    onChange={(e) => setGenreSearch(e.target.value)}
+                    placeholder="ابحث عن تصنيف..."
+                    className="pr-10"
+                  />
+                </div>
+
+                {/* قائمة التصنيفات المفلترة */}
+                {genreSearch && (
+                  <div className="max-h-48 overflow-y-auto border rounded-md p-2 bg-background">
+                    {filteredGenres.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {filteredGenres.slice(0, 12).map((genre) => (
+                          <Button
+                            key={genre}
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => addGenre(genre)}
+                            className="justify-start text-right h-8"
+                          >
+                            {genre}
+                          </Button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        لا توجد تصنيفات مطابقة للبحث
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* طريقة الاختيار التقليدية */}
+                <div className="flex gap-2">
+                  <Select value={newGenre} onValueChange={setNewGenre}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="أو اختر من القائمة الكاملة" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {AVAILABLE_GENRES.filter(
+                        (genre) => !selectedGenres.includes(genre),
+                      ).map((genre) => (
+                        <SelectItem key={genre} value={genre}>
+                          {genre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    onClick={() => addGenre(newGenre)}
+                    disabled={!newGenre}
+                  >
+                    إضافة
+                  </Button>
+                </div>
               </div>
             </div>
 

@@ -10,6 +10,8 @@ import {
   Info,
   Eye,
   Bookmark,
+  Settings,
+  Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +28,8 @@ import {
   getMangaUrl,
   getMangaSlug,
 } from "@/lib/slug";
+import ViewsCounter from "@/components/ViewsCounter";
+import ChapterInteractions from "@/components/ChapterInteractions";
 
 interface Chapter {
   id: string;
@@ -60,10 +64,6 @@ const ChapterReader = () => {
   const [manga, setManga] = useState<Manga | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showUI, setShowUI] = useState(true);
-  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("up");
-  const lastScrollY = useRef(0);
-  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (slug && chapterParam) {
@@ -118,6 +118,7 @@ const ChapterReader = () => {
 
   const trackChapterView = async (chapterId: string) => {
     try {
+      console.log("📖 Tracking chapter view for ID:", chapterId);
       const { data: sessionData } = await supabase.auth.getSession();
       const headers: HeadersInit = {
         "Content-Type": "application/json",
@@ -126,17 +127,22 @@ const ChapterReader = () => {
       // Add authorization header if user is logged in
       if (sessionData.session?.access_token) {
         headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+        console.log("👤 User is logged in for chapter");
+      } else {
+        console.log("👤 Anonymous user reading chapter");
       }
 
-      await supabase.functions.invoke("track-view", {
+      const response = await supabase.functions.invoke("track-view", {
         body: {
           mangaId: chapterId,
           type: "chapter",
         },
         headers,
       });
+
+      console.log("✅ Track chapter view response:", response);
     } catch (error) {
-      console.error("Error tracking chapter view:", error);
+      console.error("❌ Error tracking chapter view:", error);
       // Don't fail the page load if view tracking fails
     }
   };
@@ -208,56 +214,6 @@ const ChapterReader = () => {
       : null;
   };
 
-  // Scroll detection for auto-hide UI
-  const handleScroll = useCallback(() => {
-    const currentScrollY = window.scrollY;
-
-    if (currentScrollY < 50) {
-      // Near top of page, always show UI
-      setShowUI(true);
-      setScrollDirection("up");
-    } else if (Math.abs(currentScrollY - lastScrollY.current) > 10) {
-      // Only update if scrolled more than 10px to avoid jitter
-      if (currentScrollY > lastScrollY.current) {
-        // Scrolling down - hide UI
-        setScrollDirection("down");
-        setShowUI(false);
-      } else {
-        // Scrolling up - show UI
-        setScrollDirection("up");
-        setShowUI(true);
-      }
-    }
-
-    lastScrollY.current = currentScrollY;
-
-    // Clear existing timeout
-    if (scrollTimeout.current) {
-      clearTimeout(scrollTimeout.current);
-    }
-
-    // Show UI after user stops scrolling for 2 seconds
-    scrollTimeout.current = setTimeout(() => {
-      setShowUI(true);
-    }, 2000);
-  }, []);
-
-  // Scroll event listener
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current);
-      }
-    };
-  }, [handleScroll]);
-
-  // Touch/click events to toggle UI visibility
-  const handleUIToggle = useCallback(() => {
-    setShowUI(!showUI);
-  }, [showUI]);
-
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -265,21 +221,34 @@ const ChapterReader = () => {
         case "Escape":
           navigate(-1);
           break;
-        case " ": // Spacebar to toggle UI
-          event.preventDefault();
-          handleUIToggle();
+        case "ArrowLeft":
+          // التالي (للغة العربية)
+          const next = getNextChapter();
+          if (next && manga) {
+            navigate(getChapterUrl(getMangaSlug(manga), next.chapter_number));
+          }
+          break;
+        case "ArrowRight":
+          // السابق (للغة العربية)
+          const prev = getPreviousChapter();
+          if (prev && manga) {
+            navigate(getChapterUrl(getMangaSlug(manga), prev.chapter_number));
+          }
           break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [navigate, handleUIToggle]);
+  }, [navigate, manga, chapter, allChapters]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white">جاري التحميل...</div>
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>جاري تحميل الفصل...</p>
+        </div>
       </div>
     );
   }
@@ -288,9 +257,15 @@ const ChapterReader = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
-          <p className="mb-4">الفصل غير موجود</p>
+          <p className="mb-4 text-xl">الفصل غير موجود</p>
+          <p className="text-gray-400 mb-6">تأكد من صحة الرابط</p>
           <Link to="/">
-            <Button variant="outline">العودة للرئيسية</Button>
+            <Button
+              variant="outline"
+              className="text-white border-white hover:bg-white hover:text-black"
+            >
+              العودة للرئيسية
+            </Button>
           </Link>
         </div>
       </div>
@@ -302,154 +277,95 @@ const ChapterReader = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Top Title Bar */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm transition-transform duration-300 ease-in-out ${
-          showUI ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4">
+      {/* شريط التنقل العلوي - ثابت دائماً */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-b border-gray-800 shadow-lg">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Left Action Icons - Hidden on mobile */}
-            <div className="hidden md:flex items-center gap-2 lg:gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
-              >
-                <Info className="h-3 w-3 lg:h-4 lg:w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
-              >
-                <Eye className="h-3 w-3 lg:h-4 lg:w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
-              >
-                <Bookmark className="h-3 w-3 lg:h-4 lg:w-4" />
-              </Button>
-            </div>
-
-            {/* Center Title */}
-            <div className="text-center flex-1 px-2">
-              <Link
-                to={`/manga/${manga.id}`}
-                className="hover:text-blue-400 transition-colors"
-              >
-                <h1 className="text-sm sm:text-lg font-bold text-white hover:text-blue-400 truncate">
-                  {manga.title} - {chapter.chapter_number}
-                </h1>
-              </Link>
-            </div>
-
-            {/* Right Breadcrumb - Simplified on mobile */}
-            <div className="text-xs sm:text-sm text-gray-400 hidden sm:block">
-              {chapter.chapter_number} / {manga.title} /{" "}
-              <Link to="/" className="hover:text-white">
-                الرئيسية
-              </Link>
-            </div>
-
-            {/* Mobile home button */}
-            <div className="sm:hidden">
-              <Link to="/">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white"
-                >
-                  <Home className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Bar */}
-      <div
-        className={`fixed top-16 left-0 right-0 z-40 bg-black/80 backdrop-blur-sm border-b border-white/10 transition-transform duration-300 ease-in-out ${
-          showUI ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
-          <div className="flex items-center justify-between gap-2">
-            {/* Left Navigation */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            {/* الجهة اليسرى - أيقونات الإجراءات */}
+            <div className="flex items-center gap-3">
               <Link to={getMangaUrl(getMangaSlug(manga))}>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="hover:bg-white/10 text-xs sm:text-sm px-2 sm:px-3"
+                  className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
+                  title="العودة للمانجا"
                 >
-                  <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
-                  <span className="hidden sm:inline">العودة</span>
-                  <span className="sm:hidden">←</span>
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
 
-              {/* Next Chapter Button - Hidden on mobile nav */}
-              {nextChapter && manga && (
-                <Link
-                  to={getChapterUrl(
-                    getMangaSlug(manga),
-                    nextChapter.chapter_number,
-                  )}
-                  className="hidden sm:block"
+              <Link to="/">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
+                  title="الرئيسية"
                 >
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm"
-                  >
-                    التالي →
-                  </Button>
-                </Link>
-              )}
+                  <Home className="h-4 w-4" />
+                </Button>
+              </Link>
+
+              <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
+                <Eye className="h-4 w-4" />
+                <ViewsCounter
+                  viewsCount={chapter?.views_count || 0}
+                  type="chapter"
+                  className="text-white text-sm"
+                />
+              </div>
             </div>
 
-            {/* Center Chapter Info - Simplified on mobile */}
-            <div className="text-center flex-1 px-2">
-              <p className="text-xs sm:text-sm text-gray-400 truncate">
+            {/* الوسط - عنوان المانجا والفصل */}
+            <div className="text-center flex-1 px-4">
+              <Link
+                to={getMangaUrl(getMangaSlug(manga))}
+                className="hover:text-blue-400 transition-colors"
+              >
+                <h1 className="text-lg font-bold text-white hover:text-blue-400 truncate">
+                  {manga.title}
+                </h1>
+              </Link>
+              <p className="text-sm text-gray-400">
                 الفصل {chapter.chapter_number}
-                {chapter.title && (
-                  <span className="hidden sm:inline">: {chapter.title}</span>
-                )}
+                {chapter.title && ` - ${chapter.title}`}
               </p>
             </div>
 
-            {/* Right Chapter Selector */}
-            <div className="flex items-center gap-2">
+            {/* الجهة اليمنى - منتقي الفصول */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
+                title="الإعدادات"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="bg-gray-700 hover:bg-gray-600 text-white px-2 sm:px-4 py-2 rounded min-w-[40px] sm:min-w-[60px] text-xs sm:text-sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium border border-blue-500"
                   >
-                    {chapter.chapter_number}
-                    <ChevronDown className="h-3 w-3 mr-1" />
+                    الفصل {chapter.chapter_number}
+                    <ChevronDown className="h-4 w-4 mr-2" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700"
+                  className="w-64 max-h-72 overflow-y-auto bg-gray-900 border-gray-700 shadow-xl"
                 >
                   {allChapters.map((chapterItem) => (
                     <DropdownMenuItem
                       key={chapterItem.id}
-                      className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700 ${
+                      className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700 p-3 ${
                         chapterItem.id === chapter.id
-                          ? "bg-gray-700 text-white"
+                          ? "bg-blue-600 text-white"
                           : ""
                       }`}
                       onClick={() =>
-                        manga &&
                         navigate(
                           getChapterUrl(
                             getMangaSlug(manga),
@@ -458,12 +374,12 @@ const ChapterReader = () => {
                         )
                       }
                     >
-                      <div className="flex flex-col">
+                      <div className="flex flex-col w-full">
                         <span className="font-medium">
                           الفصل {chapterItem.chapter_number}
                         </span>
                         {chapterItem.title && (
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-400 mt-1">
                             {chapterItem.title}
                           </span>
                         )}
@@ -477,51 +393,91 @@ const ChapterReader = () => {
         </div>
       </div>
 
-      {/* Main Content - Vertical Layout */}
-      <main
-        className={`transition-all duration-300 ease-in-out ${
-          showUI ? "pt-32 pb-20" : "pt-4 pb-4"
-        }`}
-      >
-        {/* Click overlay for UI toggle */}
-        <div
-          className="fixed inset-0 z-10"
-          onClick={handleUIToggle}
-          style={{ pointerEvents: showUI ? "none" : "auto" }}
-        />
-
+      {/* المحتوى الرئيسي - صفحات الفصل */}
+      <main className="pt-20 pb-24">
         {chapter.pages.length === 0 ? (
-          <div className="flex items-center justify-center min-h-[80vh]">
-            <p className="text-gray-400">لا توجد صفحات في هذا الفصل</p>
+          <div className="flex items-center justify-center min-h-[70vh]">
+            <div className="text-center">
+              <p className="text-gray-400 text-xl mb-4">
+                لا توجد صفحات في هذا الفصل
+              </p>
+              <p className="text-gray-500">يرجى المحاولة لاحقاً</p>
+            </div>
           </div>
         ) : (
-          <div className="max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
-            {/* All Pages Displayed Vertically */}
-            {chapter.pages.map((page, index) => (
-              <div key={index} className="mb-1 sm:mb-2">
-                <img
-                  src={page?.url || "/placeholder.svg"}
-                  alt={`صفحة ${index + 1}`}
-                  className="w-full max-w-full object-contain bg-gray-900 rounded-sm sm:rounded-md"
-                  loading={index < 3 ? "eager" : "lazy"}
-                  onClick={handleUIToggle}
-                  style={{ cursor: showUI ? "default" : "pointer" }}
-                />
-              </div>
-            ))}
+          <div className="max-w-4xl mx-auto px-4">
+            {/* عرض جميع الصفحات عمودياً */}
+            <div className="space-y-1">
+              {chapter.pages.map((page, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={page?.url || "/placeholder.svg"}
+                    alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
+                    className="w-full max-w-full object-contain bg-gray-900 rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.01]"
+                    loading={index < 3 ? "eager" : "lazy"}
+                  />
+                  {/* رقم الصفحة */}
+                  <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    {index + 1} / {chapter.pages.length}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </main>
 
-      {/* Bottom Navigation - Fixed and Minimal */}
-      <div
-        className={`fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm transition-transform duration-300 ease-in-out ${
-          showUI ? "translate-y-0" : "translate-y-full"
-        }`}
-      >
-        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-3">
-          <div className="flex items-center justify-between gap-2">
-            {/* Next Chapter Button */}
+      {/* التفاعلات والتعليقات */}
+      {chapter && (
+        <div className="bg-gradient-to-t from-gray-900 to-black">
+          <ChapterInteractions chapterId={chapter.id} />
+        </div>
+      )}
+
+      {/* شريط التنقل السفلي - ثابت دائماً */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-t border-gray-800 shadow-lg">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            {/* الفصل السابق */}
+            <div className="flex-1">
+              {previousChapter && manga ? (
+                <Link
+                  to={getChapterUrl(
+                    getMangaSlug(manga),
+                    previousChapter.chapter_number,
+                  )}
+                >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 px-4 py-2 rounded-lg font-medium w-full"
+                  >
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                    السابق
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled
+                  className="bg-gray-900 border-gray-700 text-gray-500 px-4 py-2 rounded-lg font-medium cursor-not-allowed w-full"
+                >
+                  <ChevronRight className="h-4 w-4 ml-2" />
+                  السابق
+                </Button>
+              )}
+            </div>
+
+            {/* معلومات الفصل الحالي */}
+            <div className="text-center px-4">
+              <div className="text-sm font-medium text-white">
+                {chapter.chapter_number} / {allChapters.length}
+              </div>
+              <div className="text-xs text-gray-400">فصل</div>
+            </div>
+
+            {/* الفصل التالي */}
             <div className="flex-1">
               {nextChapter && manga ? (
                 <Link
@@ -533,9 +489,10 @@ const ChapterReader = () => {
                   <Button
                     variant="default"
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-6 py-2 rounded-lg font-medium text-xs sm:text-sm w-full sm:w-auto"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   >
-                    التالي →
+                    التالي
+                    <ChevronLeft className="h-4 w-4 mr-2" />
                   </Button>
                 </Link>
               ) : (
@@ -543,64 +500,26 @@ const ChapterReader = () => {
                   variant="default"
                   size="sm"
                   disabled
-                  className="bg-gray-600 text-gray-300 px-3 sm:px-6 py-2 rounded-lg font-medium cursor-not-allowed text-xs sm:text-sm w-full sm:w-auto"
+                  className="bg-gray-600 text-gray-300 px-4 py-2 rounded-lg font-medium cursor-not-allowed w-full"
                 >
-                  التالي →
+                  التالي
+                  <ChevronLeft className="h-4 w-4 mr-2" />
                 </Button>
               )}
             </div>
-
-            {/* Chapter Selector */}
-            <div className="flex-shrink-0">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="bg-gray-700 hover:bg-gray-600 text-white px-2 sm:px-4 py-2 rounded-lg min-w-[50px] sm:min-w-[60px] font-medium text-xs sm:text-sm"
-                  >
-                    {chapter.chapter_number}
-                    <ChevronDown className="h-3 w-3 mr-1" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 max-h-64 overflow-y-auto bg-gray-800 border-gray-700 mb-2"
-                >
-                  {allChapters.map((chapterItem) => (
-                    <DropdownMenuItem
-                      key={chapterItem.id}
-                      className={`cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700 ${
-                        chapterItem.id === chapter.id
-                          ? "bg-gray-700 text-white"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        manga &&
-                        navigate(
-                          getChapterUrl(
-                            getMangaSlug(manga),
-                            chapterItem.chapter_number,
-                          ),
-                        )
-                      }
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          الفصل {chapterItem.chapter_number}
-                        </span>
-                        {chapterItem.title && (
-                          <span className="text-xs text-gray-400">
-                            {chapterItem.title}
-                          </span>
-                        )}
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
           </div>
+        </div>
+      </div>
+
+      {/* مؤشر التقدم */}
+      <div className="fixed top-16 left-0 right-0 z-40">
+        <div className="h-1 bg-gray-800">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300"
+            style={{
+              width: `${((getCurrentChapterIndex() + 1) / allChapters.length) * 100}%`,
+            }}
+          />
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
-import { Star, Eye, Clock } from "lucide-react";
+import { Star, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { getMangaUrl, getMangaSlug } from "@/lib/slug";
+import ViewsCounter from "@/components/ViewsCounter";
 
 interface MangaCardProps {
   id?: string;
@@ -9,7 +10,7 @@ interface MangaCardProps {
   title: string;
   cover: string;
   rating: number;
-  views: string;
+  views: number;
   status: string;
   genre: string;
   lastUpdate: string;
@@ -52,23 +53,20 @@ const MangaCard = ({
         </div>
       </div>
 
-      <div className="p-3 space-y-2">
+      <div className="p-3 space-y-2 text-center">
         <h3 className="font-medium text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
             <span>{rating}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Eye className="h-3 w-3" />
-            <span>{views}</span>
-          </div>
+          <ViewsCounter viewsCount={views} type="manga" className="text-xs" />
         </div>
 
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
           <span>{lastUpdate}</span>
         </div>
@@ -78,7 +76,7 @@ const MangaCard = ({
 
   const mangaSlug = getMangaSlug({ slug, title, id });
 
-  return id || slug ? (
+  return mangaSlug ? (
     <Link to={getMangaUrl(mangaSlug)}>{CardContent}</Link>
   ) : (
     CardContent
