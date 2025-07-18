@@ -82,6 +82,7 @@ const MangaDetails = () => {
   const [manga, setManga] = useState<Manga | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
