@@ -45,6 +45,7 @@ import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
 import ViewsCounter from "@/components/ViewsCounter";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface Manga {
   id: string;
@@ -138,7 +139,7 @@ const MangaDetails = () => {
       }
 
       if (!data) {
-        throw new Error("لم يتم العثور على بيانات المانجا");
+        throw new Error("لم يتم العثور على بي��نات المانجا");
       }
 
       setManga(data);
@@ -208,10 +209,12 @@ const MangaDetails = () => {
 
       console.log("✅ Track view response:", response);
 
-      // Force refresh the page data to see updated count
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Update the view count in state instead of reloading
+      if (manga) {
+        setManga((prev) =>
+          prev ? { ...prev, views_count: (prev.views_count || 0) + 1 } : prev,
+        );
+      }
     } catch (error: any) {
       console.error("❌ Error tracking view:", error);
     }
@@ -603,10 +606,7 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-                  <Button className="w-full mt-4">
-                    <Bookmark className="h-4 w-4 ml-2" />
-                    إضافة للمفضلة
-                  </Button>
+                  <FavoriteButton mangaId={manga.id} className="w-full mt-4" />
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-4">

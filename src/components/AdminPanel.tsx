@@ -7,16 +7,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Plus,
-  BookOpen,
-  FileText,
-  Settings,
-  MessageCircle,
-} from "lucide-react";
+import { Plus, BookOpen, FileText, Settings } from "lucide-react";
 import AddMangaForm from "./admin/AddMangaForm";
 import AddChapterForm from "./admin/AddChapterForm";
-import CommentsAdmin from "./admin/CommentsAdmin";
 import { useAuth } from "@/hooks/useAuth";
 import { ensureMangaHasSlugs } from "@/utils/ensureSlugs";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +19,6 @@ const AdminPanel = () => {
   const { toast } = useToast();
   const [openMangaDialog, setOpenMangaDialog] = useState(false);
   const [openChapterDialog, setOpenChapterDialog] = useState(false);
-  const [openCommentsDialog, setOpenCommentsDialog] = useState(false);
 
   const handleEnsureSlugs = async () => {
     try {
@@ -92,25 +84,6 @@ const AdminPanel = () => {
             <DialogTitle>إضافة فصل جديد</DialogTitle>
           </DialogHeader>
           <AddChapterForm onSuccess={() => setOpenChapterDialog(false)} />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={openCommentsDialog} onOpenChange={setOpenCommentsDialog}>
-        <DialogTrigger asChild>
-          <Button
-            size="lg"
-            variant="outline"
-            className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <MessageCircle className="h-5 w-5 ml-2" />
-            إدارة التعليقات
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>إدارة التعليقات والمستخدمين</DialogTitle>
-          </DialogHeader>
-          <CommentsAdmin />
         </DialogContent>
       </Dialog>
 
