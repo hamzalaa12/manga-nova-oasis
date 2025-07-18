@@ -29,9 +29,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AVAILABLE_GENRES } from "@/constants/genres";
 
 interface Manga {
   id: string;
@@ -335,7 +336,7 @@ const EditMangaDialog = ({
                 name="rating"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>��لتقييم (0-10)</FormLabel>
+                    <FormLabel>التقييم (0-10)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
