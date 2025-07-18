@@ -76,7 +76,7 @@ interface Chapter {
 }
 
 const MangaDetails = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, userProfile, isAdmin } = useAuth();
   const { toast } = useToast();
@@ -214,7 +214,7 @@ const MangaDetails = () => {
       if (error) throw error;
       setChapters(data || []);
     } catch (error: any) {
-      // إعادة المحاولة مرة واحدة إذا كان خطأ مؤقت
+      // إعادة المحاولة مرة واحد�� إذا كان خطأ مؤقت
       if (retryCount === 0 && (error.status === 500 || error.status === 503)) {
         console.warn("Retrying chapters fetch...");
         setTimeout(() => fetchChaptersForManga(mangaId, retryCount + 1), 1000);
@@ -840,8 +840,8 @@ const MangaDetails = () => {
                                         </AlertDialogTitle>
                                         <AlertDialogDescription>
                                           هل أنت متأكد من حذف الفصل{" "}
-                                          {chapter.chapter_number}؟ ه��ا الإجراء
-                                          لا يمكن التراجع عنه.
+                                          {chapter.chapter_number}؟ ����ا
+                                          الإجراء لا يمكن التراجع عنه.
                                         </AlertDialogDescription>
                                       </AlertDialogHeader>
                                       <AlertDialogFooter>
