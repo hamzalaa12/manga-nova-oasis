@@ -134,8 +134,13 @@ const MangaDetails = () => {
 
       if (error) throw error;
       setChapters(data || []);
-    } catch (error) {
-      console.error("Error fetching chapters:", error);
+    } catch (error: any) {
+      console.error("Error fetching chapters:", error.message || error);
+      toast({
+        title: "خطأ",
+        description: error.message || "فشل في تحميل الفصول",
+        variant: "destructive",
+      });
     }
   };
 
@@ -465,7 +470,7 @@ const MangaDetails = () => {
 
                   {manga.genre && manga.genre.length > 0 && (
                     <div className="mt-4">
-                      <p className="text-sm font-medium mb-2">التصنيفات:</p>
+                      <p className="text-sm font-medium mb-2">التصن��فات:</p>
                       <div className="flex flex-wrap gap-1 justify-center">
                         {manga.genre.map((genre, index) => (
                           <Badge
