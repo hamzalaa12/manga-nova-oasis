@@ -173,7 +173,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       isSpoiler: boolean;
     }) => {
       if (!user || !user.id) {
-        throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
+        throw new Error("يجب تسجيل الدخول لكتا��ة التعليقات");
       }
 
       console.log("User validation passed:", {
@@ -252,19 +252,10 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
     },
     onError: (error: any) => {
       console.error("Comment mutation error:", error);
+      console.log("🔄 Attempting fallback comment submission...");
 
-      let errorMessage = "فشل في نشر التعليق";
-      if (error?.message) {
-        errorMessage = error.message;
-      } else if (typeof error === "string") {
-        errorMessage = error;
-      }
-
-      toast({
-        title: "خطأ في نشر التعليق",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      // Try the fallback method
+      handleSubmitCommentFallback();
     },
   });
 
@@ -862,7 +853,7 @@ const CommentItem = ({
     >
       <Card className="bg-gray-800 border-gray-700 hover:bg-gray-800/80 transition-colors">
         <CardContent className="p-4">
-          {/* ر��س التعليق */}
+          {/* رأس التعليق */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-blue-400">
