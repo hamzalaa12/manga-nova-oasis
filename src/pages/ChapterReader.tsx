@@ -302,7 +302,7 @@ const ChapterReader = () => {
           <div className="flex items-center justify-between">
             {/* Left Navigation */}
             <div className="flex items-center gap-4">
-              <Link to={`/manga/${manga.id}`}>
+              <Link to={getMangaUrl(getMangaSlug(manga))}>
                 <Button variant="ghost" size="sm" className="hover:bg-white/10">
                   <ArrowRight className="h-4 w-4 ml-1" />
                   العودة
