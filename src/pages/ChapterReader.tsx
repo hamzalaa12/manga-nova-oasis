@@ -50,7 +50,11 @@ interface Manga {
 }
 
 const ChapterReader = () => {
-  const { id } = useParams<{ id: string }>();
+  const {
+    slug,
+    chapter: chapterParam,
+    id,
+  } = useParams<{ slug?: string; chapter?: string; id?: string }>();
   const navigate = useNavigate();
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [manga, setManga] = useState<Manga | null>(null);
@@ -58,10 +62,14 @@ const ChapterReader = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
+    if (slug && chapterParam) {
+      // New format: /read/manga-slug/chapter-number
+      fetchChapterBySlugAndNumber();
+    } else if (id) {
+      // Old format: /read/chapter-id (for backward compatibility)
       fetchChapterDetails();
     }
-  }, [id]);
+  }, [slug, chapterParam, id]);
 
   const fetchChapterDetails = async () => {
     try {
