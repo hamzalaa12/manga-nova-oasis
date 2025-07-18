@@ -96,7 +96,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "أرواح شريرة",
     "عوالم موازية",
     "سفر عبر الوقت",
-    "سفر عبر الأب��اد",
+    "سفر عبر الأبعاد",
 
     // القوى والقتال
     "قوى خارقة",
@@ -110,7 +110,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "بطولات",
     "مهام",
     "بحث عن الكنز",
-    "قراصنة",
+    "قرا��نة",
     "بحارة",
     "طيران",
 
@@ -173,7 +173,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     "طقس",
     "فصول السنة",
     "سفر",
-    "سياحة",
+    "سياح��",
     "تاريخ قديم",
     "حضارات",
     "أثار",
@@ -238,14 +238,41 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     setGenres(genres.filter((genre) => genre !== genreToRemove));
   };
 
+  const generateUniqueSlug = async (title: string): Promise<string> => {
+    const baseSlug = createSlug(title);
+    let finalSlug = baseSlug;
+    let counter = 0;
+
+    // التأكد من أن الـ slug فريد
+    while (true) {
+      const { data: existing } = await supabase
+        .from("manga")
+        .select("id")
+        .eq("slug", finalSlug);
+
+      if (!existing || existing.length === 0) {
+        break; // الـ slug متاح
+      }
+
+      counter++;
+      finalSlug = `${baseSlug}-${counter}`;
+    }
+
+    return finalSlug;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // إنشاء slug فريد للمانجا
+      const slug = await generateUniqueSlug(formData.title);
+
       const { error } = await supabase.from("manga").insert([
         {
           title: formData.title,
+          slug: slug,
           description: formData.description,
           cover_image_url: formData.coverImageUrl,
           manga_type: formData.mangaType as any,
