@@ -43,7 +43,7 @@ const ChapterCard = ({
 
   const chapterUrl = getChapterUrl(getMangaSlug(manga), chapter_number);
 
-  // تحديد إذ�� كان الفصل جديد (آخر 3 أيام)
+  // تحديد إذا كان الفصل جديد (آخر 3 أيام)
   const isNewChapter = () => {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
@@ -134,9 +134,11 @@ const ChapterCard = ({
               <span className="font-medium">الفصل {chapter_number}</span>
             </div>
             {manga.author && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center justify-center gap-1 mt-2">
                 <User className="h-3 w-3" />
-                <span className="truncate max-w-[80px]">{manga.author}</span>
+                <span className="truncate max-w-[100px] text-center">
+                  {manga.author}
+                </span>
               </div>
             )}
           </div>
