@@ -41,6 +41,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import EditMangaDialog from "@/components/admin/EditMangaDialog";
 
 interface Manga {
   id: string;
@@ -313,7 +314,7 @@ const MangaDetails = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">المانجا غير موجودة</div>
+          <div className="text-center">ال��انجا غير موجودة</div>
         </div>
         <Footer />
       </div>
@@ -427,7 +428,7 @@ const MangaDetails = () => {
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
                               الفصول المرتبطة بها أيضاً. هذا الإجراء لا يمكن
-                              التراجع ��نه.
+                              التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -478,7 +479,7 @@ const MangaDetails = () => {
                     >
                       <Button>
                         <Play className="h-4 w-4 ml-2" />
-                        بدء القراءة
+                        بدء ��لقراءة
                       </Button>
                     </Link>
                   )}
