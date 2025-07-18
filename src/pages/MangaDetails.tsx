@@ -105,7 +105,18 @@ const MangaDetails = () => {
 
       const { data, error } = await query.single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === "PGRST116") {
+          // No rows returned
+          throw new Error("المانجا غير موجودة");
+        }
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error("لم يتم العثور على بيانات المانجا");
+      }
+
       setManga(data);
 
       // جلب الفصول والتتبع في نفس الوقت
