@@ -60,6 +60,10 @@ const ChapterReader = () => {
   const [manga, setManga] = useState<Manga | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showUI, setShowUI] = useState(true);
+  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("up");
+  const lastScrollY = useRef(0);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (slug && chapterParam) {
