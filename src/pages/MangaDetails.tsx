@@ -410,13 +410,66 @@ const MangaDetails = () => {
     );
   }
 
-  if (!manga) {
+  if (error) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">المانجا غير موجودة</div>
-        </div>
+        <main className="container mx-auto px-4 py-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary-glow transition-colors mb-6"
+          >
+            <ArrowRight className="h-4 w-4" />
+            العودة للرئيسية
+          </Link>
+          <Card>
+            <CardContent className="p-8 text-center">
+              <div className="space-y-4">
+                <div className="text-destructive text-6xl">⚠️</div>
+                <h1 className="text-2xl font-bold">حدث خطأ</h1>
+                <p className="text-muted-foreground">{error}</p>
+                <Button
+                  onClick={() => window.location.reload()}
+                  variant="outline"
+                >
+                  إعادة المحاولة
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!manga && !loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary-glow transition-colors mb-6"
+          >
+            <ArrowRight className="h-4 w-4" />
+            العودة للرئيسية
+          </Link>
+          <Card>
+            <CardContent className="p-8 text-center">
+              <div className="space-y-4">
+                <div className="text-muted-foreground text-6xl">📚</div>
+                <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
+                <p className="text-muted-foreground">
+                  لم يتم العثور على المانجا المطلوبة
+                </p>
+                <Button onClick={() => navigate("/")} variant="outline">
+                  العودة للرئيسية
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
         <Footer />
       </div>
     );
