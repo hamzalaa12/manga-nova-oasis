@@ -205,7 +205,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
               dir="rtl"
             />
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <Button
                 onClick={handleSubmitComment}
                 disabled={!newComment.trim() || addCommentMutation.isPending}
@@ -214,6 +214,39 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 <Send className="h-4 w-4" />
                 {addCommentMutation.isPending ? "جاري النشر..." : "نشر التعليق"}
               </Button>
+
+              {process.env.NODE_ENV === "development" && (
+                <Button
+                  onClick={async () => {
+                    console.log("=== Debug Info ===");
+                    console.log("Chapter ID:", chapterId);
+                    console.log("User:", user);
+                    console.log("Comment content:", newComment);
+
+                    // Test chapter access
+                    const { data: chapter, error: chapterError } =
+                      await supabase
+                        .from("chapters")
+                        .select("*")
+                        .eq("id", chapterId)
+                        .single();
+                    console.log("Chapter test:", { chapter, chapterError });
+
+                    // Test user session
+                    const { data: session } = await supabase.auth.getSession();
+                    console.log("Session:", session);
+
+                    toast({
+                      title: "Debug Complete",
+                      description: "Check console for details",
+                    });
+                  }}
+                  variant="outline"
+                  className="border-yellow-600 text-yellow-600"
+                >
+                  🔍 Debug
+                </Button>
+              )}
             </div>
           </div>
         ) : (
