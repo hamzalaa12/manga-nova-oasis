@@ -76,7 +76,13 @@ const MangaCard = ({
     </div>
   );
 
-  return id ? <Link to={`/manga/${id}`}>{CardContent}</Link> : CardContent;
+  const mangaSlug = getMangaSlug({ slug, title, id });
+
+  return id || slug ? (
+    <Link to={getMangaUrl(mangaSlug)}>{CardContent}</Link>
+  ) : (
+    CardContent
+  );
 };
 
 export default MangaCard;
