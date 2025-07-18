@@ -391,7 +391,7 @@ const ChapterReader = () => {
       </div>
 
       {/* المحتوى الرئيسي - صفحات الفصل */}
-      <main className="pt-20 pb-24">
+      <main className="pt-4 pb-4">
         {chapter.pages.length === 0 ? (
           <div className="flex items-center justify-center min-h-[70vh]">
             <div className="text-center">
@@ -431,7 +431,7 @@ const ChapterReader = () => {
         </div>
       )}
 
-      {/* شريط التنقل السفلي - ثابت د��ئماً */}
+      {/* شريط التنقل السفلي - ثابت دائماً */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-t border-gray-800 shadow-lg">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
