@@ -277,7 +277,7 @@ const ChapterReader = () => {
               variant="outline"
               className="text-white border-white hover:bg-white hover:text-black"
             >
-              العودة للرئيسي��
+              العودة للرئيسية
             </Button>
           </Link>
         </div>
@@ -290,8 +290,12 @@ const ChapterReader = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* شريط التنقل العلوي - ثابت دائماً */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-b border-gray-800 shadow-lg">
+      {/* شريط التنقل العلوي - يظهر عند التمرير */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
+          showNavigation ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* الجهة اليسرى - أيقونات الإجراءات */}
@@ -303,56 +307,36 @@ const ChapterReader = () => {
                   className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
                   title="العودة للمانجا"
                 >
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-
-              <Link to="/">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
-                  title="الرئيسية"
-                >
-                  <Home className="h-4 w-4" />
+                  <Info className="h-4 w-4" />
                 </Button>
               </Link>
 
               <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
-                <Eye className="h-4 w-4" />
-                <ViewsCounter
-                  viewsCount={chapter?.views_count || 0}
-                  type="chapter"
-                  className="text-white text-sm"
-                />
+                <span className="text-white text-sm font-medium">
+                  {getCurrentChapterIndex() + 1} / {allChapters.length}
+                </span>
               </div>
             </div>
 
             {/* الوسط - عنوان المانجا والفصل */}
             <div className="text-center flex-1 px-4">
-              <Link
-                to={getMangaUrl(getMangaSlug(manga))}
-                className="hover:text-blue-400 transition-colors"
-              >
-                <h1 className="text-lg font-bold text-white hover:text-blue-400 truncate">
-                  {manga.title}
-                </h1>
-              </Link>
-              <p className="text-sm text-gray-400">
-                الفصل {chapter.chapter_number}
-                {chapter.title && ` - ${chapter.title}`}
-              </p>
+              <h1 className="text-lg font-bold text-white truncate">
+                {manga.title} - {chapter.chapter_number}
+              </h1>
+              <div className="text-sm text-gray-400">
+                {manga.title} / الرئيسية /
+              </div>
             </div>
 
-            {/* الجهة اليمنى - منتق�� الفصول */}
+            {/* الجهة اليمنى - منتقي الفصول */}
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
-                title="الإعدادات"
+                title="القائمة"
               >
-                <Settings className="h-4 w-4" />
+                <Menu className="h-4 w-4" />
               </Button>
 
               <DropdownMenu>
@@ -360,9 +344,9 @@ const ChapterReader = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-medium border border-blue-500"
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium border border-gray-600"
                   >
-                    الفصل {chapter.chapter_number}
+                    {chapter.chapter_number}
                     <ChevronDown className="h-4 w-4 mr-2" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -447,7 +431,7 @@ const ChapterReader = () => {
         </div>
       )}
 
-      {/* شريط التنقل السفلي - ثابت دائماً */}
+      {/* شريط التنقل السفلي - ثابت د��ئماً */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-t border-gray-800 shadow-lg">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
