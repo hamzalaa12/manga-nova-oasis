@@ -101,15 +101,20 @@ const MangaDetails = () => {
 
     try {
       const identifier = parseMangaIdentifier(slug);
+      console.log("Looking for manga with identifier:", identifier);
+
       let query = supabase.from("manga").select("*");
 
       if (identifier.type === "slug") {
         query = query.eq("slug", identifier.value);
+        console.log("Searching by slug:", identifier.value);
       } else {
         query = query.eq("id", identifier.value);
+        console.log("Searching by ID:", identifier.value);
       }
 
       const { data, error } = await query.single();
+      console.log("Query result:", { data, error });
 
       if (error) {
         if (error.code === "PGRST116") {
