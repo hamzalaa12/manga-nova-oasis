@@ -207,6 +207,13 @@ const MangaDetails = () => {
       });
 
       console.log("✅ Track view response:", response);
+
+      // Update the view count in state instead of reloading
+      if (manga) {
+        setManga((prev) =>
+          prev ? { ...prev, views_count: (prev.views_count || 0) + 1 } : prev,
+        );
+      }
     } catch (error: any) {
       console.error("❌ Error tracking view:", error);
     }
