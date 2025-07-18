@@ -97,7 +97,7 @@ const MangaDetails = () => {
       return;
     }
 
-    setError(null); // إعادة تعيين حالة الخطأ
+    setError(null); // إعا��ة تعيين حالة الخطأ
 
     try {
       const identifier = parseMangaIdentifier(slug);
@@ -182,8 +182,11 @@ const MangaDetails = () => {
         },
         headers,
       });
-    } catch (error) {
-      console.error("Error tracking view:", error);
+    } catch (error: any) {
+      // Log only if it's not a network or minor error
+      if (error.status !== 404 && error.status !== 500) {
+        console.warn("Error tracking view:", error.message || error);
+      }
       // Don't fail the page load if view tracking fails
     }
   };
