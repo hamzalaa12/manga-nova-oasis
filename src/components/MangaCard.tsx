@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 
 interface MangaCardProps {
   id?: string;
-  slug?: string;
   title: string;
   cover: string;
   rating: number;
