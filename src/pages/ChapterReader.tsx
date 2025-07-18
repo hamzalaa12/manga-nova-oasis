@@ -27,6 +27,7 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
+import ChapterInteractions from "@/components/ChapterInteractions";
 
 interface Chapter {
   id: string;
