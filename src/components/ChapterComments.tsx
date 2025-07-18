@@ -184,6 +184,18 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         is_spoiler: isSpoiler,
       });
 
+      // First verify the chapter exists
+      const { data: chapterExists, error: chapterError } = await supabase
+        .from("chapters")
+        .select("id")
+        .eq("id", chapterId)
+        .single();
+
+      if (chapterError || !chapterExists) {
+        console.error("Chapter not found:", chapterError);
+        throw new Error("الفصل غير موجود");
+      }
+
       const { data, error } = await supabase
         .from("chapter_comments")
         .insert({
@@ -325,7 +337,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
         .eq("comment_id", commentId)
         .eq("user_id", user.id);
 
-      // إضافة ��لإعجاب الجديد
+      // إضافة الإعجاب الجديد
       const { error } = await supabase.from("comment_likes").insert({
         comment_id: commentId,
         user_id: user.id,
@@ -668,7 +680,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
                 {addCommentMutation.isPending
                   ? "جاري النشر..."
                   : replyingTo
-                    ? "إرسال الرد"
+                    ? "إرسا�� الرد"
                     : "نشر التعليق"}
               </Button>
             </div>
