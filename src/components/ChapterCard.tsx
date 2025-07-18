@@ -43,7 +43,7 @@ const ChapterCard = ({
 
   const chapterUrl = getChapterUrl(getMangaSlug(manga), chapter_number);
 
-  // تحديد إذا كان الفصل جديد (آخر 3 أيام)
+  // تحديد إذ�� كان الفصل جديد (آخر 3 أيام)
   const isNewChapter = () => {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
@@ -61,7 +61,7 @@ const ChapterCard = ({
             className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
           />
 
-          {/* بادج الفصل ��ع تأثير جديد */}
+          {/* بادج الفصل مع تأثير جديد */}
           <div className="absolute top-2 right-2">
             <Badge
               variant="default"
@@ -114,7 +114,7 @@ const ChapterCard = ({
           </div>
         </div>
 
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2 text-center">
           {/* عنوان المانجا */}
           <h3 className="font-bold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
             {manga.title}
@@ -128,7 +128,7 @@ const ChapterCard = ({
           )}
 
           {/* معلومات إضافية */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/50">
+          <div className="flex items-center justify-center text-xs text-muted-foreground pt-2 border-t border-border/50">
             <div className="flex items-center gap-1">
               <BookOpen className="h-3 w-3" />
               <span className="font-medium">الفصل {chapter_number}</span>
