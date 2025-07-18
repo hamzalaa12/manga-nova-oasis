@@ -280,7 +280,7 @@ const MangaDetails = () => {
       if (error) throw error;
 
       toast({
-        title: "تم الحذف!",
+        title: "تم الح��ف!",
         description: `تم حذف الفصل ${chapterNumber} بنجاح`,
       });
 
@@ -672,7 +672,7 @@ const MangaDetails = () => {
                     >
                       <Button>
                         <Play className="h-4 w-4 ml-2" />
-                        بدء القراءة
+                        بدء ��لقراءة
                       </Button>
                     </Link>
                   )}
@@ -702,8 +702,8 @@ const MangaDetails = () => {
                             className="flex-1"
                           >
                             <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-medium">
+                              <div className="flex items-center justify-center gap-2 mb-1">
+                                <h3 className="font-medium text-center">
                                   الفصل {chapter.chapter_number}
                                   {chapter.title && `: ${chapter.title}`}
                                 </h3>
