@@ -457,8 +457,62 @@ const MangaDetails = () => {
     );
   }
 
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
+  // إنشاء structured data للمانجا
+  const structuredData = manga
+    ? {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        "@id": currentUrl,
+        name: manga.title,
+        description:
+          manga.description || `اقرأ مانجا ${manga.title} مترجمة بجودة عالية`,
+        image: manga.cover_image_url,
+        author: {
+          "@type": "Person",
+          name: manga.author || "غير محدد",
+        },
+        genre: manga.genre || [],
+        inLanguage: "ar",
+        dateCreated: manga.created_at,
+        aggregateRating: manga.rating
+          ? {
+              "@type": "AggregateRating",
+              ratingValue: manga.rating,
+              ratingCount: manga.views_count || 1,
+              bestRating: 5,
+              worstRating: 1,
+            }
+          : undefined,
+        interactionStatistic: {
+          "@type": "InteractionCounter",
+          interactionType: "https://schema.org/ReadAction",
+          userInteractionCount: manga.views_count || 0,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "مانجا العرب",
+          url: typeof window !== "undefined" ? window.location.origin : "",
+        },
+      }
+    : undefined;
+
   return (
     <div className="min-h-screen bg-background">
+      {manga && (
+        <SEO
+          title={`${manga.title} - مانجا العرب`}
+          description={
+            manga.description ||
+            `اقرأ مانجا ${manga.title} مترجمة بجودة عالية. ${manga.author ? `بقلم ${manga.author}` : ""} ${manga.genre && manga.genre.length > 0 ? `تصنيف: ${manga.genre.slice(0, 3).join("، ")}` : ""}`
+          }
+          image={manga.cover_image_url || undefined}
+          url={currentUrl}
+          type="article"
+          structuredData={structuredData}
+        />
+      )}
       <Header />
 
       <main className="container mx-auto px-4 py-8">
