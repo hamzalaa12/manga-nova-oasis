@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import MangaCard from "./MangaCard";
+import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -152,7 +153,7 @@ const MangaGrid = ({
           ))}
         </div>
 
-        {/* أزرار التنقل بين الصفحات */}
+        {/* أزرار الت��قل بين الصفحات */}
         {!showAll && totalPages > 1 && (
           <div className="flex items-center justify-center mt-12 gap-4">
             <Button
