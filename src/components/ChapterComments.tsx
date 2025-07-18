@@ -119,7 +119,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
       const commentsMap = new Map();
       const rootComments: Comment[] = [];
 
-      // جلب إعجابات المستخدم
+      // جل�� إعجابات المستخدم
       let userLikes: any[] = [];
       if (user) {
         const { data: likesData } = await supabase
@@ -252,28 +252,12 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
   // حذف تعليق
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: string) => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-      }
-
-      const { data, error } = await supabase.functions.invoke(
-        "manage-comments",
-        {
-          body: {
-            action: "delete",
-            commentId,
-          },
-          headers,
-        },
-      );
+      const { error } = await supabase
+        .from("chapter_comments")
+        .update({ is_deleted: true })
+        .eq("id", commentId);
 
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -679,7 +663,7 @@ const ChapterComments = ({ chapterId }: ChapterCommentsProps) => {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-400">
-            <p>يجب تسجيل الدخول لكتابة التعليقات</p>
+            <p>يجب تسجيل الدخول لكت��بة التعليقات</p>
           </div>
         )}
       </div>
