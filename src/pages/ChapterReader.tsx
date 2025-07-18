@@ -308,50 +308,63 @@ const ChapterReader = () => {
           showUI ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4">
           <div className="flex items-center justify-between">
-            {/* Left Action Icons */}
-            <div className="flex items-center gap-3">
+            {/* Left Action Icons - Hidden on mobile */}
+            <div className="hidden md:flex items-center gap-2 lg:gap-3">
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
               >
-                <Info className="h-4 w-4" />
+                <Info className="h-3 w-3 lg:h-4 lg:w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
               >
-                <Eye className="h-4 w-4" />
+                <Eye className="h-3 w-3 lg:h-4 lg:w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20"
               >
-                <Bookmark className="h-4 w-4" />
+                <Bookmark className="h-3 w-3 lg:h-4 lg:w-4" />
               </Button>
             </div>
 
             {/* Center Title */}
-            <div className="text-center flex-1">
+            <div className="text-center flex-1 px-2">
               <Link
                 to={`/manga/${manga.id}`}
                 className="hover:text-blue-400 transition-colors"
               >
-                <h1 className="text-lg font-bold text-white hover:text-blue-400">
+                <h1 className="text-sm sm:text-lg font-bold text-white hover:text-blue-400 truncate">
                   {manga.title} - {chapter.chapter_number}
                 </h1>
               </Link>
             </div>
 
-            {/* Right Breadcrumb */}
-            <div className="text-sm text-gray-400">
+            {/* Right Breadcrumb - Simplified on mobile */}
+            <div className="text-xs sm:text-sm text-gray-400 hidden sm:block">
               {chapter.chapter_number} / {manga.title} /{" "}
               <Link to="/" className="hover:text-white">
                 الرئيسية
+              </Link>
+            </div>
+
+            {/* Mobile home button */}
+            <div className="sm:hidden">
+              <Link to="/">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white"
+                >
+                  <Home className="h-4 w-4" />
+                </Button>
               </Link>
             </div>
           </div>
