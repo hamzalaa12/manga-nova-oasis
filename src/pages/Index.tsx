@@ -5,7 +5,6 @@ import ChaptersGrid from "@/components/ChaptersGrid";
 import Footer from "@/components/Footer";
 import AdminPanel from "@/components/AdminPanel";
 import SEO from "@/components/SEO";
-import NewChaptersNotification from "@/components/NewChaptersNotification";
 
 const Index = () => {
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
