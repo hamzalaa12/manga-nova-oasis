@@ -46,6 +46,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
 import ViewsCounter from "@/components/ViewsCounter";
 import FavoriteButton from "@/components/FavoriteButton";
+import PreloadContent from "@/components/PreloadContent";
+import ServerSideContent from "@/components/ServerSideContent";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
 interface Manga {
@@ -642,7 +644,7 @@ const MangaDetails = () => {
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
-                              الفصول المرتبطة بها أيضاً. هذا الإجراء لا يمكن
+                              الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
