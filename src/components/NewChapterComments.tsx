@@ -590,7 +590,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setSortBy('latest')}>
-                الأحدث أولاً
+                الأح��ث أولاً
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortBy('oldest')}>
                 الأقدم أولاً
@@ -609,7 +609,10 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage src={user.user_metadata?.avatar_url} alt="Your avatar" />
+                <AvatarImage
+                  src={user.user_metadata?.avatar_url || fullProfile?.avatar_url}
+                  alt="Your avatar"
+                />
                 <AvatarFallback>
                   <User className="h-5 w-5" />
                 </AvatarFallback>
