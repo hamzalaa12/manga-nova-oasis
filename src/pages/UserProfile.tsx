@@ -275,7 +275,7 @@ const UserProfile = () => {
 
       if (progressError) console.error("Error counting reading progress:", progressError);
 
-      // جلب عد�� التعليقات
+      // جلب عدد التعليقات
       const { count: commentsCount, error: commentsError } = await supabase
         .from("chapter_comments")
         .select("id", { count: "exact" })
@@ -396,7 +396,7 @@ const UserProfile = () => {
           id: "11",
           title: "أسطورة الموقع",
           description: "حقق جميع الإنجازات",
-          icon: "���",
+          icon: "🏆",
           unlocked: false,
           rarity: "legendary"
         },
@@ -511,7 +511,7 @@ const UserProfile = () => {
     enabled: !!user?.id,
   });
 
-  // جلب الإشعارات
+  // جلب الإشع��رات
   const { data: notifications = [], isLoading: notificationsLoading } = useQuery({
     queryKey: ["user-notifications", user?.id],
     queryFn: async () => {
@@ -632,7 +632,7 @@ const UserProfile = () => {
     },
   });
 
-  // و��ع علامة قراءة على الإشعار
+  // وضع علامة قراءة على الإشعار
   const markNotificationReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
       const { error } = await supabase
@@ -777,7 +777,7 @@ const UserProfile = () => {
               {/* Level Progress */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span>التقدم للمستوى التالي</span>
+                  <span>التقدم للم��توى التالي</span>
                   <span>{userStats?.experience}/{userStats?.nextLevelExp} XP</span>
                 </div>
                 <Progress 
@@ -804,7 +804,7 @@ const UserProfile = () => {
                   className="gap-2"
                 >
                   {editMode ? <X className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-                  {editMode ? "إلغاء" : "تحرير الملف"}
+                  {editMode ? "إلغ��ء" : "تحرير الملف"}
                 </Button>
 
                 {editMode && (
@@ -900,7 +900,7 @@ const UserProfile = () => {
                                 ) : (
                                   <>
                                     <Upload className="h-4 w-4 mr-2" />
-                                    اختر صورة
+                                    اخ��ر صورة
                                   </>
                                 )}
                               </span>
@@ -980,7 +980,7 @@ const UserProfile = () => {
           <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
             <TabsTrigger value="overview" className="gap-2 text-xs">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">��ظرة عامة</span>
+              <span className="hidden sm:inline">نظرة عامة</span>
             </TabsTrigger>
             <TabsTrigger value="favorites" className="gap-2 text-xs">
               <Heart className="h-4 w-4" />
@@ -1135,7 +1135,7 @@ const UserProfile = () => {
                     <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">لا توجد مانجا في المفضلة</h3>
                     <p className="text-muted-foreground mb-4">
-                      ابدأ في إضافة المان��ا المفضلة لديك لتظهر هنا
+                      ابدأ في إضافة المانجا المفضلة لديك لتظهر هنا
                     </p>
                     <Link to="/">
                       <Button>
@@ -1489,9 +1489,265 @@ const UserProfile = () => {
             </Card>
           </TabsContent>
 
+          {/* Social Tab */}
+          <TabsContent value="social" className="space-y-6">
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    المعلومات الاجتماعية
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">الموقع الجغرافي</label>
+                      <div className="relative">
+                        <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          placeholder="مثال: الرياض، السعودية"
+                          dir="rtl"
+                          className="pr-10"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">الموقع الإلكتروني</label>
+                      <div className="relative">
+                        <Globe className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          value={website}
+                          onChange={(e) => setWebsite(e.target.value)}
+                          placeholder="https://example.com"
+                          dir="ltr"
+                          className="pr-10"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">روابط وسائل التواصل الاجتماعي</h3>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">تويتر</label>
+                        <div className="relative">
+                          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-muted-foreground">@</span>
+                          <Input
+                            value={socialLinks.twitter}
+                            onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
+                            placeholder="username"
+                            dir="ltr"
+                            className="pr-8"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">إنستقرام</label>
+                        <div className="relative">
+                          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-muted-foreground">@</span>
+                          <Input
+                            value={socialLinks.instagram}
+                            onChange={(e) => setSocialLinks({...socialLinks, instagram: e.target.value})}
+                            placeholder="username"
+                            dir="ltr"
+                            className="pr-8"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">يوتيوب</label>
+                        <Input
+                          value={socialLinks.youtube}
+                          onChange={(e) => setSocialLinks({...socialLinks, youtube: e.target.value})}
+                          placeholder="Channel ID"
+                          dir="ltr"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">تيك توك</label>
+                        <div className="relative">
+                          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-muted-foreground">@</span>
+                          <Input
+                            value={socialLinks.tiktok}
+                            onChange={(e) => setSocialLinks({...socialLinks, tiktok: e.target.value})}
+                            placeholder="username"
+                            dir="ltr"
+                            className="pr-8"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline">إلغاء</Button>
+                    <Button>حفظ المعلومات الاجتماعية</Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5" />
+                    التفضيلات
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">الأنواع المفضلة</label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {['أكشن', 'مغامرة', 'كوميديا', 'در��ما', 'خيال', 'رومانسي', 'رياضة', 'إثارة', 'خارق طبيعي'].map((genre) => (
+                        <Button
+                          key={genre}
+                          variant={preferences.favoriteGenres.includes(genre) ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            const updated = preferences.favoriteGenres.includes(genre)
+                              ? preferences.favoriteGenres.filter(g => g !== genre)
+                              : [...preferences.favoriteGenres, genre];
+                            setPreferences({...preferences, favoriteGenres: updated});
+                          }}
+                          className="justify-start"
+                        >
+                          {genre}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">لغات القراءة المفضلة</label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {['العربية', 'English', '日本語', '한국어', '中文'].map((lang) => (
+                        <Button
+                          key={lang}
+                          variant={preferences.readingLanguages.includes(lang) ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            const updated = preferences.readingLanguages.includes(lang)
+                              ? preferences.readingLanguages.filter(l => l !== lang)
+                              : [...preferences.readingLanguages, lang];
+                            setPreferences({...preferences, readingLanguages: updated});
+                          }}
+                          className="justify-start"
+                        >
+                          <Languages className="h-4 w-4 mr-2" />
+                          {lang}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-6">
             <div className="grid gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5" />
+                    إعدادات الإشعارات
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">فصول جديدة</h4>
+                      <p className="text-sm text-muted-foreground">
+                        إشعار عند إضافة فصول جديدة للمانجا المفضلة
+                      </p>
+                    </div>
+                    <Button
+                      variant={preferences.notifications.newChapters ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPreferences({
+                        ...preferences,
+                        notifications: {
+                          ...preferences.notifications,
+                          newChapters: !preferences.notifications.newChapters
+                        }
+                      })}
+                    >
+                      {preferences.notifications.newChapters ? "مفعل" : "معطل"}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">تعليقات جديدة</h4>
+                      <p className="text-sm text-muted-foreground">
+                        إشعار عند الرد على تعليقاتك
+                      </p>
+                    </div>
+                    <Button
+                      variant={preferences.notifications.comments ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPreferences({
+                        ...preferences,
+                        notifications: {
+                          ...preferences.notifications,
+                          comments: !preferences.notifications.comments
+                        }
+                      })}
+                    >
+                      {preferences.notifications.comments ? "مفعل" : "معطل"}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">متابعات جديدة</h4>
+                      <p className="text-sm text-muted-foreground">
+                        إشعار عند متابعة مستخدمين جدد لك
+                      </p>
+                    </div>
+                    <Button
+                      variant={preferences.notifications.follows ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPreferences({
+                        ...preferences,
+                        notifications: {
+                          ...preferences.notifications,
+                          follows: !preferences.notifications.follows
+                        }
+                      })}
+                    >
+                      {preferences.notifications.follows ? "مفعل" : "معطل"}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">إشعارات النظام</h4>
+                      <p className="text-sm text-muted-foreground">
+                        إشعارات التحديثات والصيانة
+                      </p>
+                    </div>
+                    <Button
+                      variant={preferences.notifications.system ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPreferences({
+                        ...preferences,
+                        notifications: {
+                          ...preferences.notifications,
+                          system: !preferences.notifications.system
+                        }
+                      })}
+                    >
+                      {preferences.notifications.system ? "مفعل" : "معطل"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -1500,18 +1756,6 @@ const UserProfile = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">إشعارات البريد الإلكتروني</h4>
-                      <p className="text-sm text-muted-foreground">
-                        تلقي إشعارات عن الفصول الجديدة ��التحديثات
-                      </p>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      تفعيل
-                    </Button>
-                  </div>
-                  
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium">الملف الشخصي العام</h4>
@@ -1534,6 +1778,19 @@ const UserProfile = () => {
                     <Button variant="outline" size="sm">
                       <Download className="h-4 w-4 mr-2" />
                       تصدير
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">تغيير كلمة المرور</h4>
+                      <p className="text-sm text-muted-foreground">
+                        تحديث كلمة مرور حسابك
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      <Shield className="h-4 w-4 mr-2" />
+                      تغيير
                     </Button>
                   </div>
 
