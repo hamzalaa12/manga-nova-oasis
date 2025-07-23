@@ -106,10 +106,25 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
       });
     },
     onError: (error: any) => {
-      console.error("Favorite toggle error:", error);
+      console.error("Favorite toggle error:", {
+        message: error.message,
+        stack: error.stack,
+        error: error
+      });
+
+      let errorMessage = "فشل في تحديث المفضلة";
+
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error.code) {
+        errorMessage = `Database error (${error.code}): ${error.message || 'Unknown error'}`;
+      }
+
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحديث ��لمفضلة",
+        description: errorMessage,
         variant: "destructive",
       });
     },
