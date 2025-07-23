@@ -655,10 +655,10 @@ const UserProfile = () => {
     },
   });
 
-  // حذف م�� المفضلة
+  // حذف من المفضلة
   const removeFavoriteMutation = useMutation({
     mutationFn: async (mangaId: string) => {
-      if (!user?.id) throw new Error("المستخدم غير مسجل الدخول");
+      if (!user?.id) throw new Error("المستخدم غير مسجل الدخ��ل");
 
       const { error } = await supabase
         .from("user_favorites")
@@ -696,9 +696,14 @@ const UserProfile = () => {
 
   useEffect(() => {
     if (fullProfile) {
-      setDisplayName(fullProfile.display_name);
+      console.log("Updating local state from profile:", fullProfile);
+      setDisplayName(fullProfile.display_name || "");
       setBio(fullProfile.bio || "");
       setAvatarUrl(fullProfile.avatar_url || "");
+
+      // تحديث المعلومات الإضافية إذا كانت متوفرة
+      if (fullProfile.location) setLocation(fullProfile.location);
+      if (fullProfile.website) setWebsite(fullProfile.website);
     }
   }, [fullProfile]);
 
@@ -1280,7 +1285,7 @@ const UserProfile = () => {
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <Heart className="h-5 w-5" />
-                    الما��جا المفضلة ({favorites.length})
+                    المانجا المفضلة ({favorites.length})
                   </CardTitle>
                   <div className="flex gap-2 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-64">
@@ -1627,7 +1632,7 @@ const UserProfile = () => {
                 ) : notifications.length === 0 ? (
                   <div className="text-center py-12">
                     <Bell className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">لا توجد إشعارات</h3>
+                    <h3 className="text-lg font-semibold mb-2">لا توجد إشعار��ت</h3>
                     <p className="text-muted-foreground">
                       ستظهر إشعاراتك هنا عند وجود تحديثات
                     </p>
@@ -1876,7 +1881,7 @@ const UserProfile = () => {
                     <div>
                       <h4 className="font-medium">تعليقات جديدة</h4>
                       <p className="text-sm text-muted-foreground">
-                        إشعار عند الرد على تعلي��اتك
+                        إشعار عند الرد على تعليقاتك
                       </p>
                     </div>
                     <Button
@@ -1952,7 +1957,7 @@ const UserProfile = () => {
                     <div>
                       <h4 className="font-medium">الملف الشخصي العام</h4>
                       <p className="text-sm text-muted-foreground">
-                        السماح للمستخدمين الآخرين برؤية ملفك الشخصي
+                        السماح للمستخدم��ن الآخرين برؤية ملفك الشخصي
                       </p>
                     </div>
                     <Button variant="outline" size="sm">
