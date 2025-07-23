@@ -93,7 +93,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const value = {
     user,
     session,
-    userProfile,
     isAdmin,
     loading,
     signIn,
