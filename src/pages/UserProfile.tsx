@@ -119,6 +119,7 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("recent");
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // جلب معلومات المستخدم المحدثة
   const { data: fullProfile, isLoading: profileLoading } = useQuery({
@@ -992,7 +993,7 @@ const UserProfile = () => {
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
-                    تقدم القراءة
+                    تقدم القراء��
                   </CardTitle>
                   <div className="flex gap-2 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-64">
