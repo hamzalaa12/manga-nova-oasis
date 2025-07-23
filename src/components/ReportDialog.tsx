@@ -47,6 +47,8 @@ const ReportDialog = ({ targetId, targetType, triggerElement }: ReportDialogProp
 
   const reportMutation = useMutation({
     mutationFn: async () => {
+      console.log("Starting report submission...");
+
       if (!user) {
         throw new Error("يجب تسجيل الدخول للإبلاغ");
       }
@@ -55,14 +57,20 @@ const ReportDialog = ({ targetId, targetType, triggerElement }: ReportDialogProp
         throw new Error("يرجى اختيار سبب البلاغ");
       }
 
+      console.log("Submitting report:", { targetId, targetType, reason, user: user.id });
+
       // Check if user already reported this item
-      const { data: existingReport } = await supabase
+      const { data: existingReport, error: checkError } = await supabase
         .from("reports")
         .select("id")
         .eq("target_id", targetId)
         .eq("target_type", targetType)
         .eq("reporter_id", user.id)
-        .single();
+        .maybeSingle();
+
+      if (checkError) {
+        console.error("Error checking existing report:", checkError);
+      }
 
       if (existingReport) {
         throw new Error("لقد قمت بالإبلاغ عن هذا العنصر مسبقاً");
@@ -77,7 +85,12 @@ const ReportDialog = ({ targetId, targetType, triggerElement }: ReportDialogProp
         status: "pending",
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error inserting report:", error);
+        throw error;
+      }
+
+      console.log("Report submitted successfully");
     },
     onSuccess: () => {
       toast({
@@ -89,6 +102,7 @@ const ReportDialog = ({ targetId, targetType, triggerElement }: ReportDialogProp
       setDescription("");
     },
     onError: (error: any) => {
+      console.error("Report error:", error);
       toast({
         title: "خطأ في الإبلاغ",
         description: error.message || "حدث خطأ أثناء إرسال البلاغ",
@@ -98,11 +112,26 @@ const ReportDialog = ({ targetId, targetType, triggerElement }: ReportDialogProp
   });
 
   const handleSubmit = () => {
+    console.log("Handle submit called", { reason, description });
     reportMutation.mutate();
   };
 
   if (!user) {
-    return null; // Don't show report option for non-logged-in users
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
+        title="يجب تسجيل الدخول للإبلاغ"
+        onClick={() => toast({
+          title: "تسجيل الدخول مطلوب",
+          description: "يجب تسجيل الدخول للإبلاغ عن المحتوى",
+          variant: "destructive",
+        })}
+      >
+        <Flag className="h-4 w-4" />
+      </Button>
+    );
   }
 
   return (
