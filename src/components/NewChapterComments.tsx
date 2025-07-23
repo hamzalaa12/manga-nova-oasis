@@ -642,7 +642,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
                 <Textarea
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="شاركنا رأيك في هذا الفصل..."
+                  placeholder={`مرحباً ${currentUserProfile?.display_name || 'صديق'}، شاركنا رأيك في هذا الفصل...`}
                   dir="rtl"
                   rows={3}
                   className="resize-none"
