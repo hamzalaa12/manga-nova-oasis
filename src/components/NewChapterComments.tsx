@@ -631,7 +631,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
             <div className="flex items-start gap-3">
               <Avatar className="w-10 h-10">
                 <AvatarImage
-                  src={user.user_metadata?.avatar_url || fullProfile?.avatar_url}
+                  src={currentUserProfile?.avatar_url || user.user_metadata?.avatar_url}
                   alt="Your avatar"
                 />
                 <AvatarFallback>
