@@ -1,5 +1,5 @@
 import ChapterReactions from "./ChapterReactions";
-import ChapterComments from "./ChapterComments";
+import NewChapterComments from "./NewChapterComments";
 
 interface ChapterInteractionsProps {
   chapterId: string;
@@ -11,8 +11,8 @@ const ChapterInteractions = ({ chapterId }: ChapterInteractionsProps) => {
       {/* قسم التفاعلات */}
       <ChapterReactions chapterId={chapterId} />
 
-      {/* قسم التعليقات */}
-      <ChapterComments chapterId={chapterId} />
+      {/* قسم التعليقات الجديد */}
+      <NewChapterComments chapterId={chapterId} />
     </div>
   );
 };
