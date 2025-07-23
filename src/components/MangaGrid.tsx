@@ -58,18 +58,20 @@ const MangaGrid = ({
   showAll = false,
 }: MangaGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = showAll ? 100 : 36;
 
   const {
-    data: mangaData = [],
+    data: mangaResponse,
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["manga-grid", showAll],
-    queryFn: () => fetchMangaData(showAll),
-    staleTime: 5 * 60 * 1000, // 5 دقائق
+    queryKey: ["manga-grid", showAll, currentPage],
+    queryFn: () => fetchMangaData(showAll, showAll ? 1 : currentPage),
+    staleTime: 5 * 60 * 1000, // 5 دق��ئق
     gcTime: 10 * 60 * 1000, // 10 دقائق
   });
+
+  const mangaData = mangaResponse?.data || [];
+  const totalCount = mangaResponse?.totalCount || 0;
 
   if (error) {
     console.error("Error fetching manga:", error);
