@@ -619,7 +619,7 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-                  <FavoriteButton mangaId={manga.id} className="w-full mt-4" />
+
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-4">
