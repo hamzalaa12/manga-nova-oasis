@@ -202,7 +202,7 @@ const UserProfile = () => {
     if (!file.type.startsWith('image/')) {
       toast({
         title: "خطأ",
-        description: "يرجى اختيار ملف صورة صحيح",
+        description: "��رجى اختيار ملف صورة صحيح",
         variant: "destructive",
       });
       return;
@@ -219,17 +219,32 @@ const UserProfile = () => {
     }
 
     try {
+      // Try to upload the image
       const uploadedUrl = await uploadImage(file);
       setAvatarUrl(uploadedUrl);
       toast({
         title: "تم الرفع!",
-        description: "تم رفع الصورة بنجاح",
+        description: "تم رفع الصورة بنجاح. اضغط حفظ لتأكيد التغيير.",
       });
     } catch (error: any) {
+      console.error("Image upload error:", error);
+
+      // Fallback: Convert to base64 for temporary storage
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        setAvatarUrl(base64);
+        toast({
+          title: "تم تحميل الصورة محلياً",
+          description: "اضغط حفظ لتحديث صورتك الشخصية",
+        });
+      };
+      reader.readAsDataURL(file);
+
       toast({
-        title: "خطأ في رفع الصورة",
-        description: error.message || "فشل في رفع الصورة",
-        variant: "destructive",
+        title: "تنبيه",
+        description: "تم تحميل الصورة محلي��ً. اضغط حفظ للمتابعة.",
+        variant: "default",
       });
     }
   };
@@ -1062,7 +1077,7 @@ const UserProfile = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">وقت القراءة</span>
-                      <span className="font-bold text-green-600">{Math.floor((userStats?.totalReadingTime || 0) / 60)} ساع��</span>
+                      <span className="font-bold text-green-600">{Math.floor((userStats?.totalReadingTime || 0) / 60)} ساعة</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">المعدل اليومي</span>
@@ -1773,7 +1788,7 @@ const UserProfile = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <label className="text-sm font-medium mb-3 block">الأنواع المفضلة</label>
+                    <label className="text-sm font-medium mb-3 block">الأنواع ا��مفضلة</label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                       {['أكشن', 'مغامرة', 'كوميديا', 'دراما', 'خيال', 'رومانسي', 'رياضة', 'إثارة', 'خارق طبيعي'].map((genre) => (
                         <Button
