@@ -236,11 +236,16 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
     <Button
       variant={isFavorite ? "default" : "outline"}
       className={`${className} ${isFavorite ? "bg-red-500 hover:bg-red-600" : ""}`}
-      onClick={() => toggleFavoriteMutation.mutate()}
+      onClick={() => {
+        console.log("Favorite button clicked:", { mangaId, userId: user?.id, isFavorite });
+        toggleFavoriteMutation.mutate();
+      }}
       disabled={isLoading || toggleFavoriteMutation.isPending}
     >
       <Heart className={`h-4 w-4 ml-2 ${isFavorite ? "fill-current" : ""}`} />
-      {isLoading ? "..." : isFavorite ? "في المفضلة" : "إضافة للمفضلة"}
+      {toggleFavoriteMutation.isPending ? "جاري التحديث..." :
+       isLoading ? "جاري التحميل..." :
+       isFavorite ? "في المفضلة" : "إضافة للمفضلة"}
     </Button>
   );
 };
