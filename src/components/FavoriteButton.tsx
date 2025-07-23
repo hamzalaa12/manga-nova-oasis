@@ -22,17 +22,30 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
     queryFn: async () => {
       if (!user?.id) return false;
 
+      console.log("Checking favorite status for:", { userId: user.id, mangaId });
+
       const { data, error } = await supabase
         .from("user_favorites")
         .select("id")
         .eq("user_id", user.id)
         .eq("manga_id", mangaId)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== "PGRST116") throw error;
-      return !!data;
+      if (error) {
+        console.error("Error checking favorite status:", {
+          message: error.message,
+          code: error.code,
+          error
+        });
+        // Don't throw error for favorite check, just return false
+        return false;
+      }
+
+      const result = !!data;
+      console.log("Favorite check result:", result);
+      return result;
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!mangaId,
   });
 
   // تبديل حالة المفضلة
