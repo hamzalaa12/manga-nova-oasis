@@ -69,19 +69,13 @@ const Header = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem disabled>
-                  {userProfile?.display_name || user.email}
+                  {user.email}
                   {isAdmin && (
                     <span className="mr-2 text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
-                      أ��من
+                      أدمن
                     </span>
                   )}
                 </DropdownMenuItem>
-                <Link to="/profile">
-                  <DropdownMenuItem>
-                    <User className="h-4 w-4 ml-2" />
-                    الملف الشخصي
-                  </DropdownMenuItem>
-                </Link>
                 <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut className="h-4 w-4 ml-2" />
                   تسجيل خروج
