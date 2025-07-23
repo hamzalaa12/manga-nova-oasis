@@ -266,7 +266,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
       queryClient.invalidateQueries({ queryKey: ["comment-replies", chapterId] });
       toast({
         title: "تم الحذف!",
-        description: "تم حذف التعليق بنجاح",
+        description: "تم حذف التعليق ب��جاح",
       });
     },
   });
@@ -329,7 +329,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
 
     if (diffHours < 1) {
       const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      return `منذ ${diffMinutes} دقيق��`;
+      return `منذ ${diffMinutes} دقيقة`;
     } else if (diffHours < 24) {
       return `منذ ${diffHours} ساعة`;
     } else if (diffDays < 7) {
@@ -623,7 +623,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
                 <Textarea
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder={`مرحباً ${currentUserProfile?.display_name || 'صديق'}، شاركنا رأيك في هذا الفصل...`}
+                  placeholder="شاركنا رأيك في هذا الفصل..."
                   dir="rtl"
                   rows={3}
                   className="resize-none"
