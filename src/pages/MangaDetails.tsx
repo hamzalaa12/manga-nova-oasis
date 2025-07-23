@@ -82,7 +82,7 @@ interface Chapter {
 const MangaDetails = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { user, userProfile, isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -142,7 +142,7 @@ const MangaDetails = () => {
       }
 
       if (!data) {
-        throw new Error("لم يتم العثور على بي��نات المانجا");
+        throw new Error("لم يتم العثور على بي��نات ��لمانجا");
       }
 
       setManga(data);
