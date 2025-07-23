@@ -27,11 +27,20 @@ interface Chapter {
   };
 }
 
-const fetchChaptersData = async (showAll: boolean): Promise<Chapter[]> => {
-  // الحصول على الفصول من آخر 7 أيام أولاً، ثم الباقي
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{data: Chapter[], totalCount: number}> => {
+  const pageSize = 36;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
 
+  // الحصول على إجمالي عدد الفصول أولاً
+  const { count } = await supabase
+    .from("chapters")
+    .select("id", { count: "exact" })
+    .eq("is_private", false);
+
+  const totalCount = count || 0;
+
+  // جلب البيانات للصفحة الحالية
   const { data, error } = await supabase
     .from("chapters")
     .select(
@@ -53,26 +62,14 @@ const fetchChaptersData = async (showAll: boolean): Promise<Chapter[]> => {
     )
     .eq("is_private", false)
     .order("created_at", { ascending: false })
-    .limit(showAll ? 100 : 36);
+    .range(from, to);
 
   if (error) throw error;
 
-  // ترتيب الفصول: الحديثة أولاً (آخر 7 أيام) ثم الباقي
-  const sortedData = (data || []).sort((a, b) => {
-    const aDate = new Date(a.created_at);
-    const bDate = new Date(b.created_at);
-    const aIsRecent = aDate >= sevenDaysAgo;
-    const bIsRecent = bDate >= sevenDaysAgo;
-
-    // الفصول الحديثة أولاً
-    if (aIsRecent && !bIsRecent) return -1;
-    if (!aIsRecent && bIsRecent) return 1;
-
-    // ضمن نفس الفئة، الأحدث أولاً
-    return bDate.getTime() - aDate.getTime();
-  });
-
-  return sortedData;
+  return {
+    data: data || [],
+    totalCount
+  };
 };
 
 const ChaptersGrid = ({
