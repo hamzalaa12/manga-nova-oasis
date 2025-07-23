@@ -292,7 +292,7 @@ const ChapterReader = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* شريط التنقل العلوي - يظهر عند التمرير */}
+      {/* شريط التنقل العلوي - يظهر عند التم��ير */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
           showNavigation ? "translate-y-0" : "-translate-y-full"
@@ -302,12 +302,17 @@ const ChapterReader = () => {
           <div className="flex items-center justify-between">
             {/* الجهة اليسرى - أيقونات الإجراءات */}
             <div className="flex items-center gap-3">
+              <ReportDialog
+                targetId={chapter.id}
+                targetType="chapter"
+              />
+
               <Link to={getMangaUrl(getMangaSlug(manga))}>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
-                  title="العودة للمانجا"
+                  title="معلومات المانجا"
                 >
                   <Info className="h-4 w-4" />
                 </Button>
