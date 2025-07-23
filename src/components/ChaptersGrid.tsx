@@ -140,12 +140,9 @@ const ChaptersGrid = ({
   }
 
   // حساب البيانات المعروضة حسب الصفحة الحالية
-  const totalPages = Math.ceil(chaptersData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const displayData = showAll
-    ? chaptersData
-    : chaptersData.slice(startIndex, endIndex);
+  const itemsPerPage = 36;
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const displayData = chaptersData; // البيانات مقسمة بالفعل حسب الصفحة من الخادم
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
