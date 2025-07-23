@@ -132,6 +132,24 @@ const UserProfile = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("recent");
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [location, setLocation] = useState("");
+  const [website, setWebsite] = useState("");
+  const [socialLinks, setSocialLinks] = useState({
+    twitter: "",
+    instagram: "",
+    youtube: "",
+    tiktok: ""
+  });
+  const [preferences, setPreferences] = useState({
+    favoriteGenres: [] as string[],
+    readingLanguages: [] as string[],
+    notifications: {
+      newChapters: true,
+      comments: true,
+      follows: true,
+      system: true
+    }
+  });
 
   // رفع الصورة
   const uploadImage = async (file: File): Promise<string> => {
@@ -223,7 +241,7 @@ const UserProfile = () => {
     enabled: !!user?.id,
   });
 
-  // جلب إحصائيات ال��ستخدم
+  // جلب إحصائيات المستخدم
   const { data: userStats, isLoading: statsLoading } = useQuery({
     queryKey: ["user-stats", user?.id],
     queryFn: async (): Promise<UserStats> => {
@@ -804,7 +822,7 @@ const UserProfile = () => {
                         {avatarUrl && (
                           <img
                             src={avatarUrl}
-                            alt="��عاينة الصورة"
+                            alt="معاينة الصورة"
                             className="w-16 h-16 rounded-full object-cover border"
                           />
                         )}
