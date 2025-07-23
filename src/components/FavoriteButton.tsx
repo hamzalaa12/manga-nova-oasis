@@ -72,8 +72,14 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         });
 
         if (error) {
-          console.error("Error adding to favorites:", error);
-          throw error;
+          console.error("Error adding to favorites:", {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            error
+          });
+          throw new Error(`Failed to add to favorites: ${error.message || JSON.stringify(error)}`);
         }
         console.log("Successfully added to favorites");
         return true;
@@ -103,7 +109,7 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
       console.error("Favorite toggle error:", error);
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحديث المفضلة",
+        description: error.message || "فشل في تحديث ��لمفضلة",
         variant: "destructive",
       });
     },
