@@ -101,6 +101,9 @@ const SEO = ({
     }
     if (image) {
       updatePropertyTag("og:image", image);
+      updatePropertyTag("og:image:width", "1200");
+      updatePropertyTag("og:image:height", "630");
+      updatePropertyTag("og:image:type", "image/png");
     }
     if (url) {
       updatePropertyTag("og:url", url);
