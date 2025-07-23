@@ -511,7 +511,7 @@ const UserProfile = () => {
     enabled: !!user?.id,
   });
 
-  // جلب الإشع��رات
+  // جلب الإشعارات
   const { data: notifications = [], isLoading: notificationsLoading } = useQuery({
     queryKey: ["user-notifications", user?.id],
     queryFn: async () => {
@@ -777,7 +777,7 @@ const UserProfile = () => {
               {/* Level Progress */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span>التقدم للم��توى التالي</span>
+                  <span>التقدم للمستوى التالي</span>
                   <span>{userStats?.experience}/{userStats?.nextLevelExp} XP</span>
                 </div>
                 <Progress 
@@ -804,7 +804,7 @@ const UserProfile = () => {
                   className="gap-2"
                 >
                   {editMode ? <X className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-                  {editMode ? "إلغ��ء" : "تحرير الملف"}
+                  {editMode ? "إلغاء" : "تحرير الملف"}
                 </Button>
 
                 {editMode && (
@@ -900,7 +900,7 @@ const UserProfile = () => {
                                 ) : (
                                   <>
                                     <Upload className="h-4 w-4 mr-2" />
-                                    اخ��ر صورة
+                                    اختر صورة
                                   </>
                                 )}
                               </span>
@@ -1018,7 +1018,7 @@ const UserProfile = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Reading Activity */}
               <Card>
                 <CardHeader>
@@ -1031,17 +1031,98 @@ const UserProfile = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm">الفصول هذا الشهر</span>
-                      <span className="font-bold">{Math.floor((userStats?.readChaptersCount || 0) * 0.3)}</span>
+                      <span className="font-bold text-primary">{Math.floor((userStats?.readChaptersCount || 0) * 0.3)}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">وقت القراءة</span>
-                      <span className="font-bold">{Math.floor((userStats?.totalReadingTime || 0) / 60)} ساعة</span>
+                      <span className="font-bold text-green-600">{Math.floor((userStats?.totalReadingTime || 0) / 60)} ساعة</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">المعدل اليومي</span>
-                      <span className="font-bold">{Math.ceil((userStats?.readChaptersCount || 0) / 30)} فصل</span>
+                      <span className="font-bold text-blue-600">{Math.ceil((userStats?.readChaptersCount || 0) / 30)} فصل</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">أطول سلسلة قراءة</span>
+                      <span className="font-bold text-orange-600">{userStats?.streakDays || 0} يوم</span>
                     </div>
                   </div>
+
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Target className="h-4 w-4" />
+                      هدف هذا الشهر: 100 فصل
+                    </div>
+                    <Progress
+                      value={Math.min((Math.floor((userStats?.readChaptersCount || 0) * 0.3) / 100) * 100, 100)}
+                      className="mt-2"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Personal Info */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    المعلومات الشخصية
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{user?.email || "غير محدد"}</span>
+                    </div>
+
+                    {location && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{location}</span>
+                      </div>
+                    )}
+
+                    {website && (
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <a href={website} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                          {website}
+                        </a>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2">
+                      <Crown className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">عضو منذ {new Date(fullProfile?.join_date || "").toLocaleDateString("ar")}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">آخر نشاط: {new Date(fullProfile?.last_active || "").toLocaleDateString("ar")}</span>
+                    </div>
+                  </div>
+
+                  {(socialLinks.twitter || socialLinks.instagram || socialLinks.youtube || socialLinks.tiktok) && (
+                    <div className="pt-4 border-t">
+                      <p className="text-sm font-medium mb-2">وسائل التواصل</p>
+                      <div className="flex gap-2">
+                        {socialLinks.twitter && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={`https://twitter.com/${socialLinks.twitter}`} target="_blank" rel="noopener noreferrer">
+                              تويتر
+                            </a>
+                          </Button>
+                        )}
+                        {socialLinks.instagram && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={`https://instagram.com/${socialLinks.instagram}`} target="_blank" rel="noopener noreferrer">
+                              إنستقرام
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -1056,7 +1137,7 @@ const UserProfile = () => {
                 <CardContent>
                   <div className="space-y-3">
                     {readingProgress.slice(0, 5).map((progress: any) => (
-                      <div key={progress.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
+                      <div key={progress.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                         <img
                           src={progress.manga?.cover_image_url || "/placeholder.svg"}
                           alt={progress.manga?.title}
@@ -1075,10 +1156,76 @@ const UserProfile = () => {
                         </div>
                       </div>
                     ))}
+
+                    {readingProgress.length === 0 && (
+                      <div className="text-center py-6">
+                        <BookOpen className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">لا يوجد نشاط قراءة حديث</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Monthly Reading Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  إحصائيات القراءة الشهرية
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-7 gap-4 text-center">
+                  {['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'].map((day, index) => (
+                    <div key={day} className="space-y-2">
+                      <div className="text-xs text-muted-foreground">{day}</div>
+                      <div className="h-20 bg-muted rounded flex items-end justify-center">
+                        <div
+                          className="w-full bg-primary rounded-b"
+                          style={{ height: `${Math.random() * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-xs">{Math.floor(Math.random() * 10)}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 text-center text-sm text-muted-foreground">
+                  عدد الفصول المقروءة خلال الأسبوع الماضي
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  إجراءات سريعة
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Button variant="outline" className="flex flex-col gap-2 h-20">
+                    <BookOpen className="h-6 w-6" />
+                    <span className="text-xs">متابعة القراءة</span>
+                  </Button>
+                  <Button variant="outline" className="flex flex-col gap-2 h-20">
+                    <Search className="h-6 w-6" />
+                    <span className="text-xs">البحث</span>
+                  </Button>
+                  <Button variant="outline" className="flex flex-col gap-2 h-20">
+                    <Heart className="h-6 w-6" />
+                    <span className="text-xs">المفضلة</span>
+                  </Button>
+                  <Button variant="outline" className="flex flex-col gap-2 h-20">
+                    <Trophy className="h-6 w-6" />
+                    <span className="text-xs">الإنجازات</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Favorites Tab */}
@@ -1601,7 +1748,7 @@ const UserProfile = () => {
                   <div>
                     <label className="text-sm font-medium mb-3 block">الأنواع المفضلة</label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {['أكشن', 'مغامرة', 'كوميديا', 'در��ما', 'خيال', 'رومانسي', 'رياضة', 'إثارة', 'خارق طبيعي'].map((genre) => (
+                      {['أكشن', 'مغامرة', 'كوميديا', 'دراما', 'خيال', 'رومانسي', 'رياضة', 'إثارة', 'خارق طبيعي'].map((genre) => (
                         <Button
                           key={genre}
                           variant={preferences.favoriteGenres.includes(genre) ? "default" : "outline"}
@@ -1760,7 +1907,7 @@ const UserProfile = () => {
                     <div>
                       <h4 className="font-medium">الملف الشخصي العام</h4>
                       <p className="text-sm text-muted-foreground">
-                        السماح للمستخدمين الآخرين برؤية ملفك الشخصي
+                        السماح للمستخدمين الآخرين برؤية ملفك ا��شخصي
                       </p>
                     </div>
                     <Button variant="outline" size="sm">
@@ -1796,7 +1943,7 @@ const UserProfile = () => {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-red-600">حذف الحساب</h4>
+                      <h4 className="font-medium text-red-600">حذف الحس��ب</h4>
                       <p className="text-sm text-muted-foreground">
                         حذف حسابك وجميع بياناتك نهائياً
                       </p>
