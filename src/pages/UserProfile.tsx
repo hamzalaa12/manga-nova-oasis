@@ -367,19 +367,57 @@ const UserProfile = () => {
     }) => {
       if (!user?.id) throw new Error("المستخدم غير مسجل الدخول");
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          display_name: displayName,
-          bio: bio,
-          avatar_url: avatarUrl,
-        })
-        .eq("user_id", user.id);
+      console.log("Updating profile with:", { displayName, bio, avatarUrl, userId: user.id });
 
-      if (error) throw error;
+      // Check if profile exists first
+      const { data: existingProfile, error: checkError } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error("Error checking profile:", checkError);
+        throw checkError;
+      }
+
+      if (!existingProfile) {
+        // Create profile if it doesn't exist
+        const { error: insertError } = await supabase
+          .from("profiles")
+          .insert({
+            user_id: user.id,
+            display_name: displayName,
+            bio: bio,
+            avatar_url: avatarUrl,
+          });
+
+        if (insertError) {
+          console.error("Error creating profile:", insertError);
+          throw insertError;
+        }
+      } else {
+        // Update existing profile
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({
+            display_name: displayName,
+            bio: bio,
+            avatar_url: avatarUrl,
+          })
+          .eq("user_id", user.id);
+
+        if (updateError) {
+          console.error("Error updating profile:", updateError);
+          throw updateError;
+        }
+      }
+
+      console.log("Profile update successful");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-profile", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["user-stats", user?.id] });
       setEditMode(false);
       toast({
         title: "تم التحديث!",
@@ -387,6 +425,7 @@ const UserProfile = () => {
       });
     },
     onError: (error: any) => {
+      console.error("Profile update error:", error);
       toast({
         title: "خطأ",
         description: error.message || "فشل في تحديث الملف الشخصي",
@@ -605,7 +644,7 @@ const UserProfile = () => {
                     className="gap-2"
                   >
                     <Save className="h-4 w-4" />
-                    حفظ التغييرات
+                    حفظ التغيي��ات
                   </Button>
                 )}
 
@@ -1150,7 +1189,7 @@ const UserProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="h-5 w-5" />
-                  الإشعارات ({notifications.length})
+                  ��لإشعارات ({notifications.length})
                   {unreadNotifications > 0 && (
                     <Badge variant="destructive">
                       {unreadNotifications} غير مقروء
