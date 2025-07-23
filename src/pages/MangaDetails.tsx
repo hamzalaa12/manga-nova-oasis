@@ -46,6 +46,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
 import ViewsCounter from "@/components/ViewsCounter";
 import FavoriteButton from "@/components/FavoriteButton";
+import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
 interface Manga {
   id: string;
@@ -132,7 +133,7 @@ const MangaDetails = () => {
 
           data = retryData;
         } else if (error.code === "PGRST116") {
-          throw new Error("المانجا غير موجودة");
+          throw new Error("المانجا غير موجو��ة");
         } else {
           throw error;
         }
@@ -176,7 +177,7 @@ const MangaDetails = () => {
       console.error("Error fetching chapters:", error.message || error);
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحميل الفصول",
+        description: error.message || "فشل في تحميل ا��فصول",
         variant: "destructive",
       });
     } finally {
@@ -641,7 +642,7 @@ const MangaDetails = () => {
                               onClick={handleDeleteManga}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              حذف المانجا
+                              حذف ا��مانجا
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
