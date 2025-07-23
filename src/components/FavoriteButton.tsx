@@ -84,7 +84,7 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         console.log("Database access successful, user can access favorites table");
       } catch (dbError) {
         console.error("Database connection failed:", dbError);
-        throw new Error("فشل ف�� الاتصال بقاعدة البيانات");
+        throw new Error("فشل في الاتصال بقاعدة البيانات");
       }
 
       // Verify manga exists (simplified check)
@@ -105,11 +105,13 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
 
       if (isFavorite) {
         // حذف من المفضلة
-        const { error } = await supabase
+        console.log("Attempting to remove from favorites...");
+        const { data, error } = await supabase
           .from("user_favorites")
           .delete()
           .eq("user_id", user.id)
-          .eq("manga_id", mangaId);
+          .eq("manga_id", mangaId)
+          .select();
 
         if (error) {
           console.error("Error removing from favorites:", {
@@ -119,16 +121,28 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
             hint: error.hint,
             error
           });
-          throw new Error(`Failed to remove from favorites: ${error.message || JSON.stringify(error)}`);
+
+          if (error.code === '42501') {
+            throw new Error("ليس لديك صلاحية لحذف هذا العنصر من المفضلة");
+          } else if (error.code === '23503') {
+            throw new Error("العنصر غير موجود في المفضلة");
+          } else {
+            throw new Error(`فشل في حذف العنصر من المفضلة: ${error.message}`);
+          }
         }
-        console.log("Successfully removed from favorites");
+
+        console.log("Successfully removed from favorites:", data);
         return false;
       } else {
         // إضافة للمفضلة
-        const { error } = await supabase.from("user_favorites").insert({
-          user_id: user.id,
-          manga_id: mangaId,
-        });
+        console.log("Attempting to add to favorites...");
+        const { data, error } = await supabase
+          .from("user_favorites")
+          .insert([{
+            user_id: user.id,
+            manga_id: mangaId,
+          }])
+          .select();
 
         if (error) {
           console.error("Error adding to favorites:", {
@@ -138,9 +152,19 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
             hint: error.hint,
             error
           });
-          throw new Error(`Failed to add to favorites: ${error.message || JSON.stringify(error)}`);
+
+          if (error.code === '23505') {
+            throw new Error("هذا العنصر موجود بالفعل في المفضلة");
+          } else if (error.code === '42501') {
+            throw new Error("ليس لديك صلاحية لإضافة عناصر للمفضلة");
+          } else if (error.code === '23503') {
+            throw new Error("المانجا المحددة غير موجودة");
+          } else {
+            throw new Error(`فشل في إضافة العنصر للمفضلة: ${error.message}`);
+          }
         }
-        console.log("Successfully added to favorites");
+
+        console.log("Successfully added to favorites:", data);
         return true;
       }
     },
