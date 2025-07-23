@@ -66,7 +66,7 @@ const MangaGrid = ({
   } = useQuery({
     queryKey: ["manga-grid", showAll, currentPage],
     queryFn: () => fetchMangaData(showAll, showAll ? 1 : currentPage),
-    staleTime: 5 * 60 * 1000, // 5 دق��ئق
+    staleTime: 5 * 60 * 1000, // 5 دقائق
     gcTime: 10 * 60 * 1000, // 10 دقائق
   });
 
@@ -148,12 +148,9 @@ const MangaGrid = ({
   }
 
   // حساب البيانات المعروضة حسب الصفحة الحالية
-  const totalPages = Math.ceil(mangaData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const displayData = showAll
-    ? mangaData
-    : mangaData.slice(startIndex, endIndex);
+  const itemsPerPage = 36;
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const displayData = mangaData; // البيانات مقسمة بالفعل حسب الصفحة من الخادم
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
