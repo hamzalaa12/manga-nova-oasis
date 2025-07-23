@@ -37,7 +37,6 @@ export interface ContentSubmission {
   review_notes?: string;
   created_at: string;
   reviewed_at?: string;
-  user?: UserProfile;
 }
 
 export interface Report {
@@ -52,23 +51,6 @@ export interface Report {
   resolved_by?: string;
   resolved_at?: string;
   created_at: string;
-  reporter?: UserProfile;
-  reported_user?: UserProfile;
-}
-
-export interface ReadingProgress {
-  id: string;
-  user_id: string;
-  manga_id: string;
-  chapter_id?: string;
-  chapter_number?: number;
-  last_read_at: string;
-  manga?: {
-    id: string;
-    title: string;
-    cover_image_url: string;
-    slug: string;
-  };
 }
 
 // دوال مساعدة للأدوار
