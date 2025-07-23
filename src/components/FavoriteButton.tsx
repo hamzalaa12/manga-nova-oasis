@@ -61,6 +61,22 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
 
       console.log("Toggle favorite for manga:", mangaId, "User:", user.id, "Current state:", isFavorite);
 
+      // Test database connection and table existence
+      try {
+        const { data: testQuery, error: testError } = await supabase
+          .from("user_favorites")
+          .select("id")
+          .limit(1);
+
+        if (testError) {
+          console.error("Database/table access error:", testError);
+          throw new Error(`خطأ في قاعدة البيانات: ${testError.message}`);
+        }
+      } catch (dbError) {
+        console.error("Database connection failed:", dbError);
+        throw new Error("فشل في الاتصال بقاعدة البيانات");
+      }
+
       // Verify manga exists
       const { data: mangaExists, error: mangaCheckError } = await supabase
         .from("manga")
@@ -68,9 +84,12 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         .eq("id", mangaId)
         .single();
 
-      if (mangaCheckError || !mangaExists) {
-        console.error("Manga not found:", mangaCheckError);
-        throw new Error("المانجا غير موجودة");
+      if (mangaCheckError) {
+        console.error("Manga verification error:", mangaCheckError);
+        if (mangaCheckError.code === 'PGRST116') {
+          throw new Error("المانجا غير موجودة");
+        }
+        throw new Error(`خطأ في التحقق من المانجا: ${mangaCheckError.message}`);
       }
 
       if (isFavorite) {
