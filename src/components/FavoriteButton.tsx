@@ -42,6 +42,8 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         throw new Error("يجب تسجيل الدخول لإضافة المفضلة");
       }
 
+      console.log("Toggle favorite for manga:", mangaId, "User:", user.id, "Current state:", isFavorite);
+
       if (isFavorite) {
         // حذف من المفضلة
         const { error } = await supabase
@@ -50,7 +52,11 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
           .eq("user_id", user.id)
           .eq("manga_id", mangaId);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error removing from favorites:", error);
+          throw error;
+        }
+        console.log("Successfully removed from favorites");
         return false;
       } else {
         // إضافة للمفضلة
@@ -59,16 +65,26 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
           manga_id: mangaId,
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error adding to favorites:", error);
+          throw error;
+        }
+        console.log("Successfully added to favorites");
         return true;
       }
     },
     onSuccess: (newFavoriteState) => {
+      console.log("Mutation success, new state:", newFavoriteState);
+
+      // تحديث البيانات فورياً
       queryClient.setQueryData(
         ["is-favorite", user?.id, mangaId],
         newFavoriteState,
       );
-      queryClient.invalidateQueries({ queryKey: ["user-favorites", user?.id] });
+
+      // إعادة تحميل قائمة المفضلة في الملف الشخصي
+      queryClient.invalidateQueries({ queryKey: ["user-favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["user-stats"] });
 
       toast({
         title: newFavoriteState ? "تمت الإضافة!" : "تم الحذف!",
@@ -78,6 +94,7 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
       });
     },
     onError: (error: any) => {
+      console.error("Favorite toggle error:", error);
       toast({
         title: "خطأ",
         description: error.message || "فشل في تحديث المفضلة",
