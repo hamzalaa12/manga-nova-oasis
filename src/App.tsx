@@ -20,7 +20,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/profile" element={<UserProfile />} />
           <Route path="/manga/:slug" element={<MangaDetails />} />
           <Route path="/type/:type" element={<MangaByType />} />
           <Route path="/genre/:genre" element={<MangaByGenre />} />
