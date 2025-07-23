@@ -761,13 +761,58 @@ const UserProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">رابط الصورة الشخصية</label>
-                    <Input
-                      value={avatarUrl}
-                      onChange={(e) => setAvatarUrl(e.target.value)}
-                      placeholder="https://..."
-                      className="w-full"
-                    />
+                    <label className="text-sm font-medium mb-2 block">الصورة الشخصية</label>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-4">
+                        {avatarUrl && (
+                          <img
+                            src={avatarUrl}
+                            alt="معاينة الصورة"
+                            className="w-16 h-16 rounded-full object-cover border"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                            id="avatar-upload"
+                            disabled={uploadingImage}
+                          />
+                          <label htmlFor="avatar-upload">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="cursor-pointer"
+                              disabled={uploadingImage}
+                              asChild
+                            >
+                              <span>
+                                {uploadingImage ? (
+                                  <>
+                                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                                    جاري الرفع...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    اختر صورة
+                                  </>
+                                )}
+                              </span>
+                            </Button>
+                          </label>
+                        </div>
+                      </div>
+                      <Input
+                        value={avatarUrl}
+                        onChange={(e) => setAvatarUrl(e.target.value)}
+                        placeholder="أو أدخل رابط الصورة..."
+                        className="w-full text-sm"
+                        dir="ltr"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -795,7 +840,7 @@ const UserProfile = () => {
               <CardContent className="p-6 text-center">
                 <Heart className="h-8 w-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{userStats?.favoritesCount || 0}</div>
-                <div className="text-sm opacity-90">مفضلة</div>
+                <div className="text-sm opacity-90">��فضلة</div>
               </CardContent>
             </Card>
 
@@ -1115,7 +1160,7 @@ const UserProfile = () => {
                     <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">لم تبدأ قراءة أي مانجا بعد</h3>
                     <p className="text-muted-foreground mb-4">
-                      ابدأ في قراءة المانجا لتتبع تقدمك هنا
+                      ابدأ في قراءة المانجا لتتبع تقدمك هن��
                     </p>
                     <Link to="/">
                       <Button>
