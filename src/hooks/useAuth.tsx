@@ -28,23 +28,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile
+          // Check if user is admin (simplified check)
           setTimeout(async () => {
             try {
               const { data: profile } = await supabase
                 .from('profiles')
-                .select('*')
+                .select('role')
                 .eq('user_id', session.user.id)
                 .single();
-              
-              setUserProfile(profile);
+
               setIsAdmin(profile?.role === 'admin');
             } catch (error) {
-              console.error('Error fetching profile:', error);
+              console.error('Error checking admin status:', error);
+              setIsAdmin(false);
             }
           }, 0);
         } else {
-          setUserProfile(null);
           setIsAdmin(false);
         }
         setLoading(false);
