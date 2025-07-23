@@ -332,6 +332,8 @@ const UserProfile = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
+      console.log("Fetching favorites for user:", user.id);
+
       let query = supabase
         .from("user_favorites")
         .select(
@@ -362,7 +364,12 @@ const UserProfile = () => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching favorites:", error);
+        throw error;
+      }
+
+      console.log("Favorites data:", data);
       return data || [];
     },
     enabled: !!user?.id,
@@ -530,7 +537,7 @@ const UserProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-favorites", user?.id] });
       toast({
-        title: "تم الحذف!",
+        title: "تم ��لحذف!",
         description: "تم حذف المانجا من المفضلة",
       });
     },
@@ -855,7 +862,7 @@ const UserProfile = () => {
               <CardContent className="p-6 text-center">
                 <BookOpen className="h-8 w-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{userStats?.readChaptersCount || 0}</div>
-                <div className="text-sm opacity-90">فصل مقروء</div>
+                <div className="text-sm opacity-90">فصل ��قروء</div>
               </CardContent>
             </Card>
 
@@ -1167,7 +1174,7 @@ const UserProfile = () => {
                     <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">لم تبدأ قراءة أي مانجا بعد</h3>
                     <p className="text-muted-foreground mb-4">
-                      ابدأ في قراءة المانجا لتتبع تقدمك هن��
+                      ابدأ في قراءة المانجا لت��بع تقدمك هن��
                     </p>
                     <Link to="/">
                       <Button>
