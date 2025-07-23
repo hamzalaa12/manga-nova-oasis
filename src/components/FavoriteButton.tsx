@@ -42,7 +42,23 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         throw new Error("يجب تسجيل الدخول لإضافة المفضلة");
       }
 
+      if (!mangaId) {
+        throw new Error("معرف المانجا مطلوب");
+      }
+
       console.log("Toggle favorite for manga:", mangaId, "User:", user.id, "Current state:", isFavorite);
+
+      // Verify manga exists
+      const { data: mangaExists, error: mangaCheckError } = await supabase
+        .from("manga")
+        .select("id")
+        .eq("id", mangaId)
+        .single();
+
+      if (mangaCheckError || !mangaExists) {
+        console.error("Manga not found:", mangaCheckError);
+        throw new Error("المانجا غير موجودة");
+      }
 
       if (isFavorite) {
         // حذف من المفضلة
