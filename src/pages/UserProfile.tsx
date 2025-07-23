@@ -202,7 +202,7 @@ const UserProfile = () => {
     if (!file.type.startsWith('image/')) {
       toast({
         title: "خطأ",
-        description: "��رجى اختيار ملف صورة صحيح",
+        description: "يرجى اختيار ملف صورة صحيح",
         variant: "destructive",
       });
       return;
@@ -243,7 +243,7 @@ const UserProfile = () => {
 
       toast({
         title: "تنبيه",
-        description: "تم تحميل الصورة محلي��ً. اضغط حفظ للمتابعة.",
+        description: "تم تحميل الصورة محلياً. اضغط حفظ للمتابعة.",
         variant: "default",
       });
     }
@@ -633,8 +633,11 @@ const UserProfile = () => {
 
       // إعادة تحميل البيانات من الخادم للتأكد
       queryClient.invalidateQueries({ queryKey: ["user-profile", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["current-user-profile", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["user-stats", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["user-favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["chapter-comments"] });
+      queryClient.invalidateQueries({ queryKey: ["comment-replies"] });
 
       setEditMode(false);
       toast({
@@ -652,7 +655,7 @@ const UserProfile = () => {
     },
   });
 
-  // حذف من المفضلة
+  // حذف م�� المفضلة
   const removeFavoriteMutation = useMutation({
     mutationFn: async (mangaId: string) => {
       if (!user?.id) throw new Error("المستخدم غير مسجل الدخول");
@@ -1277,7 +1280,7 @@ const UserProfile = () => {
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <Heart className="h-5 w-5" />
-                    المانجا المفضلة ({favorites.length})
+                    الما��جا المفضلة ({favorites.length})
                   </CardTitle>
                   <div className="flex gap-2 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-64">
@@ -1788,7 +1791,7 @@ const UserProfile = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <label className="text-sm font-medium mb-3 block">الأنواع ا��مفضلة</label>
+                    <label className="text-sm font-medium mb-3 block">الأنواع المفضلة</label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                       {['أكشن', 'مغامرة', 'كوميديا', 'دراما', 'خيال', 'رومانسي', 'رياضة', 'إثارة', 'خارق طبيعي'].map((genre) => (
                         <Button
@@ -1873,7 +1876,7 @@ const UserProfile = () => {
                     <div>
                       <h4 className="font-medium">تعليقات جديدة</h4>
                       <p className="text-sm text-muted-foreground">
-                        إشعار عند الرد على تعليقاتك
+                        إشعار عند الرد على تعلي��اتك
                       </p>
                     </div>
                     <Button
