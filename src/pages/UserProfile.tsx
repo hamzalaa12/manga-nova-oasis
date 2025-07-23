@@ -121,6 +121,78 @@ const UserProfile = () => {
   const [sortBy, setSortBy] = useState("recent");
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // رفع الصورة
+  const uploadImage = async (file: File): Promise<string> => {
+    setUploadingImage(true);
+    try {
+      // Create a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      // Upload file to Supabase storage
+      const { data, error } = await supabase.storage
+        .from('user-uploads')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('user-uploads')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "خطأ",
+        description: "يرجى اختيار ملف صورة صحيح",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "خطأ",
+        description: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const uploadedUrl = await uploadImage(file);
+      setAvatarUrl(uploadedUrl);
+      toast({
+        title: "تم الرفع!",
+        description: "تم رفع الصورة بنجاح",
+      });
+    } catch (error: any) {
+      toast({
+        title: "خطأ في رفع الصورة",
+        description: error.message || "فشل في رفع الصورة",
+        variant: "destructive",
+      });
+    }
+  };
+
   // جلب معلومات المستخدم المحدثة
   const { data: fullProfile, isLoading: profileLoading } = useQuery({
     queryKey: ["user-profile", user?.id],
@@ -993,7 +1065,7 @@ const UserProfile = () => {
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
-                    تقدم القراء��
+                    تقدم القراءة
                   </CardTitle>
                   <div className="flex gap-2 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-64">
