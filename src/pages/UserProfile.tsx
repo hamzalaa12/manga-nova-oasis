@@ -275,7 +275,7 @@ const UserProfile = () => {
 
       if (progressError) console.error("Error counting reading progress:", progressError);
 
-      // جلب عدد التعليقات
+      // جلب عد�� التعليقات
       const { count: commentsCount, error: commentsError } = await supabase
         .from("chapter_comments")
         .select("id", { count: "exact" })
@@ -355,7 +355,7 @@ const UserProfile = () => {
         {
           id: "6",
           title: "ليلة بيضاء",
-          description: "اقرأ 20 فصل في ي��م واحد",
+          description: "اقرأ 20 فصل في يوم واحد",
           icon: "🌙",
           unlocked: (userStats?.streakDays || 0) >= 7,
           rarity: "epic"
@@ -396,7 +396,7 @@ const UserProfile = () => {
           id: "11",
           title: "أسطورة الموقع",
           description: "حقق جميع الإنجازات",
-          icon: "🏆",
+          icon: "���",
           unlocked: false,
           rarity: "legendary"
         },
@@ -632,7 +632,7 @@ const UserProfile = () => {
     },
   });
 
-  // وضع علامة قراءة على الإشعار
+  // و��ع علامة قراءة على الإشعار
   const markNotificationReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
       const { error } = await supabase
@@ -977,26 +977,26 @@ const UserProfile = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 pb-16">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-6">
-            <TabsTrigger value="overview" className="gap-2">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+            <TabsTrigger value="overview" className="gap-2 text-xs">
               <BarChart3 className="h-4 w-4" />
-              نظرة عامة
+              <span className="hidden sm:inline">��ظرة عامة</span>
             </TabsTrigger>
-            <TabsTrigger value="favorites" className="gap-2">
+            <TabsTrigger value="favorites" className="gap-2 text-xs">
               <Heart className="h-4 w-4" />
-              المفضلة
+              <span className="hidden sm:inline">المفضلة</span>
             </TabsTrigger>
-            <TabsTrigger value="progress" className="gap-2">
+            <TabsTrigger value="progress" className="gap-2 text-xs">
               <BookOpen className="h-4 w-4" />
-              القراءة
+              <span className="hidden sm:inline">القراءة</span>
             </TabsTrigger>
-            <TabsTrigger value="achievements" className="gap-2">
+            <TabsTrigger value="achievements" className="gap-2 text-xs">
               <Trophy className="h-4 w-4" />
-              الإنجازات
+              <span className="hidden sm:inline">الإنجازات</span>
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-2 relative">
+            <TabsTrigger value="notifications" className="gap-2 relative text-xs">
               <Bell className="h-4 w-4" />
-              الإشعارات
+              <span className="hidden sm:inline">الإشعارات</span>
               {unreadNotifications > 0 && (
                 <Badge
                   variant="destructive"
@@ -1006,9 +1006,13 @@ const UserProfile = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2">
+            <TabsTrigger value="social" className="gap-2 text-xs">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">الاجتماعي</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2 text-xs">
               <Settings className="h-4 w-4" />
-              الإعدادات
+              <span className="hidden sm:inline">الإعدادات</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1131,7 +1135,7 @@ const UserProfile = () => {
                     <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">لا توجد مانجا في المفضلة</h3>
                     <p className="text-muted-foreground mb-4">
-                      ابدأ في إضافة المانجا المفضلة لديك لتظهر هنا
+                      ابدأ في إضافة المان��ا المفضلة لديك لتظهر هنا
                     </p>
                     <Link to="/">
                       <Button>
@@ -1165,9 +1169,9 @@ const UserProfile = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>إزالة من المف��لة</AlertDialogTitle>
+                              <AlertDialogTitle>إزالة من المفضلة</AlertDialogTitle>
                               <AlertDialogDescription>
-                                هل أنت متأكد من إزالة "{favorite.manga.title}" من قائمة المفضل��؟
+                                هل أنت متأكد من إزالة "{favorite.manga.title}" من قائمة المفضلة؟
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -1500,7 +1504,7 @@ const UserProfile = () => {
                     <div>
                       <h4 className="font-medium">إشعارات البريد الإلكتروني</h4>
                       <p className="text-sm text-muted-foreground">
-                        تلقي إشعارات عن الفصول الجديدة والتحديثات
+                        تلقي إشعارات عن الفصول الجديدة ��التحديثات
                       </p>
                     </div>
                     <Button variant="outline" size="sm">
