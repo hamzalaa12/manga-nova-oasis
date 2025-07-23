@@ -85,26 +85,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
   const [replyContent, setReplyContent] = useState("");
   const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'popular'>('latest');
 
-  // جلب بيانات الملف الشخصي للمستخدم الحالي
-  const { data: currentUserProfile } = useQuery({
-    queryKey: ["current-user-profile", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error("Error fetching current user profile:", error);
-        return null;
-      }
-      return data;
-    },
-    enabled: !!user?.id,
-  });
 
   // جلب التعليقات
   const { data: comments = [], isLoading, refetch } = useQuery({
@@ -620,7 +601,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                ترتيب: {sortBy === 'latest' ? 'الأحدث' : sortBy === 'oldest' ? 'الأقدم' : 'الأكثر إعجاباً'}
+                ترتيب: {sortBy === 'latest' ? 'الأحدث' : sortBy === 'oldest' ? 'الأقدم' : 'الأكثر إعج��باً'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
