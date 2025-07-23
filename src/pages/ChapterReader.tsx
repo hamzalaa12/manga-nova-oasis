@@ -32,6 +32,8 @@ import {
 import ViewsCounter from "@/components/ViewsCounter";
 import ChapterInteractions from "@/components/ChapterInteractions";
 import ReportDialog from "@/components/ReportDialog";
+import SEO from "@/components/SEO";
+import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
 interface Chapter {
   id: string;
@@ -432,7 +434,7 @@ const ChapterReader = () => {
               </div>
             </div>
 
-            {/* الجهة اليمنى - منتقي الفصول */}
+            {/* الجهة اليمنى - م��تقي الفصول */}
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
