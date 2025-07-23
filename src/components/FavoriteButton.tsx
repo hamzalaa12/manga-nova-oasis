@@ -61,17 +61,27 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
 
       console.log("Toggle favorite for manga:", mangaId, "User:", user.id, "Current state:", isFavorite);
 
-      // Test database connection and table existence
+      // Check authentication
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      if (authError || !session) {
+        console.error("Authentication issue:", authError);
+        throw new Error("مشكلة في المصادقة. يرجى تسجيل الدخول مرة أخرى");
+      }
+      console.log("User authenticated:", session.user.id);
+
+      // Test database connection and RLS policies
       try {
         const { data: testQuery, error: testError } = await supabase
           .from("user_favorites")
           .select("id")
+          .eq("user_id", user.id)
           .limit(1);
 
         if (testError) {
-          console.error("Database/table access error:", testError);
+          console.error("Database/RLS policy error:", testError);
           throw new Error(`خطأ في قاعدة البيانات: ${testError.message}`);
         }
+        console.log("Database access successful, user can access favorites table");
       } catch (dbError) {
         console.error("Database connection failed:", dbError);
         throw new Error("فشل في الاتصال بقاعدة البيانات");
@@ -160,7 +170,7 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         error: error
       });
 
-      let errorMessage = "فشل في تحديث المفضلة";
+      let errorMessage = "فشل في تحديث المف��لة";
 
       if (error.message) {
         errorMessage = error.message;
