@@ -530,7 +530,7 @@ const UserProfile = () => {
     enabled: !!user?.id,
   });
 
-  // تحديث الملف الشخصي
+  // تح��يث الملف الشخصي
   const updateProfileMutation = useMutation({
     mutationFn: async ({
       displayName,
@@ -592,12 +592,28 @@ const UserProfile = () => {
       console.log("Profile update successful");
     },
     onSuccess: () => {
+      // تحديث البيانات فورياً في الكاش
+      queryClient.setQueryData(["user-profile", user?.id], (oldData: any) => {
+        if (oldData) {
+          return {
+            ...oldData,
+            display_name: displayName,
+            bio: bio,
+            avatar_url: avatarUrl,
+          };
+        }
+        return oldData;
+      });
+
+      // إعادة تحميل البيانات من الخادم للتأكد
       queryClient.invalidateQueries({ queryKey: ["user-profile", user?.id] });
       queryClient.invalidateQueries({ queryKey: ["user-stats", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["user-favorites"] });
+
       setEditMode(false);
       toast({
         title: "تم التحديث!",
-        description: "تم تحديث ملفك الشخصي بنجاح",
+        description: "تم تحديث ملفك الشخصي ��نجاح",
       });
     },
     onError: (error: any) => {
@@ -1907,7 +1923,7 @@ const UserProfile = () => {
                     <div>
                       <h4 className="font-medium">الملف الشخصي العام</h4>
                       <p className="text-sm text-muted-foreground">
-                        السماح للمستخدمين الآخرين برؤية ملفك ا��شخصي
+                        السماح للمستخدمين الآخرين برؤية ملفك الشخصي
                       </p>
                     </div>
                     <Button variant="outline" size="sm">
@@ -1943,7 +1959,7 @@ const UserProfile = () => {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-red-600">حذف الحس��ب</h4>
+                      <h4 className="font-medium text-red-600">حذف الحساب</h4>
                       <p className="text-sm text-muted-foreground">
                         حذف حسابك وجميع بياناتك نهائياً
                       </p>
