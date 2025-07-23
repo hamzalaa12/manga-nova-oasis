@@ -203,21 +203,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (newComment) => {
-      // إضافة التعليق الجديد للكاش مع بيانات الملف الشخصي
-      if (newComment && currentUserProfile) {
-        queryClient.setQueryData(["chapter-comments", chapterId, sortBy], (oldData: any) => {
-          if (oldData) {
-            const commentWithProfile = {
-              ...newComment,
-              profiles: currentUserProfile
-            };
-            return [commentWithProfile, ...oldData];
-          }
-          return oldData;
-        });
-      }
-
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chapter-comments", chapterId] });
       queryClient.invalidateQueries({ queryKey: ["comment-replies", chapterId] });
       setNewComment("");
@@ -601,7 +587,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                ترتيب: {sortBy === 'latest' ? 'الأحدث' : sortBy === 'oldest' ? 'الأقدم' : 'الأكثر إعج��باً'}
+                ترتيب: {sortBy === 'latest' ? 'الأحدث' : sortBy === 'oldest' ? 'الأقدم' : 'الأكثر إعجاباً'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
