@@ -31,6 +31,7 @@ import {
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
 import ChapterInteractions from "@/components/ChapterInteractions";
+import ReportDialog from "@/components/ReportDialog";
 
 interface Chapter {
   id: string;
