@@ -53,8 +53,14 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
           .eq("manga_id", mangaId);
 
         if (error) {
-          console.error("Error removing from favorites:", error);
-          throw error;
+          console.error("Error removing from favorites:", {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+            error
+          });
+          throw new Error(`Failed to remove from favorites: ${error.message || JSON.stringify(error)}`);
         }
         console.log("Successfully removed from favorites");
         return false;
