@@ -370,6 +370,31 @@ const ChapterReader = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* SEO Meta Tags */}
+      {chapter && manga && (() => {
+        const pageMeta = generatePageMeta('chapter', {
+          ...chapter,
+          manga: manga
+        });
+        const pageStructuredData = generateStructuredData('chapter', {
+          ...chapter,
+          manga: manga
+        });
+
+        return (
+          <SEO
+            title={pageMeta?.title}
+            description={pageMeta?.description}
+            keywords={pageMeta?.keywords}
+            image={pageMeta?.image}
+            url={pageMeta?.url}
+            canonical={pageMeta?.canonical}
+            type={pageMeta?.type}
+            structuredData={pageStructuredData}
+          />
+        );
+      })()}
+
       {/* شريط التنقل العلوي - يظهر عند التمرير */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
@@ -504,7 +529,7 @@ const ChapterReader = () => {
               <p className="text-gray-400 text-xl mb-4">
                 لا توجد صفحات في هذا الفصل
               </p>
-              <p className="text-gray-500">يرجى المحاولة لاحقاً</p>
+              <p className="text-gray-500">يرجى المحاولة لاحقا��</p>
             </div>
           </div>
         ) : (
