@@ -14,10 +14,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="مانجا العرب - اقرأ المانجا والمانهوا مترجمة مجاناً"
-        description="أفضل موقع لقراءة المانجا والمانهوا والمانها مترجمة بجودة عالية. آلاف الفصول المترجمة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير."
-        url={currentUrl}
-        type="website"
+        title={pageMeta?.title}
+        description={pageMeta?.description}
+        keywords={pageMeta?.keywords}
+        url={pageMeta?.url}
+        canonical={pageMeta?.canonical}
+        type={pageMeta?.type}
         structuredData={structuredData}
       />
       <Header />
