@@ -235,7 +235,7 @@ const UserProfile = () => {
         const base64 = e.target?.result as string;
         setAvatarUrl(base64);
         toast({
-          title: "تم تحميل الصورة محلياً",
+          title: "تم تحميل الصورة مح��ياً",
           description: "اضغط حفظ لتحديث صورتك الشخصية",
         });
       };
@@ -268,7 +268,7 @@ const UserProfile = () => {
   });
 
   // جلب إحصائيات المستخدم
-  const { data: userStats, isLoading: statsLoading } = useQuery({
+  const { data: userStats, isLoading: statsLoading, refetch: refetchStats } = useQuery({
     queryKey: ["user-stats", user?.id],
     queryFn: async (): Promise<UserStats> => {
       if (!user?.id) return {
@@ -658,7 +658,7 @@ const UserProfile = () => {
   // حذف من المفضلة
   const removeFavoriteMutation = useMutation({
     mutationFn: async (mangaId: string) => {
-      if (!user?.id) throw new Error("المستخدم غير مسجل الدخ��ل");
+      if (!user?.id) throw new Error("المستخدم غير مسجل الدخول");
 
       const { error } = await supabase
         .from("user_favorites")
@@ -1462,7 +1462,7 @@ const UserProfile = () => {
                 ) : readingProgress.length === 0 ? (
                   <div className="text-center py-12">
                     <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">لم تبدأ قراءة أي مانجا بعد</h3>
+                    <h3 className="text-lg font-semibold mb-2">لم ت��دأ قراءة أي مانجا بعد</h3>
                     <p className="text-muted-foreground mb-4">
                       ابدأ في قراءة المانجا لتتبع تقدمك هن��
                     </p>
@@ -1632,7 +1632,7 @@ const UserProfile = () => {
                 ) : notifications.length === 0 ? (
                   <div className="text-center py-12">
                     <Bell className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">لا توجد إشعار��ت</h3>
+                    <h3 className="text-lg font-semibold mb-2">لا توجد إشعارات</h3>
                     <p className="text-muted-foreground">
                       ستظهر إشعاراتك هنا عند وجود تحديثات
                     </p>
@@ -1957,7 +1957,7 @@ const UserProfile = () => {
                     <div>
                       <h4 className="font-medium">الملف الشخصي العام</h4>
                       <p className="text-sm text-muted-foreground">
-                        السماح للمستخدم��ن الآخرين برؤية ملفك الشخصي
+                        السماح للمستخدمين الآخرين برؤية ملفك الشخصي
                       </p>
                     </div>
                     <Button variant="outline" size="sm">
