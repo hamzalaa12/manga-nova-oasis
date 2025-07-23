@@ -329,7 +329,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
 
     if (diffHours < 1) {
       const diffMinutes = Math.floor(diffMs / (1000 * 60));
-      return `منذ ${diffMinutes} دقيقة`;
+      return `منذ ${diffMinutes} دقيق��`;
     } else if (diffHours < 24) {
       return `منذ ${diffHours} ساعة`;
     } else if (diffDays < 7) {
@@ -612,7 +612,7 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
             <div className="flex items-start gap-3">
               <Avatar className="w-10 h-10">
                 <AvatarImage
-                  src={currentUserProfile?.avatar_url || user.user_metadata?.avatar_url}
+                  src={user.user_metadata?.avatar_url}
                   alt="Your avatar"
                 />
                 <AvatarFallback>
