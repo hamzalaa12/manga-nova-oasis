@@ -22,6 +22,10 @@ const SEO = ({
   type = "website",
   siteName = "مانجا العرب",
   structuredData,
+  keywords,
+  author = "مانجا العرب",
+  robots = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  canonical,
 }: SEOProps) => {
   useEffect(() => {
     // تحديث title
