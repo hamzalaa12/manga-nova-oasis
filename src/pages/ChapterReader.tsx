@@ -292,7 +292,7 @@ const ChapterReader = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* شريط التنقل العلوي - يظهر عند التم��ير */}
+      {/* شريط التنقل العلوي - يظهر عند التمرير */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
           showNavigation ? "translate-y-0" : "-translate-y-full"
@@ -328,10 +328,31 @@ const ChapterReader = () => {
             {/* الوسط - عنوان المانجا والفصل */}
             <div className="text-center flex-1 px-4">
               <h1 className="text-lg font-bold text-white truncate">
-                {manga.title} - {chapter.chapter_number}
+                <Link
+                  to={getMangaUrl(getMangaSlug(manga))}
+                  className="hover:text-blue-300 transition-colors"
+                >
+                  {manga.title}
+                </Link>
+                {" - الفصل "}
+                {chapter.chapter_number}
               </h1>
-              <div className="text-sm text-gray-400">
-                {manga.title} / الرئيسية /
+              <div className="text-sm text-gray-400 flex items-center justify-center gap-1">
+                <Link
+                  to="/"
+                  className="hover:text-white transition-colors"
+                >
+                  الرئيسية
+                </Link>
+                <span>/</span>
+                <Link
+                  to={getMangaUrl(getMangaSlug(manga))}
+                  className="hover:text-white transition-colors"
+                >
+                  {manga.title}
+                </Link>
+                <span>/</span>
+                <span>الفصل {chapter.chapter_number}</span>
               </div>
             </div>
 
