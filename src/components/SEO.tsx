@@ -59,8 +59,37 @@ const SEO = ({
     };
 
     // Meta tags أساسية
+    updateMetaTag("robots", robots);
+    updateMetaTag("googlebot", "index, follow");
+    updateMetaTag("bingbot", "index, follow");
+
     if (description) {
       updateMetaTag("description", description);
+    }
+
+    if (keywords) {
+      updateMetaTag("keywords", keywords);
+    }
+
+    if (author) {
+      updateMetaTag("author", author);
+      updateMetaTag("publisher", author);
+    }
+
+    // Language and geo tags
+    updateMetaTag("language", "Arabic");
+    updateMetaTag("geo.region", "SA");
+    updateMetaTag("geo.country", "SA");
+
+    // Canonical URL
+    if (canonical || url) {
+      let linkCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (!linkCanonical) {
+        linkCanonical = document.createElement("link");
+        linkCanonical.rel = "canonical";
+        document.head.appendChild(linkCanonical);
+      }
+      linkCanonical.href = canonical || url || "";
     }
 
     // Open Graph tags
