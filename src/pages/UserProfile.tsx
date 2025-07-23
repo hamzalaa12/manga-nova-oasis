@@ -155,29 +155,40 @@ const UserProfile = () => {
   const uploadImage = async (file: File): Promise<string> => {
     setUploadingImage(true);
     try {
+      console.log("Starting image upload for file:", file.name);
+
       // Create a unique filename
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
       const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
+      console.log("Uploading to path:", filePath);
+
       // Upload file to Supabase storage
       const { data, error } = await supabase.storage
-        .from('user-uploads')
+        .from('avatars') // Changed bucket name to 'avatars'
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: true // Allow overwriting
         });
 
       if (error) {
-        throw error;
+        console.error("Upload error:", error);
+        throw new Error(`فشل في رفع الصورة: ${error.message}`);
       }
+
+      console.log("Upload successful:", data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('user-uploads')
+        .from('avatars')
         .getPublicUrl(filePath);
 
+      console.log("Public URL:", publicUrl);
       return publicUrl;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      throw error;
     } finally {
       setUploadingImage(false);
     }
@@ -530,7 +541,7 @@ const UserProfile = () => {
     enabled: !!user?.id,
   });
 
-  // تح��يث الملف الشخصي
+  // تحديث الملف الشخصي
   const updateProfileMutation = useMutation({
     mutationFn: async ({
       displayName,
@@ -613,7 +624,7 @@ const UserProfile = () => {
       setEditMode(false);
       toast({
         title: "تم التحديث!",
-        description: "تم تحديث ملفك الشخصي ��نجاح",
+        description: "تم تحديث ملفك الشخصي بنجاح",
       });
     },
     onError: (error: any) => {
@@ -1051,7 +1062,7 @@ const UserProfile = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">وقت القراءة</span>
-                      <span className="font-bold text-green-600">{Math.floor((userStats?.totalReadingTime || 0) / 60)} ساعة</span>
+                      <span className="font-bold text-green-600">{Math.floor((userStats?.totalReadingTime || 0) / 60)} ساع��</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">المعدل اليومي</span>
