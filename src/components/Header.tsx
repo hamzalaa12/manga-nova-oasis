@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
-  const { user, userProfile, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -72,7 +72,7 @@ const Header = () => {
                   {userProfile?.display_name || user.email}
                   {isAdmin && (
                     <span className="mr-2 text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded">
-                      أدمن
+                      أ��من
                     </span>
                   )}
                 </DropdownMenuItem>
