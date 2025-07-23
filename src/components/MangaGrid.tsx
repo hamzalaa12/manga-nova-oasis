@@ -24,17 +24,33 @@ interface Manga {
   manga_type: string;
 }
 
-const fetchMangaData = async (showAll: boolean): Promise<Manga[]> => {
+const fetchMangaData = async (showAll: boolean, page: number = 1): Promise<{data: Manga[], totalCount: number}> => {
+  const pageSize = 36;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // الحصول على إجمالي عدد المانجا أولاً
+  const { count } = await supabase
+    .from("manga")
+    .select("id", { count: "exact" });
+
+  const totalCount = count || 0;
+
+  // جلب البيانات للصفحة الحالية
   const { data, error } = await supabase
     .from("manga")
     .select(
       "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
     )
     .order("updated_at", { ascending: false })
-    .limit(showAll ? 100 : 200);
+    .range(from, to);
 
   if (error) throw error;
-  return data || [];
+
+  return {
+    data: data || [],
+    totalCount
+  };
 };
 
 const MangaGrid = ({
@@ -42,18 +58,20 @@ const MangaGrid = ({
   showAll = false,
 }: MangaGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = showAll ? 100 : 36;
 
   const {
-    data: mangaData = [],
+    data: mangaResponse,
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["manga-grid", showAll],
-    queryFn: () => fetchMangaData(showAll),
+    queryKey: ["manga-grid", showAll, currentPage],
+    queryFn: () => fetchMangaData(showAll, showAll ? 1 : currentPage),
     staleTime: 5 * 60 * 1000, // 5 دقائق
     gcTime: 10 * 60 * 1000, // 10 دقائق
   });
+
+  const mangaData = mangaResponse?.data || [];
+  const totalCount = mangaResponse?.totalCount || 0;
 
   if (error) {
     console.error("Error fetching manga:", error);
@@ -130,12 +148,9 @@ const MangaGrid = ({
   }
 
   // حساب البيانات المعروضة حسب الصفحة الحالية
-  const totalPages = Math.ceil(mangaData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const displayData = showAll
-    ? mangaData
-    : mangaData.slice(startIndex, endIndex);
+  const itemsPerPage = 36;
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const displayData = mangaData; // البيانات مقسمة بالفعل حسب الصفحة من الخادم
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

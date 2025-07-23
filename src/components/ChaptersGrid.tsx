@@ -27,11 +27,20 @@ interface Chapter {
   };
 }
 
-const fetchChaptersData = async (showAll: boolean): Promise<Chapter[]> => {
-  // الحصول على الفصول من آخر 7 أيام أولاً، ثم الباقي
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{data: Chapter[], totalCount: number}> => {
+  const pageSize = 36;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
 
+  // الحصول على إجمالي عدد الفصول أولاً
+  const { count } = await supabase
+    .from("chapters")
+    .select("id", { count: "exact" })
+    .eq("is_private", false);
+
+  const totalCount = count || 0;
+
+  // جلب البيانات للصفحة الحالية
   const { data, error } = await supabase
     .from("chapters")
     .select(
@@ -53,26 +62,14 @@ const fetchChaptersData = async (showAll: boolean): Promise<Chapter[]> => {
     )
     .eq("is_private", false)
     .order("created_at", { ascending: false })
-    .limit(showAll ? 100 : 36);
+    .range(from, to);
 
   if (error) throw error;
 
-  // ترتيب الفصول: الحديثة أولاً (آخر 7 أيام) ثم الباقي
-  const sortedData = (data || []).sort((a, b) => {
-    const aDate = new Date(a.created_at);
-    const bDate = new Date(b.created_at);
-    const aIsRecent = aDate >= sevenDaysAgo;
-    const bIsRecent = bDate >= sevenDaysAgo;
-
-    // الفصول الحديثة أولاً
-    if (aIsRecent && !bIsRecent) return -1;
-    if (!aIsRecent && bIsRecent) return 1;
-
-    // ضمن نفس الفئة، الأحدث أولاً
-    return bDate.getTime() - aDate.getTime();
-  });
-
-  return sortedData;
+  return {
+    data: data || [],
+    totalCount
+  };
 };
 
 const ChaptersGrid = ({
@@ -80,18 +77,20 @@ const ChaptersGrid = ({
   showAll = false,
 }: ChaptersGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = showAll ? 100 : 36;
 
   const {
-    data: chaptersData = [],
+    data: chaptersResponse,
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["chapters-grid", showAll],
-    queryFn: () => fetchChaptersData(showAll),
+    queryKey: ["chapters-grid", showAll, currentPage],
+    queryFn: () => fetchChaptersData(showAll, showAll ? 1 : currentPage),
     staleTime: 2 * 60 * 1000, // 2 دقائق (أقل من المانجا لأن الفصول تتحدث أكثر)
     gcTime: 5 * 60 * 1000, // 5 دقائق
   });
+
+  const chaptersData = chaptersResponse?.data || [];
+  const totalCount = chaptersResponse?.totalCount || 0;
 
   if (error) {
     console.error("Error fetching chapters:", error);
@@ -141,12 +140,9 @@ const ChaptersGrid = ({
   }
 
   // حساب البيانات المعروضة حسب الصفحة الحالية
-  const totalPages = Math.ceil(chaptersData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const displayData = showAll
-    ? chaptersData
-    : chaptersData.slice(startIndex, endIndex);
+  const itemsPerPage = 36;
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const displayData = chaptersData; // البيانات مقسمة بالفعل حسب الصفحة من الخادم
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

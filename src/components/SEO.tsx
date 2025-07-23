@@ -8,6 +8,10 @@ interface SEOProps {
   type?: "website" | "article";
   siteName?: string;
   structuredData?: object;
+  keywords?: string;
+  author?: string;
+  robots?: string;
+  canonical?: string;
 }
 
 const SEO = ({
@@ -18,6 +22,10 @@ const SEO = ({
   type = "website",
   siteName = "مانجا العرب",
   structuredData,
+  keywords,
+  author = "مانجا العرب",
+  robots = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+  canonical,
 }: SEOProps) => {
   useEffect(() => {
     // تحديث title
@@ -51,8 +59,37 @@ const SEO = ({
     };
 
     // Meta tags أساسية
+    updateMetaTag("robots", robots);
+    updateMetaTag("googlebot", "index, follow");
+    updateMetaTag("bingbot", "index, follow");
+
     if (description) {
       updateMetaTag("description", description);
+    }
+
+    if (keywords) {
+      updateMetaTag("keywords", keywords);
+    }
+
+    if (author) {
+      updateMetaTag("author", author);
+      updateMetaTag("publisher", author);
+    }
+
+    // Language and geo tags
+    updateMetaTag("language", "Arabic");
+    updateMetaTag("geo.region", "SA");
+    updateMetaTag("geo.country", "SA");
+
+    // Canonical URL
+    if (canonical || url) {
+      let linkCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (!linkCanonical) {
+        linkCanonical = document.createElement("link");
+        linkCanonical.rel = "canonical";
+        document.head.appendChild(linkCanonical);
+      }
+      linkCanonical.href = canonical || url || "";
     }
 
     // Open Graph tags
@@ -64,6 +101,9 @@ const SEO = ({
     }
     if (image) {
       updatePropertyTag("og:image", image);
+      updatePropertyTag("og:image:width", "1200");
+      updatePropertyTag("og:image:height", "630");
+      updatePropertyTag("og:image:type", "image/png");
     }
     if (url) {
       updatePropertyTag("og:url", url);

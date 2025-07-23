@@ -7,31 +7,7 @@ export type UserRole =
   | "leader"
   | "admin";
 
-export interface UserProfile {
-  user_id: string;
-  display_name: string;
-  role: UserRole;
-  avatar_url?: string;
-  bio?: string;
-  join_date: string;
-  last_active: string;
-  is_banned: boolean;
-  ban_until?: string;
-  ban_reason?: string;
-}
 
-export interface UserFavorite {
-  id: string;
-  user_id: string;
-  manga_id: string;
-  created_at: string;
-  manga?: {
-    id: string;
-    title: string;
-    cover_image_url: string;
-    slug: string;
-  };
-}
 
 export interface Notification {
   id: string;
@@ -61,7 +37,6 @@ export interface ContentSubmission {
   review_notes?: string;
   created_at: string;
   reviewed_at?: string;
-  user?: UserProfile;
 }
 
 export interface Report {
@@ -76,23 +51,6 @@ export interface Report {
   resolved_by?: string;
   resolved_at?: string;
   created_at: string;
-  reporter?: UserProfile;
-  reported_user?: UserProfile;
-}
-
-export interface ReadingProgress {
-  id: string;
-  user_id: string;
-  manga_id: string;
-  chapter_id?: string;
-  chapter_number?: number;
-  last_read_at: string;
-  manga?: {
-    id: string;
-    title: string;
-    cover_image_url: string;
-    slug: string;
-  };
 }
 
 // دوال مساعدة للأدوار

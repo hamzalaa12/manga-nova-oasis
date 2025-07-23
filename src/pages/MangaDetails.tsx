@@ -45,7 +45,10 @@ import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
 import ViewsCounter from "@/components/ViewsCounter";
-import FavoriteButton from "@/components/FavoriteButton";
+
+import PreloadContent from "@/components/PreloadContent";
+import ServerSideContent from "@/components/ServerSideContent";
+import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
 interface Manga {
   id: string;
@@ -79,7 +82,7 @@ interface Chapter {
 const MangaDetails = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { user, userProfile, isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const [manga, setManga] = useState<Manga | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
@@ -132,7 +135,7 @@ const MangaDetails = () => {
 
           data = retryData;
         } else if (error.code === "PGRST116") {
-          throw new Error("المانجا غير موجودة");
+          throw new Error("المانجا غير موجو��ة");
         } else {
           throw error;
         }
@@ -176,7 +179,7 @@ const MangaDetails = () => {
       console.error("Error fetching chapters:", error.message || error);
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحميل الفصول",
+        description: error.message || "فشل في تحميل ا��فصول",
         variant: "destructive",
       });
     } finally {
@@ -513,19 +516,29 @@ const MangaDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {manga && (
-        <SEO
-          title={`${manga.title} - مانجا العرب`}
-          description={
-            manga.description ||
-            `اقرأ مانجا ${manga.title} مترجمة بجودة عالية. ${manga.author ? `بقلم ${manga.author}` : ""} ${manga.genre && manga.genre.length > 0 ? `تصنيف: ${manga.genre.slice(0, 3).join("، ")}` : ""}`
-          }
-          image={manga.cover_image_url || undefined}
-          url={currentUrl}
-          type="article"
-          structuredData={structuredData}
-        />
-      )}
+      {manga && (() => {
+        const pageMeta = generatePageMeta('manga', {
+          ...manga,
+          genres: manga.genre
+        });
+        const pageStructuredData = generateStructuredData('manga', {
+          ...manga,
+          genres: manga.genre
+        });
+
+        return (
+          <SEO
+            title={pageMeta?.title}
+            description={pageMeta?.description}
+            keywords={pageMeta?.keywords}
+            image={pageMeta?.image}
+            url={pageMeta?.url}
+            canonical={pageMeta?.canonical}
+            type={pageMeta?.type}
+            structuredData={pageStructuredData}
+          />
+        );
+      })()}
       <Header />
 
       <main className="container mx-auto px-4 py-8">
@@ -606,7 +619,7 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-                  <FavoriteButton mangaId={manga.id} className="w-full mt-4" />
+
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-4">
@@ -631,7 +644,7 @@ const MangaDetails = () => {
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
-                              الفصول المرتبطة بها أيضاً. هذا الإجراء لا يمكن
+                              الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
@@ -641,7 +654,7 @@ const MangaDetails = () => {
                               onClick={handleDeleteManga}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              حذف المانجا
+                              حذف ا��مانجا
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

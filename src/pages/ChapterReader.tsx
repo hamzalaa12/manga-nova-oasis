@@ -12,6 +12,7 @@ import {
   Bookmark,
   Settings,
   Menu,
+  Flag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,6 +31,9 @@ import {
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
 import ChapterInteractions from "@/components/ChapterInteractions";
+import ReportDialog from "@/components/ReportDialog";
+import SEO from "@/components/SEO";
+import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
 interface Chapter {
   id: string;
@@ -129,6 +133,8 @@ const ChapterReader = () => {
       if (sessionData.session?.access_token) {
         headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
         console.log("👤 User is logged in for chapter");
+
+
       } else {
         console.log("👤 Anonymous user reading chapter");
       }
@@ -147,6 +153,8 @@ const ChapterReader = () => {
       // Don't fail the page load if view tracking fails
     }
   };
+
+
 
   const fetchChapterBySlugAndNumber = async () => {
     if (!slug || !chapterParam) return;
@@ -290,6 +298,31 @@ const ChapterReader = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* SEO Meta Tags */}
+      {chapter && manga && (() => {
+        const pageMeta = generatePageMeta('chapter', {
+          ...chapter,
+          manga: manga
+        });
+        const pageStructuredData = generateStructuredData('chapter', {
+          ...chapter,
+          manga: manga
+        });
+
+        return (
+          <SEO
+            title={pageMeta?.title}
+            description={pageMeta?.description}
+            keywords={pageMeta?.keywords}
+            image={pageMeta?.image}
+            url={pageMeta?.url}
+            canonical={pageMeta?.canonical}
+            type={pageMeta?.type}
+            structuredData={pageStructuredData}
+          />
+        );
+      })()}
+
       {/* شريط التنقل العلوي - يظهر عند التمرير */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
@@ -300,12 +333,17 @@ const ChapterReader = () => {
           <div className="flex items-center justify-between">
             {/* الجهة اليسرى - أيقونات الإجراءات */}
             <div className="flex items-center gap-3">
+              <ReportDialog
+                targetId={chapter.id}
+                targetType="chapter"
+              />
+
               <Link to={getMangaUrl(getMangaSlug(manga))}>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
-                  title="العودة للمانجا"
+                  title="معلومات المانجا"
                 >
                   <Info className="h-4 w-4" />
                 </Button>
@@ -321,14 +359,35 @@ const ChapterReader = () => {
             {/* الوسط - عنوان المانجا والفصل */}
             <div className="text-center flex-1 px-4">
               <h1 className="text-lg font-bold text-white truncate">
-                {manga.title} - {chapter.chapter_number}
+                <Link
+                  to={getMangaUrl(getMangaSlug(manga))}
+                  className="hover:text-blue-300 transition-colors"
+                >
+                  {manga.title}
+                </Link>
+                {" - الفصل "}
+                {chapter.chapter_number}
               </h1>
-              <div className="text-sm text-gray-400">
-                {manga.title} / الرئيسية /
+              <div className="text-sm text-gray-400 flex items-center justify-center gap-1">
+                <Link
+                  to="/"
+                  className="hover:text-white transition-colors"
+                >
+                  الرئيسية
+                </Link>
+                <span>/</span>
+                <Link
+                  to={getMangaUrl(getMangaSlug(manga))}
+                  className="hover:text-white transition-colors"
+                >
+                  {manga.title}
+                </Link>
+                <span>/</span>
+                <span>الفصل {chapter.chapter_number}</span>
               </div>
             </div>
 
-            {/* الجهة اليمنى - منتقي الفصول */}
+            {/* الجهة اليمنى - م��تقي الفصول */}
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -398,7 +457,7 @@ const ChapterReader = () => {
               <p className="text-gray-400 text-xl mb-4">
                 لا توجد صفحات في هذا الفصل
               </p>
-              <p className="text-gray-500">يرجى المحاولة لاحقاً</p>
+              <p className="text-gray-500">يرجى المحاولة لاحقا��</p>
             </div>
           </div>
         ) : (
