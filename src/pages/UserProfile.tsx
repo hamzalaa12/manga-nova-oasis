@@ -227,23 +227,34 @@ const UserProfile = () => {
         nextLevelExp: 100
       };
 
+      console.log("Calculating stats for user:", user.id);
+
       // جلب عدد المفضلة
-      const { count: favoritesCount } = await supabase
+      const { count: favoritesCount, error: favError } = await supabase
         .from("user_favorites")
         .select("id", { count: "exact" })
         .eq("user_id", user.id);
 
+      if (favError) console.error("Error counting favorites:", favError);
+
       // جلب عدد الفصول المقروءة
-      const { count: readChaptersCount } = await supabase
+      const { count: readChaptersCount, error: progressError } = await supabase
         .from("reading_progress")
         .select("id", { count: "exact" })
         .eq("user_id", user.id);
 
+      if (progressError) console.error("Error counting reading progress:", progressError);
+
       // جلب عدد التعليقات
-      const { count: commentsCount } = await supabase
-        .from("comments")
+      const { count: commentsCount, error: commentsError } = await supabase
+        .from("chapter_comments")
         .select("id", { count: "exact" })
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .eq("is_deleted", false);
+
+      if (commentsError) console.error("Error counting comments:", commentsError);
+
+      console.log("Stats counts:", { favoritesCount, readChaptersCount, commentsCount });
 
       // حساب المستوى والخبرة
       const totalActions = (favoritesCount || 0) * 10 + (readChaptersCount || 0) * 5 + (commentsCount || 0) * 15;
@@ -537,7 +548,7 @@ const UserProfile = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-favorites", user?.id] });
       toast({
-        title: "تم ��لحذف!",
+        title: "تم الحذف!",
         description: "تم حذف المانجا من المفضلة",
       });
     },
@@ -862,7 +873,7 @@ const UserProfile = () => {
               <CardContent className="p-6 text-center">
                 <BookOpen className="h-8 w-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{userStats?.readChaptersCount || 0}</div>
-                <div className="text-sm opacity-90">فصل ��قروء</div>
+                <div className="text-sm opacity-90">فصل مقروء</div>
               </CardContent>
             </Card>
 
@@ -1174,7 +1185,7 @@ const UserProfile = () => {
                     <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-semibold mb-2">لم تبدأ قراءة أي مانجا بعد</h3>
                     <p className="text-muted-foreground mb-4">
-                      ابدأ في قراءة المانجا لت��بع تقدمك هن��
+                      ابدأ في قراءة المانجا لتتبع تقدمك هن��
                     </p>
                     <Link to="/">
                       <Button>
