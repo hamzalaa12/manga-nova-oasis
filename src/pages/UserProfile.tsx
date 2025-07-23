@@ -374,6 +374,8 @@ const UserProfile = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
+      console.log("Fetching reading progress for user:", user.id);
+
       let query = supabase
         .from("reading_progress")
         .select(
@@ -402,7 +404,12 @@ const UserProfile = () => {
 
       const { data, error } = await query.limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching reading progress:", error);
+        throw error;
+      }
+
+      console.log("Reading progress data:", data);
       return data || [];
     },
     enabled: !!user?.id,
