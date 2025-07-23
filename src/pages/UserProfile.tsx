@@ -74,6 +74,18 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Map,
+  Globe,
+  Users,
+  Briefcase,
+  GraduationCap,
+  Mail,
+  Phone,
+  MapPin,
+  Link as LinkIcon,
+  Languages,
+  Coins,
+  ShoppingBag,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -211,7 +223,7 @@ const UserProfile = () => {
     enabled: !!user?.id,
   });
 
-  // جلب إحصائيات المستخدم
+  // جلب إحصائيات ال��ستخدم
   const { data: userStats, isLoading: statsLoading } = useQuery({
     queryKey: ["user-stats", user?.id],
     queryFn: async (): Promise<UserStats> => {
@@ -792,7 +804,7 @@ const UserProfile = () => {
                         {avatarUrl && (
                           <img
                             src={avatarUrl}
-                            alt="معاينة الصورة"
+                            alt="��عاينة الصورة"
                             className="w-16 h-16 rounded-full object-cover border"
                           />
                         )}
