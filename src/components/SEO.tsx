@@ -8,6 +8,10 @@ interface SEOProps {
   type?: "website" | "article";
   siteName?: string;
   structuredData?: object;
+  keywords?: string;
+  author?: string;
+  robots?: string;
+  canonical?: string;
 }
 
 const SEO = ({
