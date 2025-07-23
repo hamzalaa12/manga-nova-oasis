@@ -155,78 +155,7 @@ const ChapterReader = () => {
     }
   };
 
-  const trackReadingProgress = async (chapterId: string) => {
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const user = sessionData.session?.user;
 
-      if (!user || !chapter || !manga) return;
-
-      console.log("📚 Tracking reading progress for user:", user.id);
-
-      // Check if progress record exists
-      const { data: existingProgress, error: checkError } = await supabase
-        .from("reading_progress")
-        .select("id, chapter_number")
-        .eq("user_id", user.id)
-        .eq("manga_id", manga.id)
-        .single();
-
-      if (checkError && checkError.code !== 'PGRST116') {
-        console.error("Error checking reading progress:", checkError);
-        return;
-      }
-
-      if (!existingProgress) {
-        // Create new progress record
-        const { error: insertError } = await supabase
-          .from("reading_progress")
-          .insert({
-            user_id: user.id,
-            manga_id: manga.id,
-            chapter_number: chapter.chapter_number,
-            last_read_at: new Date().toISOString(),
-          });
-
-        if (insertError) {
-          console.error("Error creating reading progress:", insertError);
-        } else {
-          console.log("✅ Reading progress created");
-        }
-      } else if (existingProgress.chapter_number < chapter.chapter_number) {
-        // Update progress if current chapter is newer
-        const { error: updateError } = await supabase
-          .from("reading_progress")
-          .update({
-            chapter_number: chapter.chapter_number,
-            last_read_at: new Date().toISOString(),
-          })
-          .eq("id", existingProgress.id);
-
-        if (updateError) {
-          console.error("Error updating reading progress:", updateError);
-        } else {
-          console.log("✅ Reading progress updated");
-        }
-      } else {
-        // Just update the timestamp
-        const { error: timestampError } = await supabase
-          .from("reading_progress")
-          .update({
-            last_read_at: new Date().toISOString(),
-          })
-          .eq("id", existingProgress.id);
-
-        if (timestampError) {
-          console.error("Error updating reading timestamp:", timestampError);
-        } else {
-          console.log("✅ Reading timestamp updated");
-        }
-      }
-    } catch (error) {
-      console.error("❌ Error tracking reading progress:", error);
-    }
-  };
 
   const fetchChapterBySlugAndNumber = async () => {
     if (!slug || !chapterParam) return;
@@ -340,7 +269,7 @@ const ChapterReader = () => {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>جاري تحميل الفصل...</p>
+          <p>جاري تحميل الف��ل...</p>
         </div>
       </div>
     );
