@@ -222,7 +222,21 @@ const NewChapterComments = ({ chapterId }: NewChapterCommentsProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (newComment) => {
+      // إضافة التعليق الجديد للكاش مع بيانات الملف الشخصي
+      if (newComment && currentUserProfile) {
+        queryClient.setQueryData(["chapter-comments", chapterId, sortBy], (oldData: any) => {
+          if (oldData) {
+            const commentWithProfile = {
+              ...newComment,
+              profiles: currentUserProfile
+            };
+            return [commentWithProfile, ...oldData];
+          }
+          return oldData;
+        });
+      }
+
       queryClient.invalidateQueries({ queryKey: ["chapter-comments", chapterId] });
       queryClient.invalidateQueries({ queryKey: ["comment-replies", chapterId] });
       setNewComment("");
