@@ -355,9 +355,57 @@ const UserProfile = () => {
         {
           id: "6",
           title: "ليلة بيضاء",
-          description: "اقرأ 20 فصل في يوم واحد",
+          description: "اقرأ 20 فصل في ي��م واحد",
           icon: "🌙",
           unlocked: (userStats?.streakDays || 0) >= 7,
+          rarity: "epic"
+        },
+        {
+          id: "7",
+          title: "عضو جديد",
+          description: "انضم للموقع",
+          icon: "🎉",
+          unlocked: true,
+          rarity: "common"
+        },
+        {
+          id: "8",
+          title: "ناقد محترف",
+          description: "اكتب 100 تعليق",
+          icon: "🎯",
+          unlocked: (userStats?.commentsCount || 0) >= 100,
+          rarity: "rare"
+        },
+        {
+          id: "9",
+          title: "محارب ماراثون",
+          description: "اقرأ 50 فصل متتالي",
+          icon: "🏃‍♂️",
+          unlocked: (userStats?.readChaptersCount || 0) >= 50,
+          rarity: "epic"
+        },
+        {
+          id: "10",
+          title: "جامع المفضلة",
+          description: "أضف 100 مانجا للمفضلة",
+          icon: "📚",
+          unlocked: (userStats?.favoritesCount || 0) >= 100,
+          rarity: "epic"
+        },
+        {
+          id: "11",
+          title: "أسطورة الموقع",
+          description: "حقق جميع الإنجازات",
+          icon: "🏆",
+          unlocked: false,
+          rarity: "legendary"
+        },
+        {
+          id: "12",
+          title: "رحالة الأنواع",
+          description: "اقرأ من 20 نوع مختلف",
+          icon: "🗺️",
+          unlocked: (userStats?.level || 0) >= 10,
           rarity: "epic"
         }
       ];
@@ -1117,9 +1165,9 @@ const UserProfile = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>إزالة من المفضلة</AlertDialogTitle>
+                              <AlertDialogTitle>إزالة من المف��لة</AlertDialogTitle>
                               <AlertDialogDescription>
-                                هل أنت متأكد من إزالة "{favorite.manga.title}" من قائمة المفضلة؟
+                                هل أنت متأكد من إزالة "{favorite.manga.title}" من قائمة المفضل��؟
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
