@@ -235,7 +235,7 @@ const UserProfile = () => {
         const base64 = e.target?.result as string;
         setAvatarUrl(base64);
         toast({
-          title: "تم تحميل الصورة مح��ياً",
+          title: "تم تحميل الصورة محلياً",
           description: "اضغط حفظ لتحديث صورتك الشخصية",
         });
       };
@@ -442,7 +442,7 @@ const UserProfile = () => {
   });
 
   // جلب المفضلة
-  const { data: favorites = [], isLoading: favoritesLoading } = useQuery({
+  const { data: favorites = [], isLoading: favoritesLoading, refetch: refetchFavorites } = useQuery({
     queryKey: ["user-favorites", user?.id, searchTerm, sortBy],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -993,7 +993,7 @@ const UserProfile = () => {
               <CardContent className="p-6 text-center">
                 <Heart className="h-8 w-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{userStats?.favoritesCount || 0}</div>
-                <div className="text-sm opacity-90">��فضلة</div>
+                <div className="text-sm opacity-90">���فضلة</div>
               </CardContent>
             </Card>
 
@@ -1462,7 +1462,7 @@ const UserProfile = () => {
                 ) : readingProgress.length === 0 ? (
                   <div className="text-center py-12">
                     <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">لم ت��دأ قراءة أي مانجا بعد</h3>
+                    <h3 className="text-lg font-semibold mb-2">لم تبدأ قراءة أي مانجا بعد</h3>
                     <p className="text-muted-foreground mb-4">
                       ابدأ في قراءة المانجا لتتبع تقدمك هن��
                     </p>
@@ -1857,7 +1857,7 @@ const UserProfile = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium">فصول جديدة</h4>
+                      <h4 className="font-medium">فص��ل جديدة</h4>
                       <p className="text-sm text-muted-foreground">
                         إشعار عند إضافة فصول جديدة للمانجا المفضلة
                       </p>
@@ -1949,7 +1949,7 @@ const UserProfile = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Settings className="h-5 w-5" />
-                    إعدادات الحساب
+                    إعد��دات الحساب
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
