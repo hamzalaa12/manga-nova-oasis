@@ -77,18 +77,20 @@ const ChaptersGrid = ({
   showAll = false,
 }: ChaptersGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = showAll ? 100 : 36;
 
   const {
-    data: chaptersData = [],
+    data: chaptersResponse,
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["chapters-grid", showAll],
-    queryFn: () => fetchChaptersData(showAll),
+    queryKey: ["chapters-grid", showAll, currentPage],
+    queryFn: () => fetchChaptersData(showAll, showAll ? 1 : currentPage),
     staleTime: 2 * 60 * 1000, // 2 دقائق (أقل من المانجا لأن الفصول تتحدث أكثر)
     gcTime: 5 * 60 * 1000, // 5 دقائق
   });
+
+  const chaptersData = chaptersResponse?.data || [];
+  const totalCount = chaptersResponse?.totalCount || 0;
 
   if (error) {
     console.error("Error fetching chapters:", error);
