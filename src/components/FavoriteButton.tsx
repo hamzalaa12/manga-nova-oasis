@@ -84,22 +84,23 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         console.log("Database access successful, user can access favorites table");
       } catch (dbError) {
         console.error("Database connection failed:", dbError);
-        throw new Error("فشل في الاتصال بقاعدة البيانات");
+        throw new Error("فشل ف�� الاتصال بقاعدة البيانات");
       }
 
-      // Verify manga exists
+      // Verify manga exists (simplified check)
       const { data: mangaExists, error: mangaCheckError } = await supabase
         .from("manga")
         .select("id")
         .eq("id", mangaId)
-        .single();
+        .maybeSingle();
 
       if (mangaCheckError) {
         console.error("Manga verification error:", mangaCheckError);
-        if (mangaCheckError.code === 'PGRST116') {
-          throw new Error("المانجا غير موجودة");
-        }
         throw new Error(`خطأ في التحقق من المانجا: ${mangaCheckError.message}`);
+      }
+
+      if (!mangaExists) {
+        throw new Error("المانجا غير موجودة");
       }
 
       if (isFavorite) {
@@ -170,7 +171,7 @@ const FavoriteButton = ({ mangaId, className = "" }: FavoriteButtonProps) => {
         error: error
       });
 
-      let errorMessage = "فشل في تحديث المف��لة";
+      let errorMessage = "فشل في تحديث المفضلة";
 
       if (error.message) {
         errorMessage = error.message;
