@@ -514,19 +514,29 @@ const MangaDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {manga && (
-        <SEO
-          title={`${manga.title} - مانجا العرب`}
-          description={
-            manga.description ||
-            `اقرأ مانجا ${manga.title} مترجمة بجودة عالية. ${manga.author ? `بقلم ${manga.author}` : ""} ${manga.genre && manga.genre.length > 0 ? `تصنيف: ${manga.genre.slice(0, 3).join("، ")}` : ""}`
-          }
-          image={manga.cover_image_url || undefined}
-          url={currentUrl}
-          type="article"
-          structuredData={structuredData}
-        />
-      )}
+      {manga && (() => {
+        const pageMeta = generatePageMeta('manga', {
+          ...manga,
+          genres: manga.genre
+        });
+        const pageStructuredData = generateStructuredData('manga', {
+          ...manga,
+          genres: manga.genre
+        });
+
+        return (
+          <SEO
+            title={pageMeta?.title}
+            description={pageMeta?.description}
+            keywords={pageMeta?.keywords}
+            image={pageMeta?.image}
+            url={pageMeta?.url}
+            canonical={pageMeta?.canonical}
+            type={pageMeta?.type}
+            structuredData={pageStructuredData}
+          />
+        );
+      })()}
       <Header />
 
       <main className="container mx-auto px-4 py-8">
