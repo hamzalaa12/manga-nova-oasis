@@ -707,6 +707,14 @@ const UserProfile = () => {
     }
   }, [fullProfile]);
 
+  // تحديث البيانات عند تغيير التبويب النشط
+  useEffect(() => {
+    if (activeTab === "favorites") {
+      refetchFavorites();
+      refetchStats();
+    }
+  }, [activeTab, refetchFavorites, refetchStats]);
+
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
@@ -993,7 +1001,7 @@ const UserProfile = () => {
               <CardContent className="p-6 text-center">
                 <Heart className="h-8 w-8 mx-auto mb-2" />
                 <div className="text-2xl font-bold">{userStats?.favoritesCount || 0}</div>
-                <div className="text-sm opacity-90">���فضلة</div>
+                <div className="text-sm opacity-90">��فضلة</div>
               </CardContent>
             </Card>
 
@@ -1857,7 +1865,7 @@ const UserProfile = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium">فص��ل جديدة</h4>
+                      <h4 className="font-medium">فصول جديدة</h4>
                       <p className="text-sm text-muted-foreground">
                         إشعار عند إضافة فصول جديدة للمانجا المفضلة
                       </p>
@@ -1949,7 +1957,7 @@ const UserProfile = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Settings className="h-5 w-5" />
-                    إعد��دات الحساب
+                    إعدادات الحساب
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
