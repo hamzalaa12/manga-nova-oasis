@@ -30,8 +30,7 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import ChapterInteractions from "@/components/ChapterInteractions";
-import ReportDialog from "@/components/ReportDialog";
+import SimpleComments from "@/components/SimpleComments";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
@@ -333,11 +332,6 @@ const ChapterReader = () => {
           <div className="flex items-center justify-between">
             {/* الجهة اليسرى - أيقونات الإجراءات */}
             <div className="flex items-center gap-3">
-              <ReportDialog
-                targetId={chapter.id}
-                targetType="chapter"
-              />
-
               <Link to={getMangaUrl(getMangaSlug(manga))}>
                 <Button
                   variant="ghost"
@@ -483,10 +477,10 @@ const ChapterReader = () => {
         )}
       </main>
 
-      {/* التفاعلات والتعليقات */}
+      {/* التعليقات */}
       {chapter && (
-        <div className="bg-gradient-to-t from-gray-900 to-black">
-          <ChapterInteractions chapterId={chapter.id} />
+        <div className="bg-gradient-to-t from-gray-900 to-black py-8">
+          <SimpleComments chapterId={chapter.id} mangaId={manga.id} />
         </div>
       )}
 

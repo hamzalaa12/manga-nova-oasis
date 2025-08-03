@@ -76,6 +76,12 @@ const Header = () => {
                     </span>
                   )}
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center">
+                    <User className="h-4 w-4 ml-2" />
+                    الملف الشخصي
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut className="h-4 w-4 ml-2" />
                   تسجيل خروج
