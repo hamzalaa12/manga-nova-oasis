@@ -82,12 +82,33 @@ export const getRoleColor = (role: UserRole): string => {
       return "bg-green-500";
     case "elite_fighter":
       return "bg-blue-500";
-    case "leader":
+    case "tribe_leader":
       return "bg-purple-500";
     case "admin":
+      return "bg-orange-500";
+    case "site_admin":
       return "bg-red-500";
     default:
       return "bg-gray-500";
+  }
+};
+
+export const getUserRoleIcon = (role: UserRole): string => {
+  switch (role) {
+    case "user":
+      return "👤";
+    case "beginner_fighter":
+      return "⚔️";
+    case "elite_fighter":
+      return "🏆";
+    case "tribe_leader":
+      return "👑";
+    case "admin":
+      return "🛡️";
+    case "site_admin":
+      return "⚡";
+    default:
+      return "👤";
   }
 };
 
