@@ -81,20 +81,32 @@ const AdminDashboard = () => {
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     console.log(`Admin dashboard: Changing user ${userId} role to ${newRole}`);
 
+    // تحديث فوري للواجهة
+    setLocalUsers(prevUsers =>
+      prevUsers.map(user =>
+        user.user_id === userId
+          ? { ...user, role: newRole, updated_at: new Date().toISOString() }
+          : user
+      )
+    );
+
     try {
       const success = await updateUserRole(userId, newRole);
       if (success) {
         console.log('Role change succeeded, refreshing user data');
-        // إعادة تحميل بيانات المستخدمين فوراً وبعد تأخير
-        refreshUsers();
+        // إعادة تحميل بيانات المستخدمين بعد تأخير
         setTimeout(() => {
           refreshUsers();
-        }, 2000);
+        }, 1500);
       } else {
-        console.error('Role change failed');
+        console.error('Role change failed - reverting UI change');
+        // إذا فشل، أرجع التغيير في الواجهة
+        setLocalUsers(users);
       }
     } catch (error) {
       console.error('Error in handleRoleChange:', error);
+      // إذا حدث خطأ، أرجع التغيير في الواجهة
+      setLocalUsers(users);
     }
   };
 
@@ -115,7 +127,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إج��الي المستخدمين</CardTitle>
+            <CardTitle className="text-sm font-medium">إجمالي المستخدمين</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
