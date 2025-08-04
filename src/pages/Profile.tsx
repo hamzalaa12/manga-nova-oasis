@@ -114,7 +114,7 @@ const Profile = () => {
                 </TabsTrigger>
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  الملف الشخصي
+                  ال��لف الشخصي
                 </TabsTrigger>
                 <TabsTrigger value="favorites" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
@@ -181,10 +181,12 @@ const Profile = () => {
 
 // مكون إعدادات ال��لف الشخصي
 const ProfileSettings = () => {
-  const { profile, user } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
   const { updateProfile, loading } = useProfile();
+  const { toast } = useToast();
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [bio, setBio] = useState(profile?.bio || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -195,10 +197,34 @@ const ProfileSettings = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateProfile({
-      display_name: displayName,
-      bio: bio
-    });
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      const success = await updateProfile({
+        display_name: displayName.trim(),
+        bio: bio.trim()
+      });
+
+      if (success) {
+        // إعادة تحميل بيانات المستخدم من قاعدة البيانات
+        await refreshProfile();
+
+        toast({
+          title: 'تم الحفظ',
+          description: 'تم تحديث ملفك الشخصي بنجاح'
+        });
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: 'خطأ',
+        description: 'فشل في حفظ التغييرات',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -207,7 +233,7 @@ const ProfileSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle>تعديل الملف الشخصي</CardTitle>
-          <CardDescription>قم بتعديل معلوماتك الشخصية هنا</CardDescription>
+          <CardDescription>قم بتعديل معلوم��تك الشخصية هنا</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -698,7 +724,7 @@ const AccountSettings = () => {
     // هذا سيتطلب تأكيد إضافي من المستخدم
     toast({
       title: 'تحذير',
-      description: 'هذه الميزة غير متوفرة حالياً. يرجى التواصل مع الدعم لحذف حسابك.',
+      description: 'هذه الميزة غير متو��رة حالياً. يرجى التواصل مع الدعم لحذف حسابك.',
       variant: 'destructive'
     });
   };
@@ -736,7 +762,7 @@ const AccountSettings = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                يجب أن تكون كلمة المرور 6 أحرف على الأقل
+                يجب أن تكون كلمة ا��مرور 6 أحرف على الأقل
               </p>
             </div>
 
@@ -769,7 +795,7 @@ const AccountSettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <h4 className="font-medium">تسجيل الخروج من جميع الأجهزة</h4>
+                <h4 className="font-medium">تسجيل ا��خروج من جميع الأجهزة</h4>
                 <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
               </div>
               <Button variant="outline" onClick={signOut}>
