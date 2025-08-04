@@ -623,7 +623,24 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-
+                  {/* أزرار التفاعل */}
+                  <div className="flex gap-2 mt-6">
+                    <FavoriteButton
+                      mangaId={manga.id}
+                      className="flex-1"
+                    />
+                    <ReportDialog
+                      type="manga"
+                      targetId={manga.id}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <Flag className="h-4 w-4" />
+                        إبلاغ
+                      </div>
+                    </ReportDialog>
+                  </div>
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-4">
