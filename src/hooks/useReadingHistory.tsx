@@ -81,11 +81,19 @@ export const useReadingHistory = () => {
       }
 
       setReadingHistory(data || []);
-    } catch (error) {
-      console.error('Error loading reading history:', error);
+    } catch (error: any) {
+      console.error('Error loading reading history:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        userId: user?.id,
+        error: error
+      });
+
       toast({
         title: 'خطأ',
-        description: 'فشل في تحميل سجل القراءة',
+        description: `فشل في تحميل سجل القراءة: ${error?.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
     } finally {
