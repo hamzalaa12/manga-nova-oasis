@@ -84,6 +84,7 @@ const ChapterReader = () => {
   }, [slug, chapterParam, id]);
 
   const fetchChapterDetails = async () => {
+    setError(null);
     try {
       // Fetch chapter details
       const { data: chapterData, error: chapterError } = await supabase
