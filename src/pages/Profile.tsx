@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star } from 'lucide-react';
+import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag } from 'lucide-react';
 import { getRoleDisplayName, getRoleColor } from '@/types/user';
 import SEO from '@/components/SEO';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -236,7 +236,7 @@ const ProfileSettings = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>البريد الإلكتروني</Label>
+                <Label>البريد الإل��تروني</Label>
                 <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
               </div>
               <div>
@@ -721,7 +721,7 @@ const AccountSettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <h4 className="font-medium">تسجيل الخروج من جميع الأجهزة</h4>
+                <h4 className="font-medium">تسجيل ��لخروج من جميع الأجهزة</h4>
                 <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
               </div>
               <Button variant="outline" onClick={signOut}>
@@ -748,7 +748,7 @@ const AccountSettings = () => {
                 </p>
               </div>
               <Button variant="destructive" onClick={handleDeleteAccount}>
-                حذف الحساب
+                حذ�� الحساب
               </Button>
             </div>
           </div>
