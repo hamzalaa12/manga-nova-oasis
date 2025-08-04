@@ -211,9 +211,19 @@ export const useUserManagement = () => {
         }
       }
 
-      // إعادة تحميل البيانات مع تأخير قصير لضمان الحفظ
-      await new Promise(resolve => setTimeout(resolve, 500));
-      await loadUsers();
+      // تحديث فوري للواجهة (optimistic update)
+      setUsers(prevUsers =>
+        prevUsers.map(u =>
+          u.user_id === userId
+            ? { ...u, role: newRole, updated_at: new Date().toISOString() }
+            : u
+        )
+      );
+
+      // إعادة تحميل البيانات مع ��أخير قصير لضمان الحفظ
+      setTimeout(async () => {
+        await loadUsers();
+      }, 1000);
 
       toast({
         title: 'تم تحديث الرتبة',
@@ -259,7 +269,7 @@ export const useUserManagement = () => {
 
       toast({
         title: 'تم حظر المستخدم',
-        description: `تم حظر المستخدم ${banType === 'permanent' ? 'نهائياً' : 'مؤقتاً'}`
+        description: `تم ح��ر المستخدم ${banType === 'permanent' ? 'نهائياً' : 'مؤقتاً'}`
       });
 
       return true;
