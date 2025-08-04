@@ -4,12 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Profile from "./pages/Profile";
+import AdminPanel from "./pages/AdminPanel";
 import MangaDetails from "./pages/MangaDetails";
 import MangaByType from "./pages/MangaByType";
 import MangaByGenre from "./pages/MangaByGenre";
 import ChapterReader from "./pages/ChapterReader";
-import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -23,6 +23,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/admin" element={<AdminPanel />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/manga/:slug" element={<MangaDetails />} />
             <Route path="/type/:type" element={<MangaByType />} />
