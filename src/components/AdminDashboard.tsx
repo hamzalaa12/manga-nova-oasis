@@ -76,11 +76,15 @@ const AdminDashboard = () => {
     console.log(`Admin dashboard: Changing user ${userId} role to ${newRole}`);
 
     try {
-      const success = await changeUserRole(userId, newRole);
-      if (!success) {
-        console.error('Role change failed in useUserManagement');
+      const success = await updateUserRole(userId, newRole);
+      if (success) {
+        console.log('Role change succeeded, refreshing user data');
+        // إعادة تحميل بيانات المستخدمين بعد تأخير قصير
+        setTimeout(() => {
+          refreshUsers();
+        }, 1000);
       } else {
-        console.log('Role change succeeded, data should be refreshed');
+        console.error('Role change failed');
       }
     } catch (error) {
       console.error('Error in handleRoleChange:', error);
