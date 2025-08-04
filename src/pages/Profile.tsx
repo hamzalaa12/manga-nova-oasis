@@ -106,7 +106,11 @@ const Profile = () => {
           {/* محتوى الملف الشخصي */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6">
+                <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  لوحة المعلومات
+                </TabsTrigger>
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   الملف الشخصي
@@ -266,7 +270,7 @@ const FavoritesList = () => {
       <Card>
         <CardHeader>
           <CardTitle>المانجا المفضلة</CardTitle>
-          <CardDescription>المانجا التي أضف��ها إلى قائمة المفضلة</CardDescription>
+          <CardDescription>المانجا التي أضفتها إلى قائمة المفضلة</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
@@ -458,7 +462,7 @@ const ReadingHistoryComponent = () => {
               <History className="h-5 w-5" />
               سجل القراءة الحديث
             </CardTitle>
-            <CardDescription>آخر الفصول التي قرأتها</CardDescription>
+            <CardDescription>آخر الف��ول التي قرأتها</CardDescription>
           </div>
           {readingHistory.length > 0 && (
             <Button variant="outline" size="sm" onClick={clearReadingHistory}>
@@ -714,7 +718,7 @@ const AccountSettings = () => {
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
                 <h4 className="font-medium">تسجيل الخروج من جميع الأجهزة</h4>
-                <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع ��لمتصفحات والأجهزة</p>
+                <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
               </div>
               <Button variant="outline" onClick={signOut}>
                 تسجيل الخروج
@@ -727,7 +731,7 @@ const AccountSettings = () => {
       {/* المنطقة الخطرة */}
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle className="text-destructive">المنطقة الخطرة</CardTitle>
+          <CardTitle className="text-destructive">المنطقة ��لخطرة</CardTitle>
           <CardDescription>عمليات لا يمكن التراجع عنها</CardDescription>
         </CardHeader>
         <CardContent>
