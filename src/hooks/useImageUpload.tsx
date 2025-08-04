@@ -12,7 +12,7 @@ export const useImageUpload = () => {
     if (!user) {
       toast({
         title: 'خطأ',
-        description: 'يجب تس��يل الدخول أولاً',
+        description: 'يجب تسجيل الدخول أولاً',
         variant: 'destructive'
       });
       return null;
@@ -40,62 +40,48 @@ export const useImageUpload = () => {
 
     setUploading(true);
     try {
-      // Create unique file name
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}_${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-
-      // تحقق من وجود bucket أو إنشاؤه
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const bucketExists = buckets?.some(bucket => bucket.name === 'user-content');
-
-      if (!bucketExists) {
-        const { error: bucketError } = await supabase.storage.createBucket('user-content', {
-          public: true,
-          allowedMimeTypes: ['image/*'],
-          fileSizeLimit: 5242880 // 5MB
+      // تحويل الصورة إلى base64 كحل بديل
+      const convertToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = (error) => reject(error);
         });
+      };
 
-        if (bucketError && !bucketError.message.includes('already exists')) {
-          console.error('Error creating bucket:', bucketError);
-        }
-      }
+      let avatarUrl: string;
 
-      // Upload file to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('user-content')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
+      try {
+        // محاولة رفع الصورة إلى Supabase Storage أولاً
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}_${Date.now()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        // إذا فشل الرفع، جرب bucket بديل
-        if (uploadError.message.includes('not found')) {
-          // استخدم bucket افتراضي أو حاول إنشاء واحد آخر
-          const fallbackPath = `public/${fileName}`;
-          const { data: fallbackData, error: fallbackError } = await supabase.storage
-            .from('user-content')
-            .upload(fallbackPath, file, {
-              cacheControl: '3600',
-              upsert: true
-            });
+        // Upload file to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('user-content')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
 
-          if (fallbackError) {
-            throw fallbackError;
-          }
+        if (uploadError) {
+          console.warn('Supabase storage upload failed, using base64 fallback:', uploadError);
+          // استخدام base64 كبديل
+          avatarUrl = await convertToBase64(file);
         } else {
-          throw uploadError;
+          // Get public URL
+          const { data: publicUrlData } = supabase.storage
+            .from('user-content')
+            .getPublicUrl(filePath);
+          avatarUrl = publicUrlData.publicUrl;
         }
+      } catch (storageError) {
+        console.warn('Storage failed, using base64 fallback:', storageError);
+        // استخدام base64 كبديل
+        avatarUrl = await convertToBase64(file);
       }
-
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('user-content')
-        .getPublicUrl(filePath);
-
-      const avatarUrl = publicUrlData.publicUrl;
 
       // Update user profile with new avatar URL
       const { error: updateError } = await supabase
