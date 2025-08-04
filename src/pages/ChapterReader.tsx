@@ -139,13 +139,21 @@ const ChapterReader = () => {
     }
   };
 
-  const trackChapterView = async (chapterId: string) => {
+  const trackChapterViewOld = async (chapterId: string) => {
     try {
       console.log("📖 Tracking chapter view for ID:", chapterId);
-      const { data: sessionData } = await supabase.auth.getSession();
 
+      // Track chapter view using new system
+      await trackChapterView(chapterId);
+
+      // Track manga view as well
+      if (manga) {
+        await trackMangaView(manga.id);
+      }
+
+      // Save reading progress for logged users
+      const { data: sessionData } = await supabase.auth.getSession();
       if (sessionData.session?.user && manga && chapter) {
-        // استخدام hook قراءة التاريخ لحفظ التقدم
         try {
           await updateReadingProgress(manga.id, chapterId, 1, true);
           console.log('✅ Reading progress saved via hook');
@@ -174,39 +182,10 @@ const ChapterReader = () => {
           }
         }
       }
-
-      // محاولة استخدام edge function كنسخ احتياطي
-      try {
-        const headers: HeadersInit = {
-          "Content-Type": "application/json",
-        };
-
-        if (sessionData.session?.access_token) {
-          headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-        }
-
-        const response = await supabase.functions.invoke("track-view", {
-          body: {
-            mangaId: chapterId,
-            type: "chapter",
-          },
-          headers,
-        });
-
-        console.log("✅ Track chapter view response:", response);
-      } catch (edgeFunctionError: any) {
-        console.warn("Edge function failed, but progress was saved directly:", {
-          message: edgeFunctionError?.message || 'Unknown error',
-          error: edgeFunctionError
-        });
-      }
     } catch (error: any) {
       console.error("❌ Error tracking chapter view:", {
         message: error?.message || 'Unknown error',
-        code: error?.code,
-        details: error?.details,
         chapterId,
-        userId: sessionData?.session?.user?.id,
         error: error
       });
       // Don't fail the page load if view tracking fails
@@ -270,7 +249,7 @@ const ChapterReader = () => {
       });
 
       // إظهار رسالة خطأ للمستخدم
-      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
+      setError('فشل في تح��يل الفصل. تحقق من رابط الصفحة.');
       setChapter(null);
       setManga(null);
     } finally {
