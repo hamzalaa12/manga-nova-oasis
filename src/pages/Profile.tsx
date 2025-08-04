@@ -120,7 +120,7 @@ const Profile = () => {
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="flex items-center gap-2">
                   <Bell className="h-4 w-4" />
-                  الإشعارات
+                  الإش��ارات
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
@@ -159,7 +159,7 @@ const Profile = () => {
 
 // مكون إعدادات الملف الشخصي
 const ProfileSettings = () => {
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const { updateProfile, loading } = useProfile();
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [bio, setBio] = useState(profile?.bio || '');
@@ -180,40 +180,79 @@ const ProfileSettings = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>تعديل الملف الشخصي</CardTitle>
-        <CardDescription>قم بتعديل معلوماتك الشخصية هنا</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="displayName">الاسم المعروض</Label>
-            <Input
-              id="displayName"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="أدخل اسمك المعروض"
-            />
-          </div>
+    <div className="space-y-6">
+      {/* معلومات الملف الشخصي */}
+      <Card>
+        <CardHeader>
+          <CardTitle>تعديل الملف الشخصي</CardTitle>
+          <CardDescription>قم بتعديل معلوماتك الشخصية هنا</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="displayName">الاسم المعروض</Label>
+              <Input
+                id="displayName"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="أدخل اسمك المعروض"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="bio">نبذة عنك</Label>
-            <Textarea
-              id="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="اكتب نبذة مختصرة عنك..."
-              className="min-h-[100px]"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="bio">نبذة عنك</Label>
+              <Textarea
+                id="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="اكتب نبذة مختصرة عنك..."
+                className="min-h-[100px]"
+              />
+            </div>
 
-          <Button type="submit" disabled={loading}>
-            {loading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* معلومات الحساب */}
+      <Card>
+        <CardHeader>
+          <CardTitle>معلومات الحساب</CardTitle>
+          <CardDescription>معلومات حسابك الأساسية</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>البريد الإلكتروني</Label>
+                <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
+              </div>
+              <div>
+                <Label>تاريخ التسجيل</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {user?.created_at ? new Date(user.created_at).toLocaleDateString('ar') : 'غير متوفر'}
+                </p>
+              </div>
+              <div>
+                <Label>آخر تحديث للملف</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {profile?.updated_at ? new Date(profile.updated_at).toLocaleDateString('ar') : 'غير متوفر'}
+                </p>
+              </div>
+              <div>
+                <Label>حالة البريد الإلكتروني</Label>
+                <Badge variant={user?.email_confirmed_at ? "default" : "destructive"} className="mt-1">
+                  {user?.email_confirmed_at ? "مؤكد" : "غير مؤكد"}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
@@ -467,7 +506,7 @@ const ReadingHistoryComponent = () => {
                   <div className="flex flex-col items-end gap-2">
                     <Button size="sm" variant="outline" asChild>
                       <Link to={`/manga/${item.manga.slug || item.manga_id}`}>
-                        عرض المانجا
+                        عرض الم��نجا
                       </Link>
                     </Button>
                     <Button size="sm" asChild>
@@ -622,7 +661,7 @@ const AccountSettings = () => {
           </div>
 
           <Button type="submit" variant="destructive" disabled={loading}>
-            {loading ? 'جاري التغيير...' : 'تغيير ��لمة المرور'}
+            {loading ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
           </Button>
         </form>
       </CardContent>
