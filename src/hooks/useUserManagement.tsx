@@ -288,27 +288,48 @@ export const useUserManagement = () => {
     if (!isAdmin || !user) return false;
 
     try {
-      // Delete user profile (this should cascade to delete related data)
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('user_id', userId);
+      console.log('Attempting to delete user:', userId);
 
-      if (error) throw error;
+      // Use RPC function for complete user deletion
+      const { data, error } = await supabase.rpc('delete_user_completely', {
+        user_uuid: userId
+      });
 
-      await loadUsers();
+      if (error) {
+        console.error('RPC deletion failed:', error);
+
+        // Fallback: try manual deletion
+        const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
+
+        if (deleteError) {
+          console.error('Auth deletion also failed:', deleteError);
+          throw new Error(`فشل في حذف المستخدم: ${deleteError.message}`);
+        }
+
+        console.log('User deleted via auth admin');
+      } else {
+        console.log('User deleted via RPC:', data);
+      }
+
+      // Update local state immediately
+      setUsers(prevUsers => prevUsers.filter(u => u.user_id !== userId));
+
+      // Reload users to ensure consistency
+      setTimeout(async () => {
+        await loadUsers();
+      }, 1000);
 
       toast({
         title: 'تم حذف المستخدم',
-        description: 'تم حذف حساب المستخدم وجميع بياناته'
+        description: 'تم حذف حساب المستخدم وجميع بياناته نهائياً'
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting user:', error);
       toast({
         title: 'خطأ',
-        description: 'فشل في حذف المستخدم',
+        description: `فشل في حذف المستخدم: ${error.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
       return false;
