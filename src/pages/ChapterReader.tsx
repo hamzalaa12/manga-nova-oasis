@@ -128,6 +128,7 @@ const ChapterReader = () => {
       });
 
       // إظهار رسالة خطأ للمستخدم
+      setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
       setChapter(null);
       setManga(null);
     } finally {
@@ -328,7 +329,7 @@ const ChapterReader = () => {
           }
           break;
         case "ArrowRight":
-          // السابق (للغة العرب��ة)
+          // السابق (للغة العربية)
           const prev = getPreviousChapter();
           if (prev && manga) {
             navigate(getChapterUrl(getMangaSlug(manga), prev.chapter_number));
