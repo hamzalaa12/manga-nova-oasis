@@ -60,6 +60,7 @@ const AdminDashboard = () => {
   const [banReason, setBanReason] = useState('');
   const [banType, setBanType] = useState<'temporary' | 'permanent'>('temporary');
   const [banDuration, setBanDuration] = useState('7'); // days
+  const [localUsers, setLocalUsers] = useState(users);
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -258,7 +259,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* إدارة المح��وى */}
+        {/* إدارة المحتوى */}
         <TabsContent value="content" className="space-y-4">
           <ContentModeration />
         </TabsContent>
