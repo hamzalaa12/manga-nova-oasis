@@ -159,7 +159,7 @@ const ChapterReader = () => {
         }
       }
 
-      // محاولة اس��خدام edge function كنسخ احتياطي
+      // محاولة استخدام edge function كنسخ احتياطي
       try {
         const headers: HeadersInit = {
           "Content-Type": "application/json",
@@ -256,17 +256,30 @@ const ChapterReader = () => {
       : null;
   };
 
-  // Scroll detection for navigation visibility
+  // Scroll detection for navigation visibility and completion tracking
   useEffect(() => {
+    let hasTrackedCompletion = false;
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
       // Show navigation when scrolled down more than 100px
       setShowNavigation(scrollY > 100);
+
+      // Track completion when user reaches 90% of the page
+      const scrollPercentage = (scrollY + windowHeight) / documentHeight;
+      if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga) {
+        hasTrackedCompletion = true;
+        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true);
+        console.log('📖 Chapter marked as completed via scroll');
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [chapter, manga, updateReadingProgress]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -494,7 +507,7 @@ const ChapterReader = () => {
           <div className="flex items-center justify-center min-h-[70vh]">
             <div className="text-center">
               <p className="text-gray-400 text-xl mb-4">
-                لا توجد صفحات في هذا الف��ل
+                لا توجد صفحات في هذا الفصل
               </p>
               <p className="text-gray-500">يرجى المحاولة لاحقا��</p>
             </div>
@@ -591,7 +604,7 @@ const ChapterReader = () => {
                     size="sm"
                     className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium w-full"
                   >
-                    التا��ي
+                    التالي
                     <ArrowLeft className="h-4 w-4 mr-2" />
                   </Button>
                 </Link>
