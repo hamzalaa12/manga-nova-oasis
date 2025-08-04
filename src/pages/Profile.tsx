@@ -24,7 +24,7 @@ import ProfileDashboard from '@/components/ProfileDashboard';
 
 const Profile = () => {
   const { user, profile, userRole, loading } = useAuth();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   if (loading) {
     return (
@@ -388,7 +388,7 @@ const AvatarUploadButton = () => {
   );
 };
 
-// مكون س��ل القراءة المحسن
+// مكون سجل القراءة المحسن
 const ReadingHistoryComponent = () => {
   const { readingHistory, stats, loading, clearReadingHistory } = useReadingHistory();
 
@@ -688,7 +688,7 @@ const AccountSettings = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                يجب أن تكون كلمة المرو�� 6 أحرف على الأقل
+                يجب أن تكون كلمة المرور 6 أحرف على الأقل
               </p>
             </div>
 
@@ -725,7 +725,7 @@ const AccountSettings = () => {
                 <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
               </div>
               <Button variant="outline" onClick={signOut}>
-                تسجيل الخروج
+                تسجيل الخر��ج
               </Button>
             </div>
           </div>
