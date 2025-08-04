@@ -189,11 +189,21 @@ const ChapterReader = () => {
         });
 
         console.log("✅ Track chapter view response:", response);
-      } catch (edgeFunctionError) {
-        console.warn("Edge function failed, but progress was saved directly:", edgeFunctionError);
+      } catch (edgeFunctionError: any) {
+        console.warn("Edge function failed, but progress was saved directly:", {
+          message: edgeFunctionError?.message || 'Unknown error',
+          error: edgeFunctionError
+        });
       }
-    } catch (error) {
-      console.error("❌ Error tracking chapter view:", error);
+    } catch (error: any) {
+      console.error("❌ Error tracking chapter view:", {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        chapterId,
+        userId: sessionData?.session?.user?.id,
+        error: error
+      });
       // Don't fail the page load if view tracking fails
     }
   };
