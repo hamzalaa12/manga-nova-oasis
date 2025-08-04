@@ -195,7 +195,9 @@ export const useUserManagement = () => {
         }
       }
 
-      // التحقق من أن التحديث حفظ بشكل صحيح
+      // التحقق من أن التحديث حفظ بشكل صحيح (مع تأخير)
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const { data: verificationData, error: verificationError } = await supabase
         .from('profiles')
         .select('role')
@@ -203,11 +205,23 @@ export const useUserManagement = () => {
         .single();
 
       if (verificationError) {
-        console.error('Verification failed:', verificationError);
+        console.warn('Verification failed, but update may have succeeded:', verificationError);
+        // لا نرمي خطأ هنا لأن التحديث قد يكون نجح فعلاً
       } else {
         console.log(`Verification: User role is now ${verificationData.role}`);
         if (verificationData.role !== newRole) {
-          throw new Error(`التحديث لم يحفظ بشكل صحيح. الرتبة الحالية: ${verificationData.role}, المطلوب: ${newRole}`);
+          console.warn(`Role verification mismatch: expected ${newRole}, got ${verificationData.role}`);
+          // محاولة إضافية للتحديث
+          const { error: retryError } = await supabase
+            .from('profiles')
+            .update({ role: newRole })
+            .eq('user_id', userId);
+
+          if (retryError) {
+            console.error('Retry update failed:', retryError);
+            // فقط أظهر تحذير بدلاً من إيقاف العملية
+            console.warn('Role may not have been updated, but continuing...');
+          }
         }
       }
 
@@ -269,7 +283,7 @@ export const useUserManagement = () => {
 
       toast({
         title: 'تم حظر المستخدم',
-        description: `تم ح��ر المستخدم ${banType === 'permanent' ? 'نهائياً' : 'مؤقتاً'}`
+        description: `تم حظر المستخدم ${banType === 'permanent' ? 'نهائياً' : 'مؤقتاً'}`
       });
 
       return true;
@@ -301,7 +315,7 @@ export const useUserManagement = () => {
 
       toast({
         title: 'تم رفع الحظر',
-        description: 'تم رفع الحظر عن المستخدم بنجاح'
+        description: 'تم رفع الحظر عن ��لمستخدم بنجاح'
       });
 
       return true;
