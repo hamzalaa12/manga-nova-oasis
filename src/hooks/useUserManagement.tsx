@@ -121,38 +121,46 @@ export const useUserManagement = () => {
     console.log(`Changing user ${userId} role to ${newRole}`);
 
     try {
-      // التحقق من الصلاحيات أولاً
-      const { data: currentUser } = await supabase.auth.getUser();
-      console.log('Current user ID:', currentUser.user?.id);
-      console.log('Target user ID:', userId);
-      console.log('New role:', newRole);
+      // First verify the current user has permission
+      const { data: adminUser } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
 
-      let updateSucceeded = false;
-      let lastError = null;
+      if (!adminUser || !['admin', 'site_admin'].includes(adminUser.role)) {
+        throw new Error('ليس لديك صلاحية لتغيير الأدوار');
+      }
 
-      // محاولة 1: استخدام update مباشرة
-      try {
-        const { error: updateError, data: updateData } = await supabase
-          .from('profiles')
-          .update({
-            role: newRole,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', userId)
-          .select('role');
+      console.log('Admin verification passed, proceeding with role update');
 
-        if (updateError) {
-          console.error('Direct update failed:', updateError);
-          lastError = updateError;
-        } else {
-          console.log('Direct update succeeded:', updateData);
-          if (updateData && updateData.length > 0 && updateData[0].role === newRole) {
-            updateSucceeded = true;
-          }
+      // Try direct update first
+      const { data: updateData, error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          role: newRole,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .select('*');
+
+      if (updateError) {
+        console.error('Direct update failed:', updateError);
+
+        // Try RPC as fallback
+        const { error: rpcError } = await supabase.rpc('change_user_role', {
+          user_uuid: userId,
+          role_name: newRole
+        });
+
+        if (rpcError) {
+          console.error('RPC also failed:', rpcError);
+          throw new Error(`فشل في تحديث الرتبة: ${rpcError.message}`);
         }
-      } catch (error) {
-        console.error('Direct update threw exception:', error);
-        lastError = error;
+
+        console.log('RPC update succeeded as fallback');
+      } else {
+        console.log('Direct update succeeded:', updateData);
       }
 
       // محاولة 2: استخدام RPC إذا فشل التحديث المباشر
