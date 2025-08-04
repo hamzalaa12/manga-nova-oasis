@@ -159,6 +159,12 @@ const Profile = () => {
                 <NotificationsList />
               </TabsContent>
 
+              {isAdmin && (
+                <TabsContent value="admin" className="mt-6">
+                  <AdminPanelQuick />
+                </TabsContent>
+              )}
+
               <TabsContent value="settings" className="mt-6">
                 <AccountSettings />
               </TabsContent>
@@ -232,7 +238,7 @@ const ProfileSettings = () => {
         </CardContent>
       </Card>
 
-      {/* معلومات الح��اب */}
+      {/* معلومات الحساب */}
       <Card>
         <CardHeader>
           <CardTitle>معلومات الحساب</CardTitle>
@@ -406,7 +412,7 @@ const ReadingHistoryComponent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              إحصائيات القراءة
+              إحصائيات القراء��
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -705,7 +711,7 @@ const AccountSettings = () => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="أعد إدخال كلمة المرور الجديدة"
+                placeholder="أعد إدخال كلم�� المرور الجديدة"
                 required
               />
             </div>
@@ -750,7 +756,7 @@ const AccountSettings = () => {
               <div>
                 <h4 className="font-medium text-destructive">حذف الحساب</h4>
                 <p className="text-sm text-muted-foreground">
-                  حذف حسابك نهائياً وجميع البيانات ال��رتبطة به
+                  حذف حسابك نهائياً وجميع البيانات المرتبطة به
                 </p>
               </div>
               <Button variant="destructive" onClick={handleDeleteAccount}>
