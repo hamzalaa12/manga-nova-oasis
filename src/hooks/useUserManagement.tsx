@@ -146,7 +146,7 @@ export const useUserManagement = () => {
 
       if (updateError) {
         console.error('Direct update failed:', updateError);
-
+        
         // Try RPC as fallback
         const { error: rpcError } = await supabase.rpc('change_user_role', {
           user_uuid: userId,
@@ -157,91 +157,29 @@ export const useUserManagement = () => {
           console.error('RPC also failed:', rpcError);
           throw new Error(`فشل في تحديث الرتبة: ${rpcError.message}`);
         }
-
+        
         console.log('RPC update succeeded as fallback');
       } else {
         console.log('Direct update succeeded:', updateData);
       }
 
-      // محاولة 2: استخدام RPC إذا فشل التحديث المباشر
-      if (!updateSucceeded) {
-        console.log('Trying RPC as fallback...');
-        try {
-          const { error: rpcError } = await supabase.rpc('change_user_role', {
-            user_uuid: userId,
-            role_name: newRole
-          });
-
-          if (rpcError) {
-            console.error('RPC failed:', rpcError);
-            lastError = rpcError;
-          } else {
-            console.log('RPC succeeded');
-            updateSucceeded = true;
-          }
-        } catch (error) {
-          console.error('RPC threw exception:', error);
-          lastError = error;
-        }
-      }
-
-      // محاولة 3: تحديث مبسط بدون timestamp
-      if (!updateSucceeded) {
-        console.log('Trying simplified update...');
-        try {
-          const { error: simpleError } = await supabase
-            .from('profiles')
-            .update({ role: newRole })
-            .eq('user_id', userId);
-
-          if (simpleError) {
-            console.error('Simple update failed:', simpleError);
-            lastError = simpleError;
-          } else {
-            console.log('Simple update succeeded');
-            updateSucceeded = true;
-          }
-        } catch (error) {
-          console.error('Simple update threw exception:', error);
-          lastError = error;
-        }
-      }
-
-      if (!updateSucceeded) {
-        throw new Error(`فشل في تحديث رتبة المستخدم: ${lastError?.message || 'خطأ غير معروف'}`);
-      }
-
-      // التحقق من أن التحديث حفظ بشكل صحيح (مع تأخير)
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const { data: verificationData, error: verificationError } = await supabase
+      // Verify the update worked
+      const { data: verifiedUser, error: verifyError } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, display_name, email')
         .eq('user_id', userId)
         .single();
 
-      if (verificationError) {
-        console.warn('Verification failed, but update may have succeeded:', verificationError);
-        // لا نرمي خطأ هنا لأن التحديث قد يكون نجح فعلاً
+      if (verifyError) {
+        console.error('Verification failed:', verifyError);
       } else {
-        console.log(`Verification: User role is now ${verificationData.role}`);
-        if (verificationData.role !== newRole) {
-          console.warn(`Role verification mismatch: expected ${newRole}, got ${verificationData.role}`);
-          // محاولة إضافية للتحديث
-          const { error: retryError } = await supabase
-            .from('profiles')
-            .update({ role: newRole })
-            .eq('user_id', userId);
-
-          if (retryError) {
-            console.error('Retry update failed:', retryError);
-            // فقط أظهر تحذير بدلاً من إيقاف العملية
-            console.warn('Role may not have been updated, but continuing...');
-          }
+        console.log('Role update verified:', verifiedUser);
+        if (verifiedUser.role !== newRole) {
+          throw new Error(`فشل في حفظ التحديث. الرتبة الحالية: ${verifiedUser.role}`);
         }
       }
 
-      // تحديث فوري للواجهة (optimistic update)
+      // Update local state immediately
       setUsers(prevUsers =>
         prevUsers.map(u =>
           u.user_id === userId
@@ -250,10 +188,10 @@ export const useUserManagement = () => {
         )
       );
 
-      // إعادة تحميل البيانات مع ��أخير قصير لضمان الحفظ
+      // Reload data after a delay
       setTimeout(async () => {
         await loadUsers();
-      }, 1000);
+      }, 1500);
 
       toast({
         title: 'تم تحديث الرتبة',
@@ -261,7 +199,7 @@ export const useUserManagement = () => {
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error changing user role:', error);
       toast({
         title: 'خطأ',
