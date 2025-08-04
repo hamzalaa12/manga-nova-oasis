@@ -127,72 +127,80 @@ export const useUserManagement = () => {
       console.log('Target user ID:', userId);
       console.log('New role:', newRole);
 
-      // استخدام update مباشرة أولاً (أكثر موثوقية)
-      const { error: updateError, data: updateData } = await supabase
-        .from('profiles')
-        .update({
-          role: newRole,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
-        .select('*'); // للتأكد من أن التحديث تم
+      let updateSucceeded = false;
+      let lastError = null;
 
-      if (updateError) {
-        console.error('Direct update failed with error:', {
-          message: updateError.message,
-          details: updateError.details,
-          hint: updateError.hint,
-          code: updateError.code
-        });
+      // محاولة 1: استخدام update مباشرة
+      try {
+        const { error: updateError, data: updateData } = await supabase
+          .from('profiles')
+          .update({
+            role: newRole,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+          .select('role');
 
-        // إذا فشل بسبب RLS، جرب طريقة أخرى
-        if (updateError.code === '42501' || updateError.message.includes('policy')) {
-          console.log('RLS policy issue detected, trying service role update...');
+        if (updateError) {
+          console.error('Direct update failed:', updateError);
+          lastError = updateError;
+        } else {
+          console.log('Direct update succeeded:', updateData);
+          if (updateData && updateData.length > 0 && updateData[0].role === newRole) {
+            updateSucceeded = true;
+          }
+        }
+      } catch (error) {
+        console.error('Direct update threw exception:', error);
+        lastError = error;
+      }
 
-          // محاولة باستخدام service role (إذا متوفر)
-          const { error: serviceError } = await supabase
+      // محاولة 2: استخدام RPC إذا فشل التحديث المباشر
+      if (!updateSucceeded) {
+        console.log('Trying RPC as fallback...');
+        try {
+          const { error: rpcError } = await supabase.rpc('change_user_role', {
+            user_uuid: userId,
+            role_name: newRole
+          });
+
+          if (rpcError) {
+            console.error('RPC failed:', rpcError);
+            lastError = rpcError;
+          } else {
+            console.log('RPC succeeded');
+            updateSucceeded = true;
+          }
+        } catch (error) {
+          console.error('RPC threw exception:', error);
+          lastError = error;
+        }
+      }
+
+      // محاولة 3: تحديث مبسط بدون timestamp
+      if (!updateSucceeded) {
+        console.log('Trying simplified update...');
+        try {
+          const { error: simpleError } = await supabase
             .from('profiles')
             .update({ role: newRole })
             .eq('user_id', userId);
 
-          if (serviceError) {
-            console.error('Service role update also failed:', serviceError);
+          if (simpleError) {
+            console.error('Simple update failed:', simpleError);
+            lastError = simpleError;
           } else {
-            console.log('Service role update succeeded');
+            console.log('Simple update succeeded');
+            updateSucceeded = true;
           }
+        } catch (error) {
+          console.error('Simple update threw exception:', error);
+          lastError = error;
         }
+      }
 
-        // محاولة RPC كنسخ احتياطي
-        const { error: rpcError } = await supabase.rpc('change_user_role', {
-          user_uuid: userId,
-          role_name: newRole
-        });
-
-        if (rpcError) {
-          console.error('RPC also failed:', rpcError);
-          throw new Error(`فشل جميع طرق التحديث. تفاصيل الخطأ: ${updateError.message}`);
-        }
-
-        console.log('RPC succeeded after direct update failed');
-      } else {
-        console.log('Direct update succeeded:', updateData);
-
-        if (!updateData || updateData.length === 0) {
-          console.warn('Update succeeded but no data returned - checking if row exists');
-
-          const { data: existingUser, error: checkError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', userId)
-            .single();
-
-          if (checkError) {
-            console.error('User not found:', checkError);
-            throw new Error('المستخدم غير موجود في قاعدة البيانات');
-          }
-
-          console.log('User exists:', existingUser);
-        }
+      if (!updateSucceeded) {
+        throw new Error(`فشل في تحديث رتبة المستخدم: ${lastError?.message || 'خطأ غير معروف'}`);
       }
 
       // التحقق من أن التحديث حفظ بشكل صحيح (مع تأخير)
@@ -315,7 +323,7 @@ export const useUserManagement = () => {
 
       toast({
         title: 'تم رفع الحظر',
-        description: 'تم رفع الحظر عن ��لمستخدم بنجاح'
+        description: 'تم رفع الحظر عن المستخدم بنجاح'
       });
 
       return true;
