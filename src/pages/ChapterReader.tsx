@@ -216,6 +216,7 @@ const ChapterReader = () => {
   const fetchChapterBySlugAndNumber = async () => {
     if (!slug || !chapterParam) return;
 
+    setError(null);
     try {
       const chapterNumber = parseFloat(chapterParam);
       const identifier = parseMangaIdentifier(slug);
