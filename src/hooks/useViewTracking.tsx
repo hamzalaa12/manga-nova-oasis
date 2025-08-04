@@ -1,0 +1,107 @@
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
+
+export const useViewTracking = () => {
+  const { user } = useAuth();
+
+  const trackMangaView = async (mangaId: string) => {
+    try {
+      console.log('Tracking manga view for:', mangaId);
+      
+      // Use RPC function for reliable tracking
+      const { error } = await supabase.rpc('track_manga_view', {
+        manga_uuid: mangaId
+      });
+
+      if (error) {
+        console.error('Error tracking manga view:', error);
+        
+        // Fallback: direct update
+        try {
+          const { error: updateError } = await supabase
+            .from('manga')
+            .update({
+              views_count: supabase.sql`COALESCE(views_count, 0) + 1`
+            })
+            .eq('id', mangaId);
+
+          if (updateError) {
+            console.error('Fallback update failed:', updateError);
+          } else {
+            console.log('✅ Manga view tracked via fallback');
+          }
+        } catch (fallbackError) {
+          console.error('Fallback failed:', fallbackError);
+        }
+      } else {
+        console.log('✅ Manga view tracked successfully');
+      }
+    } catch (error) {
+      console.error('Error in trackMangaView:', error);
+    }
+  };
+
+  const trackChapterView = async (chapterId: string) => {
+    try {
+      console.log('Tracking chapter view for:', chapterId);
+      
+      // Use RPC function for reliable tracking
+      const { error } = await supabase.rpc('track_chapter_view', {
+        chapter_uuid: chapterId
+      });
+
+      if (error) {
+        console.error('Error tracking chapter view:', error);
+        
+        // Fallback: direct update
+        try {
+          const { error: updateError } = await supabase
+            .from('chapters')
+            .update({
+              views_count: supabase.sql`COALESCE(views_count, 0) + 1`
+            })
+            .eq('id', chapterId);
+
+          if (updateError) {
+            console.error('Fallback update failed:', updateError);
+          } else {
+            console.log('✅ Chapter view tracked via fallback');
+          }
+        } catch (fallbackError) {
+          console.error('Fallback failed:', fallbackError);
+        }
+      } else {
+        console.log('✅ Chapter view tracked successfully');
+      }
+    } catch (error) {
+      console.error('Error in trackChapterView:', error);
+    }
+  };
+
+  const getViewsCount = async (id: string, type: 'manga' | 'chapter') => {
+    try {
+      const table = type === 'manga' ? 'manga' : 'chapters';
+      const { data, error } = await supabase
+        .from(table)
+        .select('views_count')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error(`Error getting ${type} views:`, error);
+        return 0;
+      }
+
+      return data?.views_count || 0;
+    } catch (error) {
+      console.error(`Error in getViewsCount for ${type}:`, error);
+      return 0;
+    }
+  };
+
+  return {
+    trackMangaView,
+    trackChapterView,
+    getViewsCount
+  };
+};
