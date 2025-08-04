@@ -103,37 +103,66 @@ export const useUserManagement = () => {
   };
 
   const changeUserRole = async (userId: string, newRole: UserRole): Promise<boolean> => {
-    if (!isAdmin || !user) return false;
+    if (!isAdmin || !user) {
+      console.error('changeUserRole: User not admin or not logged in');
+      return false;
+    }
+
+    console.log(`Changing user ${userId} role to ${newRole}`);
 
     try {
-      // محاولة استخدام RPC أولاً
-      const { error: rpcError } = await supabase.rpc('change_user_role', {
-        user_uuid: userId,
-        role_name: newRole
-      });
+      // استخدام update مباشرة أولاً (أكثر موثوقية)
+      const { error: updateError, data: updateData } = await supabase
+        .from('profiles')
+        .update({
+          role: newRole,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId)
+        .select('*'); // للتأكد من أن التحديث تم
 
-      if (rpcError) {
-        // إذا فشل RPC، استخدم update مباشرة
-        console.warn('RPC failed, trying direct update:', rpcError);
+      if (updateError) {
+        console.error('Direct update failed:', updateError);
 
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            role: newRole,
-            updated_at: new Date().toISOString()
-          })
-          .eq('user_id', userId);
+        // محاولة RPC كنسخ احتياطي
+        const { error: rpcError } = await supabase.rpc('change_user_role', {
+          user_uuid: userId,
+          role_name: newRole
+        });
 
-        if (updateError) {
-          throw updateError;
+        if (rpcError) {
+          console.error('RPC also failed:', rpcError);
+          throw new Error(`فشل التحديث المباشر والـ RPC: ${updateError.message}`);
+        }
+
+        console.log('RPC succeeded after direct update failed');
+      } else {
+        console.log('Direct update succeeded:', updateData);
+      }
+
+      // التحقق من أن التحديث حفظ بشكل صحيح
+      const { data: verificationData, error: verificationError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (verificationError) {
+        console.error('Verification failed:', verificationError);
+      } else {
+        console.log(`Verification: User role is now ${verificationData.role}`);
+        if (verificationData.role !== newRole) {
+          throw new Error(`التحديث لم يحفظ بشكل صحيح. الرتبة الحالية: ${verificationData.role}, المطلوب: ${newRole}`);
         }
       }
 
+      // إعادة تحميل البيانات مع تأخير قصير لضمان الحفظ
+      await new Promise(resolve => setTimeout(resolve, 500));
       await loadUsers();
 
       toast({
         title: 'تم تحديث الرتبة',
-        description: 'تم تغيير رتبة المستخدم بنجاح'
+        description: `تم تغيير رتبة المستخدم إلى ${getRoleDisplayName(newRole)} بنجاح`
       });
 
       return true;
@@ -246,7 +275,7 @@ export const useUserManagement = () => {
       console.error('Error deleting user:', error);
       toast({
         title: 'خطأ',
-        description: 'فشل في حذف المستخدم',
+        description: 'فشل في حذف الم��تخدم',
         variant: 'destructive'
       });
       return false;
