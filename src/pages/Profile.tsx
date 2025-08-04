@@ -401,7 +401,7 @@ const FavoritesList = () => {
 // مك��ن رفع الصورة الشخصية
 const AvatarUploadButton = () => {
   const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
-  const { profile } = useAuth();
+  const { profile, refreshProfile } = useAuth();
   const { toast } = useToast();
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -616,7 +616,7 @@ const ReadingHistoryComponent = () => {
                     </Button>
                     <Button size="sm" asChild>
                       <Link to={`/read/${item.manga.slug || item.manga_id}/${item.chapter.chapter_number}`}>
-                        متابعة القراءة
+                        متابعة ا��قراءة
                       </Link>
                     </Button>
                   </div>
@@ -801,7 +801,7 @@ const AccountSettings = () => {
             </div>
 
             <Button type="submit" disabled={loading}>
-              {loading ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
+              {loading ? 'جا��ي التغيير...' : 'تغيير كلمة المرور'}
             </Button>
           </form>
         </CardContent>
@@ -923,7 +923,7 @@ const AdminPanelQuick = () => {
               {userRole === 'admin' && (
                 <>
                   <p>• إدارة المستخدمين والمحتوى</p>
-                  <p>• مراجعة الإبلاغات</p>
+                  <p>• مراجعة الإ��لاغات</p>
                   <p>• حظر المستخدمين المسيئين</p>
                   <p>• إدارة التعليقات</p>
                 </>
