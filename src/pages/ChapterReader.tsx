@@ -129,31 +129,37 @@ const ChapterReader = () => {
       const { data: sessionData } = await supabase.auth.getSession();
 
       if (sessionData.session?.user && manga && chapter) {
-        const userId = sessionData.session.user.id;
+        // استخدام hook قراءة التاريخ لحفظ التقدم
+        try {
+          await updateReadingProgress(manga.id, chapterId, 1, true);
+          console.log('✅ Reading progress saved via hook');
+        } catch (hookError) {
+          console.error('Hook failed, trying direct save:', hookError);
 
-        // حفظ تقدم القراءة مباشرة في قاعدة البيانات
-        const { error: progressError } = await supabase
-          .from('reading_progress')
-          .upsert({
-            user_id: userId,
-            manga_id: manga.id,
-            chapter_id: chapterId,
-            page_number: 1, // الصفحة الأولى
-            completed: true, // تم قراءة الفصل
-            last_read_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,manga_id,chapter_id'
-          });
+          // نسخ احتياطي مباشر
+          const { error: progressError } = await supabase
+            .from('reading_progress')
+            .upsert({
+              user_id: sessionData.session.user.id,
+              manga_id: manga.id,
+              chapter_id: chapterId,
+              page_number: 1,
+              completed: true,
+              last_read_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }, {
+              onConflict: 'user_id,manga_id,chapter_id'
+            });
 
-        if (progressError) {
-          console.error('Error saving reading progress:', progressError);
-        } else {
-          console.log('✅ Reading progress saved successfully');
+          if (progressError) {
+            console.error('Error saving reading progress:', progressError);
+          } else {
+            console.log('✅ Reading progress saved directly');
+          }
         }
       }
 
-      // محاولة استخدام edge function كنسخ احتياطي
+      // محاولة اس��خدام edge function كنسخ احتياطي
       try {
         const headers: HeadersInit = {
           "Content-Type": "application/json",
@@ -488,7 +494,7 @@ const ChapterReader = () => {
           <div className="flex items-center justify-center min-h-[70vh]">
             <div className="text-center">
               <p className="text-gray-400 text-xl mb-4">
-                لا توجد صفحات في هذا الفصل
+                لا توجد صفحات في هذا الف��ل
               </p>
               <p className="text-gray-500">يرجى المحاولة لاحقا��</p>
             </div>
@@ -585,7 +591,7 @@ const ChapterReader = () => {
                     size="sm"
                     className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium w-full"
                   >
-                    التالي
+                    التا��ي
                     <ArrowLeft className="h-4 w-4 mr-2" />
                   </Button>
                 </Link>
