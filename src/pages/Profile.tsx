@@ -114,7 +114,7 @@ const Profile = () => {
                 </TabsTrigger>
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  ال��لف الشخصي
+                  الملف الشخصي
                 </TabsTrigger>
                 <TabsTrigger value="favorites" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
@@ -233,12 +233,12 @@ const ProfileSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle>تعديل الملف الشخصي</CardTitle>
-          <CardDescription>قم بتعديل معلوم��تك الشخصية هنا</CardDescription>
+          <CardDescription>قم بتعديل معلوماتك الشخصية هنا</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="displayName">الاسم المعروض</Label>
+              <Label htmlFor="displayName">الاسم الم��روض</Label>
               <Input
                 id="displayName"
                 value={displayName}
@@ -258,8 +258,8 @@ const ProfileSettings = () => {
               />
             </div>
 
-            <Button type="submit" disabled={loading}>
-              {loading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+            <Button type="submit" disabled={isSubmitting || loading}>
+              {(isSubmitting || loading) ? 'جاري الحفظ...' : 'حفظ التغييرات'}
             </Button>
           </form>
         </CardContent>
@@ -724,7 +724,7 @@ const AccountSettings = () => {
     // هذا سيتطلب تأكيد إضافي من المستخدم
     toast({
       title: 'تحذير',
-      description: 'هذه الميزة غير متو��رة حالياً. يرجى التواصل مع الدعم لحذف حسابك.',
+      description: 'هذه الميزة غير متوفرة حالياً. يرجى التواصل مع الدعم لحذف حسابك.',
       variant: 'destructive'
     });
   };
@@ -762,7 +762,7 @@ const AccountSettings = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                يجب أن تكون كلمة ا��مرور 6 أحرف على الأقل
+                يجب أن تكون كلمة المرور 6 أحرف على الأقل
               </p>
             </div>
 
@@ -795,7 +795,7 @@ const AccountSettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <h4 className="font-medium">تسجيل ا��خروج من جميع الأجهزة</h4>
+                <h4 className="font-medium">تسجيل الخروج من جميع الأجهزة</h4>
                 <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
               </div>
               <Button variant="outline" onClick={signOut}>
@@ -887,7 +887,7 @@ const AdminPanelQuick = () => {
               <Badge className={getRoleColor(userRole)} variant="secondary">
                 {getRoleDisplayName(userRole)}
               </Badge>
-              <span className="text-sm font-medium">صلاحياتك الحالية</span>
+              <span className="text-sm font-medium">صلاح��اتك الحالية</span>
             </div>
             <div className="text-sm text-muted-foreground space-y-1">
               {userRole === 'site_admin' && (
@@ -915,7 +915,7 @@ const AdminPanelQuick = () => {
               )}
               {userRole === 'elite_fighter' && (
                 <>
-                  <p>• حذف التعليقات المسيئة</p>
+                  <p>• حذف التعليقات الم��يئة</p>
                   <p>• حظر المستخدمين المسيئين</p>
                   <p>• الإشراف على المحتوى</p>
                 </>
