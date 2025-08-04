@@ -12,7 +12,7 @@ export const useImageUpload = () => {
     if (!user) {
       toast({
         title: 'خطأ',
-        description: 'يجب تسجيل الدخول أولاً',
+        description: 'يجب تس��يل الدخول أولاً',
         variant: 'destructive'
       });
       return null;
@@ -45,6 +45,22 @@ export const useImageUpload = () => {
       const fileName = `${user.id}_${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
+      // تحقق من وجود bucket أو إنشاؤه
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'user-content');
+
+      if (!bucketExists) {
+        const { error: bucketError } = await supabase.storage.createBucket('user-content', {
+          public: true,
+          allowedMimeTypes: ['image/*'],
+          fileSizeLimit: 5242880 // 5MB
+        });
+
+        if (bucketError && !bucketError.message.includes('already exists')) {
+          console.error('Error creating bucket:', bucketError);
+        }
+      }
+
       // Upload file to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('user-content')
@@ -54,7 +70,24 @@ export const useImageUpload = () => {
         });
 
       if (uploadError) {
-        throw uploadError;
+        console.error('Upload error:', uploadError);
+        // إذا فشل الرفع، جرب bucket بديل
+        if (uploadError.message.includes('not found')) {
+          // استخدم bucket افتراضي أو حاول إنشاء واحد آخر
+          const fallbackPath = `public/${fileName}`;
+          const { data: fallbackData, error: fallbackError } = await supabase.storage
+            .from('user-content')
+            .upload(fallbackPath, file, {
+              cacheControl: '3600',
+              upsert: true
+            });
+
+          if (fallbackError) {
+            throw fallbackError;
+          }
+        } else {
+          throw uploadError;
+        }
       }
 
       // Get public URL
