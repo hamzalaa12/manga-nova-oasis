@@ -491,8 +491,10 @@ const ChapterReader = () => {
 
       {/* التعليقات */}
       {chapter && (
-        <div className="bg-gradient-to-t from-gray-900 to-black py-8">
-          <SimpleComments chapterId={chapter.id} mangaId={manga.id} />
+        <div className="bg-background py-8">
+          <div className="container mx-auto px-4">
+            <AdvancedComments chapterId={chapter.id} mangaId={manga.id} />
+          </div>
         </div>
       )}
 
