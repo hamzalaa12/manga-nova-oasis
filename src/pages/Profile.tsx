@@ -178,7 +178,7 @@ const Profile = () => {
   );
 };
 
-// مكون إعدادات الملف الشخصي
+// مكون إعدادات ال��لف الشخصي
 const ProfileSettings = () => {
   const { profile, user } = useAuth();
   const { updateProfile, loading } = useProfile();
@@ -216,7 +216,7 @@ const ProfileSettings = () => {
                 id="displayName"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="أدخل اسمك المعروض"
+                placeholder="��دخل اسمك المعروض"
               />
             </div>
 
@@ -412,7 +412,7 @@ const ReadingHistoryComponent = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              إحصائيات القراء��
+              إحصائيات القراءة
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -711,7 +711,7 @@ const AccountSettings = () => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="أعد إدخال كلم�� المرور الجديدة"
+                placeholder="أعد إدخال كلمة المرور الجديدة"
                 required
               />
             </div>
@@ -744,7 +744,7 @@ const AccountSettings = () => {
         </CardContent>
       </Card>
 
-      {/* المنطقة الخطرة */}
+      {/* المنطق�� الخطرة */}
       <Card className="border-destructive">
         <CardHeader>
           <CardTitle className="text-destructive">المنطقة الخطرة</CardTitle>
@@ -763,6 +763,116 @@ const AccountSettings = () => {
                 حذف الحساب
               </Button>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// مكون لوحة الإدارة السريعة
+const AdminPanelQuick = () => {
+  const { userRole } = useAuth();
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            لوحة الإدارة السريعة
+          </CardTitle>
+          <CardDescription>
+            الوصول السريع لوظائف الإدارة والمراقبة
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* الوصول لصفحة الإدارة الكاملة */}
+            <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardContent className="p-4 text-center">
+                <Link to="/admin" className="block">
+                  <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-medium mb-1">إدارة المستخدمين</h3>
+                  <p className="text-xs text-muted-foreground">إدارة الحسابات والصلاحيات</p>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardContent className="p-4 text-center">
+                <Link to="/admin" className="block">
+                  <Flag className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-medium mb-1">الإبلاغات</h3>
+                  <p className="text-xs text-muted-foreground">مراجعة البلاغات المرسلة</p>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardContent className="p-4 text-center">
+                <Link to="/admin" className="block">
+                  <Settings className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-medium mb-1">إعدادات الموقع</h3>
+                  <p className="text-xs text-muted-foreground">إدارة إعدادات المحتوى</p>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-6 p-4 bg-muted rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Badge className={getRoleColor(userRole)} variant="secondary">
+                {getRoleDisplayName(userRole)}
+              </Badge>
+              <span className="text-sm font-medium">صلاحياتك الحالية</span>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1">
+              {userRole === 'site_admin' && (
+                <>
+                  <p>• إدارة شاملة للموقع والمستخدمين</p>
+                  <p>• تغيير رتب المستخدمين</p>
+                  <p>• حذف وحظر الحسابات</p>
+                  <p>• إدارة المحتوى والإبلاغات</p>
+                </>
+              )}
+              {userRole === 'admin' && (
+                <>
+                  <p>• إدارة المستخدمين والمحتوى</p>
+                  <p>• مراجعة الإبلاغات</p>
+                  <p>• حظر المستخدمين المسيئين</p>
+                  <p>• إدارة التعليقات</p>
+                </>
+              )}
+              {userRole === 'tribe_leader' && (
+                <>
+                  <p>• تثبيت التعليقات</p>
+                  <p>• حذف التعليقات المسيئة</p>
+                  <p>• حظر المستخدمين المسيئين</p>
+                </>
+              )}
+              {userRole === 'elite_fighter' && (
+                <>
+                  <p>• حذف التعليقات المسيئة</p>
+                  <p>• حظر المستخدمين المسيئين</p>
+                  <p>• الإشراف على المحتوى</p>
+                </>
+              )}
+              {userRole === 'beginner_fighter' && (
+                <>
+                  <p>• الإشراف الأساسي على التعليقات</p>
+                  <p>• الإبلاغ عن المحتوى المسيء</p>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 text-center">
+            <Button asChild>
+              <Link to="/admin">
+                الانتقال للوحة الإدارة الكاملة
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
