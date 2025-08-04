@@ -11,12 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Heart, History, Bell, Camera } from 'lucide-react';
+import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star } from 'lucide-react';
 import { getRoleDisplayName, getRoleColor } from '@/types/user';
 import SEO from '@/components/SEO';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useProfile } from '@/hooks/useProfile';
+import { useReadingHistory } from '@/hooks/useReadingHistory';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import { Link } from 'react-router-dom';
 
 const Profile = () => {
@@ -61,15 +63,7 @@ const Profile = () => {
                       {(profile?.display_name || user.email)?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <Button
-                    size="sm"
-                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full p-0"
-                    onClick={() => {
-                      // تغيير الصورة الشخصية
-                    }}
-                  >
-                    <Camera className="h-4 w-4" />
-                  </Button>
+                  <AvatarUploadButton />
                 </div>
                 
                 <CardTitle className="flex items-center justify-center gap-2">
@@ -143,7 +137,7 @@ const Profile = () => {
               </TabsContent>
 
               <TabsContent value="history" className="mt-6">
-                <ReadingHistory />
+                <ReadingHistoryComponent />
               </TabsContent>
 
               <TabsContent value="notifications" className="mt-6">
@@ -295,22 +289,200 @@ const FavoritesList = () => {
   );
 };
 
-// مكون سجل القراءة
-const ReadingHistory = () => {
+// مكون رفع الصورة الشخصية
+const AvatarUploadButton = () => {
+  const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
+  const { profile } = useAuth();
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await uploadAvatar(file);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>سجل القراءة</CardTitle>
-        <CardDescription>الفصول التي قرأتها مؤخراً</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="text-center py-8 text-muted-foreground">
-          <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>لا يوجد سجل قراءة بعد</p>
-          <p className="text-sm">ابدأ بقراءة بعض الفصول!</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="absolute bottom-0 right-0">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+        id="avatar-upload"
+        disabled={uploading}
+      />
+      <div className="flex gap-1">
+        <Button
+          size="sm"
+          className="w-8 h-8 rounded-full p-0"
+          onClick={() => document.getElementById('avatar-upload')?.click()}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+          ) : (
+            <Camera className="h-4 w-4" />
+          )}
+        </Button>
+        {profile?.avatar_url && (
+          <Button
+            size="sm"
+            variant="destructive"
+            className="w-8 h-8 rounded-full p-0"
+            onClick={removeAvatar}
+            disabled={uploading}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// مكون سجل القراءة المحسن
+const ReadingHistoryComponent = () => {
+  const { readingHistory, stats, loading, clearReadingHistory } = useReadingHistory();
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        {/* إحصائيات القراءة */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              إحصائيات القراءة
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* إحصائيات القراءة */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            إحصائيات القراءة
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
+              <p className="text-2xl font-bold">{stats.totalMangaRead}</p>
+              <p className="text-sm text-muted-foreground">مانجا مقروءة</p>
+            </div>
+            <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <History className="h-8 w-8 mx-auto mb-2 text-primary" />
+              <p className="text-2xl font-bold">{stats.totalChaptersRead}</p>
+              <p className="text-sm text-muted-foreground">فصل مكتمل</p>
+            </div>
+            <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <Star className="h-8 w-8 mx-auto mb-2 text-primary" />
+              <p className="text-2xl font-bold">{stats.favoriteGenres.length}</p>
+              <p className="text-sm text-muted-foreground">أنواع مفضلة</p>
+            </div>
+          </div>
+
+          {stats.favoriteGenres.length > 0 && (
+            <div className="mt-4 pt-4 border-t">
+              <h4 className="font-medium mb-2">الأنواع المفضلة:</h4>
+              <div className="flex flex-wrap gap-2">
+                {stats.favoriteGenres.map((genre) => (
+                  <Badge key={genre} variant="secondary">
+                    {genre}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* سجل القراءة الحديث */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              سجل القراءة الحديث
+            </CardTitle>
+            <CardDescription>آخر الفصول التي قرأتها</CardDescription>
+          </div>
+          {readingHistory.length > 0 && (
+            <Button variant="outline" size="sm" onClick={clearReadingHistory}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              مسح السجل
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent>
+          {readingHistory.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>لا يوجد سجل قراءة بعد</p>
+              <p className="text-sm">ابدأ بقراءة بعض الفصول!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {readingHistory.slice(0, 10).map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <img
+                    src={item.manga.cover_image_url || '/placeholder.svg'}
+                    alt={item.manga.title}
+                    className="w-12 h-16 object-cover rounded"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium line-clamp-1">{item.manga.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      الفصل {item.chapter.chapter_number}
+                      {item.chapter.title && ` - ${item.chapter.title}`}
+                    </p>
+                    <div className="flex items-center gap-4 mt-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(item.last_read_at).toLocaleDateString('ar')}
+                      </span>
+                      {item.completed && (
+                        <Badge variant="secondary" className="text-xs">
+                          مكتمل
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <Button size="sm" variant="outline" asChild>
+                      <Link to={`/manga/${item.manga.slug || item.manga_id}`}>
+                        عرض المانجا
+                      </Link>
+                    </Button>
+                    <Button size="sm" asChild>
+                      <Link to={`/read/${item.manga.slug || item.manga_id}/${item.chapter.chapter_number}`}>
+                        متابعة القراءة
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
@@ -450,7 +622,7 @@ const AccountSettings = () => {
           </div>
 
           <Button type="submit" variant="destructive" disabled={loading}>
-            {loading ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
+            {loading ? 'جاري التغيير...' : 'تغيير ��لمة المرور'}
           </Button>
         </form>
       </CardContent>
