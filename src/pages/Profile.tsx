@@ -407,6 +407,8 @@ const AvatarUploadButton = () => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      console.log('File selected for upload:', file.name, file.type, file.size);
+
       // تحقق من الملف قبل الرفع
       if (!file.type.startsWith('image/')) {
         toast({
@@ -427,10 +429,22 @@ const AvatarUploadButton = () => {
       }
 
       try {
+        console.log('Starting avatar upload...');
         const result = await uploadAvatar(file);
+
         if (result) {
+          console.log('Avatar upload successful, result:', result);
+
+          // Force immediate refresh of profile data
+          setTimeout(async () => {
+            await refreshProfile();
+            console.log('Profile refreshed after avatar upload');
+          }, 1000);
+
           // إعادة تعيين قيمة input لضمان تحديث الصورة عند اختيار نفس الملف
           event.target.value = '';
+        } else {
+          console.error('Avatar upload returned null result');
         }
       } catch (error) {
         console.error('خطأ في رفع الصورة:', error);
@@ -616,7 +630,7 @@ const ReadingHistoryComponent = () => {
                     </Button>
                     <Button size="sm" asChild>
                       <Link to={`/read/${item.manga.slug || item.manga_id}/${item.chapter.chapter_number}`}>
-                        متابعة ا��قراءة
+                        متابعة القراءة
                       </Link>
                     </Button>
                   </div>
@@ -801,7 +815,7 @@ const AccountSettings = () => {
             </div>
 
             <Button type="submit" disabled={loading}>
-              {loading ? 'جا��ي التغيير...' : 'تغيير كلمة المرور'}
+              {loading ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
             </Button>
           </form>
         </CardContent>
@@ -828,7 +842,7 @@ const AccountSettings = () => {
         </CardContent>
       </Card>
 
-      {/* المنطق�� الخطرة */}
+      {/* المنط���� الخطرة */}
       <Card className="border-destructive">
         <CardHeader>
           <CardTitle className="text-destructive">المنطق�� الخطرة</CardTitle>
@@ -914,7 +928,7 @@ const AdminPanelQuick = () => {
             <div className="text-sm text-muted-foreground space-y-1">
               {userRole === 'site_admin' && (
                 <>
-                  <p>• إدارة شاملة للموقع والمستخدمين</p>
+                  <p>��� إدارة شاملة للموقع والمستخدمين</p>
                   <p>• تغيير رتب المستخدمين</p>
                   <p>• حذف وحظر الحسابات</p>
                   <p>• إدارة المحتوى والإبلاغات</p>
@@ -923,7 +937,7 @@ const AdminPanelQuick = () => {
               {userRole === 'admin' && (
                 <>
                   <p>• إدارة المستخدمين والمحتوى</p>
-                  <p>• مراجعة الإ��لاغات</p>
+                  <p>• مراجعة الإبلاغات</p>
                   <p>• حظر المستخدمين المسيئين</p>
                   <p>• إدارة التعليقات</p>
                 </>
