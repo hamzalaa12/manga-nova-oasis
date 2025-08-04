@@ -133,6 +133,10 @@ const Profile = () => {
                 </TabsTrigger>
               </TabsList>
 
+              <TabsContent value="dashboard" className="mt-6">
+                <ProfileDashboard />
+              </TabsContent>
+
               <TabsContent value="profile" className="mt-6">
                 <ProfileSettings />
               </TabsContent>
@@ -384,7 +388,7 @@ const AvatarUploadButton = () => {
   );
 };
 
-// مكون سجل القراءة المحسن
+// مكون س��ل القراءة المحسن
 const ReadingHistoryComponent = () => {
   const { readingHistory, stats, loading, clearReadingHistory } = useReadingHistory();
 
@@ -462,7 +466,7 @@ const ReadingHistoryComponent = () => {
               <History className="h-5 w-5" />
               سجل القراءة الحديث
             </CardTitle>
-            <CardDescription>آخر الف��ول التي قرأتها</CardDescription>
+            <CardDescription>آخر الفصول التي قرأتها</CardDescription>
           </div>
           {readingHistory.length > 0 && (
             <Button variant="outline" size="sm" onClick={clearReadingHistory}>
@@ -684,7 +688,7 @@ const AccountSettings = () => {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                يجب أن تكون كلمة المرور 6 أحرف على الأقل
+                يجب أن تكون كلمة المرو�� 6 أحرف على الأقل
               </p>
             </div>
 
@@ -731,7 +735,7 @@ const AccountSettings = () => {
       {/* المنطقة الخطرة */}
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle className="text-destructive">المنطقة ��لخطرة</CardTitle>
+          <CardTitle className="text-destructive">المنطقة الخطرة</CardTitle>
           <CardDescription>عمليات لا يمكن التراجع عنها</CardDescription>
         </CardHeader>
         <CardContent>
