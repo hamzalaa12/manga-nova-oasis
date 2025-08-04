@@ -243,7 +243,7 @@ const ChapterReader = () => {
           navigate(-1);
           break;
         case "ArrowLeft":
-          // التالي (للغة العربية)
+          // ا��تالي (للغة العربية)
           const next = getNextChapter();
           if (next && manga) {
             navigate(getChapterUrl(getMangaSlug(manga), next.chapter_number));
@@ -392,6 +392,17 @@ const ChapterReader = () => {
               >
                 <Menu className="h-4 w-4" />
               </Button>
+
+              {/* زر الإبلاغ */}
+              <ReportDialog
+                type="chapter"
+                targetId={chapter.id}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
+              >
+                <Flag className="h-4 w-4" />
+              </ReportDialog>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
