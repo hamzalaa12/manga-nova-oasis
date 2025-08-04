@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { useReports } from '@/hooks/useReports';
+import { useRoleUpdate } from '@/hooks/useRoleUpdate';
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
 
@@ -231,7 +232,7 @@ const AdminDashboard = () => {
                 ) : filteredReports.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توج�� إبلاغات جديدة</p>
+                    <p>لا توجد إبلاغات جديدة</p>
                   </div>
                 ) : (
                   filteredReports.map((report) => (
@@ -346,7 +347,7 @@ const UserCard = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="user">مستخد�� عادي</SelectItem>
+              <SelectItem value="user">مستخدم عادي</SelectItem>
               <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
               <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
               <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
