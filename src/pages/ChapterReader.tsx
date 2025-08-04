@@ -238,7 +238,7 @@ const ChapterReader = () => {
       setAllChapters(chaptersData || []);
 
       // Track chapter view
-      await trackChapterView(chapterData.id);
+      await trackChapterViewOld(chapterData.id);
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", {
         message: error?.message || 'Unknown error',
