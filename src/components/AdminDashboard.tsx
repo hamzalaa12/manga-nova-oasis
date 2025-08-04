@@ -33,15 +33,17 @@ import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
 
 const AdminDashboard = () => {
-  const { 
-    users, 
-    loading: usersLoading, 
-    changeUserRole, 
-    banUser, 
-    unbanUser, 
+  const {
+    users,
+    loading: usersLoading,
+    banUser,
+    unbanUser,
     deleteUser,
-    getUserStats 
+    getUserStats,
+    refreshUsers
   } = useUserManagement();
+
+  const { updateUserRole } = useRoleUpdate();
   
   const { 
     reports, 
