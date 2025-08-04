@@ -1,11 +1,12 @@
-// أنواع البيانات لنظام المستخدمين
+// أنواع البيانات لنظ��م المستخدمين
 
 export type UserRole =
   | "user"
   | "beginner_fighter"
   | "elite_fighter"
-  | "leader"
-  | "admin";
+  | "tribe_leader"
+  | "admin"
+  | "site_admin";
 
 
 
