@@ -12,6 +12,8 @@ import {
   Lock,
   DollarSign,
   MoreHorizontal,
+  Flag,
+  Heart,
 } from "lucide-react";
 import { parseMangaIdentifier, getChapterUrl, getMangaSlug } from "@/lib/slug";
 import { ensureMangaHasSlugs } from "@/utils/ensureSlugs";
@@ -485,7 +487,7 @@ const MangaDetails = () => {
         "@id": currentUrl,
         name: manga.title,
         description:
-          manga.description || `اقرأ مانجا ${manga.title} مترجمة بجودة عالية`,
+          manga.description || `اقرأ م��نجا ${manga.title} مترجمة بجودة عالية`,
         image: manga.cover_image_url,
         author: {
           "@type": "Person",
@@ -817,7 +819,7 @@ const MangaDetails = () => {
                                         </AlertDialogTitle>
                                         <AlertDialogDescription>
                                           هل أنت متأكد من حذف الفصل{" "}
-                                          {chapter.chapter_number}؟ هذا الإجراء
+                                          {chapter.chapter_number}؟ ه��ا الإجراء
                                           لا يمكن التراجع عنه.
                                         </AlertDialogDescription>
                                       </AlertDialogHeader>
