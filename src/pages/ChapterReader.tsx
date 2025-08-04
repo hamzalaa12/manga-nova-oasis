@@ -70,6 +70,7 @@ const ChapterReader = () => {
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNavigation, setShowNavigation] = useState(false);
+  const { updateReadingProgress } = useReadingHistory();
 
   useEffect(() => {
     if (slug && chapterParam) {
