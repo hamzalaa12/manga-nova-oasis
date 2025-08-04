@@ -34,6 +34,7 @@ import AdvancedComments from "@/components/AdvancedComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
+import { useReadingHistory } from "@/hooks/useReadingHistory";
 
 interface Chapter {
   id: string;
@@ -393,7 +394,7 @@ const ChapterReader = () => {
                   to="/"
                   className="hover:text-white transition-colors"
                 >
-                  الرئيسية
+                  ال��ئيسية
                 </Link>
                 <span>/</span>
                 <Link
