@@ -31,6 +31,7 @@ import {
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
 import SimpleComments from "@/components/SimpleComments";
+import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
