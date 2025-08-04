@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي المستخدمين</CardTitle>
+            <CardTitle className="text-sm font-medium">إج��الي المستخدمين</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -461,7 +461,7 @@ const UserCard = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
-                    هل أنت متأكد من ر��بتك في حذف هذا المستخدم نهائياً؟ 
+                    هل أنت متأكد من رغبتك في حذف هذا المستخدم نهائياً؟ 
                     سيتم حذف جميع بياناته وتعليقاته ولا يمكن التراجع عن هذا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
