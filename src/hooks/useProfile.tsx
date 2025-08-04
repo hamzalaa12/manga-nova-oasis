@@ -4,7 +4,7 @@ import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 
 export const useProfile = () => {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -13,7 +13,7 @@ export const useProfile = () => {
     bio?: string;
     avatar_url?: string;
   }) => {
-    if (!user) return;
+    if (!user) return false;
 
     setLoading(true);
     try {
@@ -27,10 +27,15 @@ export const useProfile = () => {
 
       if (error) throw error;
 
+      // إعادة تحميل بيانات الملف الشخصي
+      await refreshProfile();
+
       toast({
         title: 'تم تحديث الملف الشخصي',
         description: 'تم حفظ التغييرات بنجاح'
       });
+
+      return true;
     } catch (error) {
       console.error('خطأ في تحديث الملف الشخصي:', error);
       toast({
@@ -38,6 +43,7 @@ export const useProfile = () => {
         description: 'فشل في تحديث الملف الشخصي',
         variant: 'destructive'
       });
+      return false;
     } finally {
       setLoading(false);
     }
