@@ -23,7 +23,7 @@ import { Link } from 'react-router-dom';
 import ProfileDashboard from '@/components/ProfileDashboard';
 
 const Profile = () => {
-  const { user, profile, userRole, loading } = useAuth();
+  const { user, profile, userRole, loading, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   if (loading) {
@@ -236,7 +236,7 @@ const ProfileSettings = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>البريد الإل��تروني</Label>
+                <Label>البريد الإلكتروني</Label>
                 <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
               </div>
               <div>
@@ -337,7 +337,7 @@ const FavoritesList = () => {
   );
 };
 
-// مكون رفع الصورة الشخصية
+// مكون رفع الصورة الشخ��ية
 const AvatarUploadButton = () => {
   const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
   const { profile } = useAuth();
@@ -721,7 +721,7 @@ const AccountSettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
-                <h4 className="font-medium">تسجيل ��لخروج من جميع الأجهزة</h4>
+                <h4 className="font-medium">تسجيل الخروج من جميع الأجهزة</h4>
                 <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
               </div>
               <Button variant="outline" onClick={signOut}>
@@ -748,7 +748,7 @@ const AccountSettings = () => {
                 </p>
               </div>
               <Button variant="destructive" onClick={handleDeleteAccount}>
-                حذ�� الحساب
+                حذف الحساب
               </Button>
             </div>
           </div>
