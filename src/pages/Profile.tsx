@@ -120,7 +120,7 @@ const Profile = () => {
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="flex items-center gap-2">
                   <Bell className="h-4 w-4" />
-                  الإش��ارات
+                  الإشعارات
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
@@ -211,7 +211,7 @@ const ProfileSettings = () => {
             </div>
 
             <Button type="submit" disabled={loading}>
-              {loading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+              {loading ? 'جاري الحفظ...' : 'حفظ ال��غييرات'}
             </Button>
           </form>
         </CardContent>
@@ -506,7 +506,7 @@ const ReadingHistoryComponent = () => {
                   <div className="flex flex-col items-end gap-2">
                     <Button size="sm" variant="outline" asChild>
                       <Link to={`/manga/${item.manga.slug || item.manga_id}`}>
-                        عرض الم��نجا
+                        عرض المانجا
                       </Link>
                     </Button>
                     <Button size="sm" asChild>
@@ -602,70 +602,150 @@ const NotificationsList = () => {
 // مكون إعدادات الحساب
 const AccountSettings = () => {
   const { changePassword, loading } = useProfile();
+  const { signOut } = useAuth();
+  const { toast } = useToast();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (newPassword !== confirmPassword) {
-      // Handle password mismatch
+      toast({
+        title: 'خطأ',
+        description: 'كلمات المرور غير متطابقة',
+        variant: 'destructive'
+      });
       return;
     }
-    
-    await changePassword(currentPassword, newPassword);
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+
+    if (newPassword.length < 6) {
+      toast({
+        title: 'خطأ',
+        description: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const success = await changePassword(currentPassword, newPassword);
+    if (success) {
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    // هذا سيتطلب تأكيد إضافي من المستخدم
+    toast({
+      title: 'تحذير',
+      description: 'هذه الميزة غير متوفرة حالياً. يرجى التواصل مع الدعم لحذف حسابك.',
+      variant: 'destructive'
+    });
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>إعدادات الحساب</CardTitle>
-        <CardDescription>إدارة حسابك وكلمة المرور</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="currentPassword">كلمة المرور الحالية</Label>
-            <Input 
-              id="currentPassword" 
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
-            />
-          </div>
+    <div className="space-y-6">
+      {/* تغيير كلمة المرور */}
+      <Card>
+        <CardHeader>
+          <CardTitle>تغيير كلمة المرور</CardTitle>
+          <CardDescription>قم بتحديث كلمة مرورك لحماية حسابك</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">كلمة المرور الحالية</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="أدخل كلمة المرور الحالية"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="newPassword">كلمة المرور الجديدة</Label>
-            <Input 
-              id="newPassword" 
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">كلمة المرور الجديدة</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="أدخل كلمة المرور الجديدة"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                يجب أن تكون كلمة المرور 6 أحرف على الأقل
+              </p>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
-            <Input 
-              id="confirmPassword" 
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">تأكيد كلمة المرور الجديدة</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="أعد إدخال كلمة المرور الجديدة"
+                required
+              />
+            </div>
 
-          <Button type="submit" variant="destructive" disabled={loading}>
-            {loading ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* إعدادات أمان إضافية */}
+      <Card>
+        <CardHeader>
+          <CardTitle>الأمان والخصوصية</CardTitle>
+          <CardDescription>إدارة إعدادات الأمان الخاصة بك</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <h4 className="font-medium">تسجيل الخروج من جميع الأجهزة</h4>
+                <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
+              </div>
+              <Button variant="outline" onClick={signOut}>
+                تسجيل الخروج
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* المنطقة الخطرة */}
+      <Card className="border-destructive">
+        <CardHeader>
+          <CardTitle className="text-destructive">المنطقة الخطرة</CardTitle>
+          <CardDescription>عمليات لا يمكن التراجع عنها</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border border-destructive rounded-lg">
+              <div>
+                <h4 className="font-medium text-destructive">حذف الحساب</h4>
+                <p className="text-sm text-muted-foreground">
+                  حذف حسابك نهائياً وجميع البيانات المرتبطة به
+                </p>
+              </div>
+              <Button variant="destructive" onClick={handleDeleteAccount}>
+                حذف الحساب
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
