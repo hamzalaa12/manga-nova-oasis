@@ -45,8 +45,12 @@ export const useUserManagement = () => {
   }, [user, isAdmin]);
 
   const loadUsers = async () => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      console.log('loadUsers: User is not admin, skipping');
+      return;
+    }
 
+    console.log('Loading users...');
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -63,7 +67,12 @@ export const useUserManagement = () => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading users from database:', error);
+        throw error;
+      }
+
+      console.log(`Loaded ${data?.length || 0} users from database`);
 
       const usersWithBanInfo = data?.map(profile => ({
         ...profile,
@@ -72,6 +81,7 @@ export const useUserManagement = () => {
         ban_expires_at: profile.user_bans?.find((ban: any) => ban.is_active)?.expires_at
       })) || [];
 
+      console.log('Processed users with ban info:', usersWithBanInfo.length);
       setUsers(usersWithBanInfo);
     } catch (error) {
       console.error('Error loading users:', error);
@@ -312,7 +322,7 @@ export const useUserManagement = () => {
 
       toast({
         title: 'تم حذف المستخدم',
-        description: 'تم حذف حساب المستخدم وجميع ��ياناته'
+        description: 'تم حذف حساب المستخدم وجميع بياناته'
       });
 
       return true;
