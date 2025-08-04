@@ -119,7 +119,7 @@ const ChapterReader = () => {
       setAllChapters(chaptersData || []);
 
       // Track view using the new system
-      await trackChapterView(id);
+      await trackChapterViewOld(id);
     } catch (error: any) {
       console.error("Error fetching chapter details:", {
         message: error?.message || 'Unknown error',
@@ -249,7 +249,7 @@ const ChapterReader = () => {
       });
 
       // إظهار رسالة خطأ للمستخدم
-      setError('فشل في تح��يل الفصل. تحقق من رابط الصفحة.');
+      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
       setChapter(null);
       setManga(null);
     } finally {
