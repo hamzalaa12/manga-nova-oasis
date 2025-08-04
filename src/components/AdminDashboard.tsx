@@ -29,6 +29,7 @@ import {
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { useReports } from '@/hooks/useReports';
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
+import ContentModeration from './ContentModeration';
 
 const AdminDashboard = () => {
   const { 
@@ -244,7 +245,7 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle>إدارة المحتوى</CardTitle>
               <CardDescription>
-                إعدادات المحتوى والمراجعة
+                إعدادات المحتوى ��المراجعة
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -272,7 +273,7 @@ const AdminDashboard = () => {
                 <div className="space-y-2">
                   <Label>قائمة الكلمات المحظورة</Label>
                   <Textarea 
-                    placeholder="أدخل الكلمات المحظورة، كل كلمة في سطر منفصل..."
+                    placeholder="أدخل الكلمات المحظورة، ��ل كلمة في سطر منفصل..."
                     className="min-h-[100px]"
                   />
                   <Button size="sm">حفظ القائمة</Button>
@@ -511,7 +512,7 @@ const ReportCard = ({
               </Badge>
             </div>
             <p className="text-sm font-medium">
-              تم الإبلاغ بواسطة: {report.reporter.display_name || report.reporter.email}
+              تم الإبلاغ ��واسطة: {report.reporter.display_name || report.reporter.email}
             </p>
             <p className="text-xs text-muted-foreground">
               {new Date(report.created_at).toLocaleString('ar')}
@@ -551,7 +552,7 @@ const ReportCard = ({
 
         {report.manga && (
           <div className="text-sm">
-            <strong>المانجا المبلغ عنها:</strong> {report.manga.title}
+            <strong>المانجا ال��بلغ عنها:</strong> {report.manga.title}
           </div>
         )}
 
