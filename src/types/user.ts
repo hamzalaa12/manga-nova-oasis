@@ -1,4 +1,4 @@
-// أنواع البيانات لنظ��م المستخدمين
+// أنواع البيانات لنظام المستخدمين
 
 export type UserRole =
   | "user"
@@ -62,10 +62,12 @@ export const getRoleDisplayName = (role: UserRole): string => {
     case "beginner_fighter":
       return "مقاتل مبتدئ";
     case "elite_fighter":
-      return "مقاتل نخبوي";
-    case "leader":
-      return "زعيم الطائفة";
+      return "مقاتل نخبة";
+    case "tribe_leader":
+      return "قائد قبيلة";
     case "admin":
+      return "مدير";
+    case "site_admin":
       return "مدير الموقع";
     default:
       return "مستخدم عادي";
