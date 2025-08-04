@@ -62,7 +62,12 @@ const AdminDashboard = () => {
   const [banDuration, setBanDuration] = useState('7'); // days
   const [localUsers, setLocalUsers] = useState(users);
 
-  const filteredUsers = users.filter(user => {
+  // تحديث المستخدمين المحليين عند تغيير البيانات الأصلية
+  useEffect(() => {
+    setLocalUsers(users);
+  }, [users]);
+
+  const filteredUsers = localUsers.filter(user => {
     const matchesSearch = user.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = selectedRole === 'all' || user.role === selectedRole;
@@ -456,7 +461,7 @@ const UserCard = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
-                    هل أنت متأكد من رغبتك في حذف هذا المستخدم نهائياً؟ 
+                    هل أنت متأكد من ر��بتك في حذف هذا المستخدم نهائياً؟ 
                     سيتم حذف جميع بياناته وتعليقاته ولا يمكن التراجع عن هذا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
