@@ -20,6 +20,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useReadingHistory } from '@/hooks/useReadingHistory';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { Link } from 'react-router-dom';
+import ProfileDashboard from '@/components/ProfileDashboard';
 
 const Profile = () => {
   const { user, profile, userRole, loading } = useAuth();
@@ -211,7 +212,7 @@ const ProfileSettings = () => {
             </div>
 
             <Button type="submit" disabled={loading}>
-              {loading ? 'جاري الحفظ...' : 'حفظ ال��غييرات'}
+              {loading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
             </Button>
           </form>
         </CardContent>
@@ -265,7 +266,7 @@ const FavoritesList = () => {
       <Card>
         <CardHeader>
           <CardTitle>المانجا المفضلة</CardTitle>
-          <CardDescription>المانجا التي أضفتها إلى قائمة المفضلة</CardDescription>
+          <CardDescription>المانجا التي أضف��ها إلى قائمة المفضلة</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
@@ -713,7 +714,7 @@ const AccountSettings = () => {
             <div className="flex items-center justify-between p-4 border rounded-lg">
               <div>
                 <h4 className="font-medium">تسجيل الخروج من جميع الأجهزة</h4>
-                <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع المتصفحات والأجهزة</p>
+                <p className="text-sm text-muted-foreground">قم بتسجيل الخروج من جميع ��لمتصفحات والأجهزة</p>
               </div>
               <Button variant="outline" onClick={signOut}>
                 تسجيل الخروج
