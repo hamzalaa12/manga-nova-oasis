@@ -79,10 +79,11 @@ const AdminDashboard = () => {
       const success = await updateUserRole(userId, newRole);
       if (success) {
         console.log('Role change succeeded, refreshing user data');
-        // إعادة تحميل بيانات المستخدمين بعد تأخير قصير
+        // إعادة تحميل بيانات المستخدمين فوراً وبعد تأخير
+        refreshUsers();
         setTimeout(() => {
           refreshUsers();
-        }, 1000);
+        }, 2000);
       } else {
         console.error('Role change failed');
       }
@@ -257,7 +258,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* إدارة المحتوى */}
+        {/* إدارة المح��وى */}
         <TabsContent value="content" className="space-y-4">
           <ContentModeration />
         </TabsContent>
