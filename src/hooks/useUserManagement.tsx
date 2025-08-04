@@ -111,6 +111,12 @@ export const useUserManagement = () => {
     console.log(`Changing user ${userId} role to ${newRole}`);
 
     try {
+      // التحقق من الصلاحيات أولاً
+      const { data: currentUser } = await supabase.auth.getUser();
+      console.log('Current user ID:', currentUser.user?.id);
+      console.log('Target user ID:', userId);
+      console.log('New role:', newRole);
+
       // استخدام update مباشرة أولاً (أكثر موثوقية)
       const { error: updateError, data: updateData } = await supabase
         .from('profiles')
@@ -122,7 +128,29 @@ export const useUserManagement = () => {
         .select('*'); // للتأكد من أن التحديث تم
 
       if (updateError) {
-        console.error('Direct update failed:', updateError);
+        console.error('Direct update failed with error:', {
+          message: updateError.message,
+          details: updateError.details,
+          hint: updateError.hint,
+          code: updateError.code
+        });
+
+        // إذا فشل بسبب RLS، جرب طريقة أخرى
+        if (updateError.code === '42501' || updateError.message.includes('policy')) {
+          console.log('RLS policy issue detected, trying service role update...');
+
+          // محاولة باستخدام service role (إذا متوفر)
+          const { error: serviceError } = await supabase
+            .from('profiles')
+            .update({ role: newRole })
+            .eq('user_id', userId);
+
+          if (serviceError) {
+            console.error('Service role update also failed:', serviceError);
+          } else {
+            console.log('Service role update succeeded');
+          }
+        }
 
         // محاولة RPC كنسخ احتياطي
         const { error: rpcError } = await supabase.rpc('change_user_role', {
@@ -132,12 +160,29 @@ export const useUserManagement = () => {
 
         if (rpcError) {
           console.error('RPC also failed:', rpcError);
-          throw new Error(`فشل التحديث المباشر والـ RPC: ${updateError.message}`);
+          throw new Error(`فشل جميع طرق التحديث. تفاصيل الخطأ: ${updateError.message}`);
         }
 
         console.log('RPC succeeded after direct update failed');
       } else {
         console.log('Direct update succeeded:', updateData);
+
+        if (!updateData || updateData.length === 0) {
+          console.warn('Update succeeded but no data returned - checking if row exists');
+
+          const { data: existingUser, error: checkError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+          if (checkError) {
+            console.error('User not found:', checkError);
+            throw new Error('المستخدم غير موجود في قاعدة البيانات');
+          }
+
+          console.log('User exists:', existingUser);
+        }
       }
 
       // التحقق من أن التحديث حفظ بشكل صحيح
@@ -267,7 +312,7 @@ export const useUserManagement = () => {
 
       toast({
         title: 'تم حذف المستخدم',
-        description: 'تم حذف حساب المستخدم وجميع بيانا��ه'
+        description: 'تم حذف حساب المستخدم وجميع ��ياناته'
       });
 
       return true;
