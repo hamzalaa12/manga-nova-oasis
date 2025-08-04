@@ -106,15 +106,31 @@ export const useUserManagement = () => {
     if (!isAdmin || !user) return false;
 
     try {
-      const { error } = await supabase.rpc('change_user_role', {
+      // محاولة استخدام RPC أولاً
+      const { error: rpcError } = await supabase.rpc('change_user_role', {
         user_uuid: userId,
         role_name: newRole
       });
 
-      if (error) throw error;
+      if (rpcError) {
+        // إذا فشل RPC، استخدم update مباشرة
+        console.warn('RPC failed, trying direct update:', rpcError);
+
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            role: newRole,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+
+        if (updateError) {
+          throw updateError;
+        }
+      }
 
       await loadUsers();
-      
+
       toast({
         title: 'تم تحديث الرتبة',
         description: 'تم تغيير رتبة المستخدم بنجاح'
@@ -125,7 +141,7 @@ export const useUserManagement = () => {
       console.error('Error changing user role:', error);
       toast({
         title: 'خطأ',
-        description: 'فشل في تغيير رتبة المستخدم',
+        description: `فشل في تغيير رتبة المستخدم: ${error.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
       return false;
