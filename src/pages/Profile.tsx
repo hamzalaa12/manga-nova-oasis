@@ -106,7 +106,7 @@ const Profile = () => {
           {/* محتوى الملف الشخصي */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-6">
+              <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-7' : 'grid-cols-6'}`}>
                 <TabsTrigger value="dashboard" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
                   لوحة المعلومات
@@ -127,6 +127,12 @@ const Profile = () => {
                   <Bell className="h-4 w-4" />
                   الإشعارات
                 </TabsTrigger>
+                {isAdmin && (
+                  <TabsTrigger value="admin" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    لوحة الإدارة
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="settings" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   الإعدادات
@@ -226,7 +232,7 @@ const ProfileSettings = () => {
         </CardContent>
       </Card>
 
-      {/* معلومات الحساب */}
+      {/* معلومات الح��اب */}
       <Card>
         <CardHeader>
           <CardTitle>معلومات الحساب</CardTitle>
@@ -337,7 +343,7 @@ const FavoritesList = () => {
   );
 };
 
-// مكون رفع الصورة الشخ��ية
+// مكون رفع الصورة الشخصية
 const AvatarUploadButton = () => {
   const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
   const { profile } = useAuth();
@@ -744,7 +750,7 @@ const AccountSettings = () => {
               <div>
                 <h4 className="font-medium text-destructive">حذف الحساب</h4>
                 <p className="text-sm text-muted-foreground">
-                  حذف حسابك نهائياً وجميع البيانات المرتبطة به
+                  حذف حسابك نهائياً وجميع البيانات ال��رتبطة به
                 </p>
               </div>
               <Button variant="destructive" onClick={handleDeleteAccount}>
