@@ -49,7 +49,7 @@ export const useProfile = () => {
     }
   };
 
-  const changePassword = async (currentPassword: string, newPassword: string) => {
+  const changePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({
@@ -62,6 +62,8 @@ export const useProfile = () => {
         title: 'تم تغيير كلمة المرور',
         description: 'تم تغيير كلمة المرور بنجاح'
       });
+
+      return true;
     } catch (error) {
       console.error('خطأ في تغيير كلمة المرور:', error);
       toast({
@@ -69,6 +71,7 @@ export const useProfile = () => {
         description: 'فشل في تغيير كلمة المرور',
         variant: 'destructive'
       });
+      return false;
     } finally {
       setLoading(false);
     }
