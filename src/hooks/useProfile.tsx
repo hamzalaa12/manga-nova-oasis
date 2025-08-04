@@ -13,34 +13,73 @@ export const useProfile = () => {
     bio?: string;
     avatar_url?: string;
   }) => {
-    if (!user) return false;
+    if (!user) {
+      console.error('No user found for profile update');
+      return false;
+    }
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      console.log('Updating profile for user:', user.id, 'with data:', updates);
+
+      // First, let's verify the user exists in profiles table
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('user_id, role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (checkError) {
+        console.error('Error checking existing profile:', checkError);
+        throw new Error('لم يتم العثور على الملف الشخصي');
+      }
+
+      console.log('Existing profile found:', existingProfile);
+
+      // Update the profile
+      const { data, error } = await supabase
         .from('profiles')
         .update({
           ...updates,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .select('*');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Update profile error:', error);
+        throw error;
+      }
+
+      console.log('Profile update result:', data);
+
+      // Verify the update was successful
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (verifyError) {
+        console.error('Verification error:', verifyError);
+      } else {
+        console.log('Updated profile verified:', verifyData);
+      }
 
       // إعادة تحميل بيانات الملف الشخصي
       await refreshProfile();
 
       toast({
         title: 'تم تحديث الملف الشخصي',
-        description: 'تم حفظ التغييرات بنجاح'
+        description: 'تم ��فظ التغييرات بنجاح'
       });
 
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('خطأ في تحديث الملف الشخصي:', error);
       toast({
         title: 'خطأ',
-        description: 'فشل في تحديث الملف الشخصي',
+        description: `فشل في تحديث الملف الشخصي: ${error.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
       return false;
