@@ -45,6 +45,8 @@ import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
 import ViewsCounter from "@/components/ViewsCounter";
+import FavoriteButton from "@/components/FavoriteButton";
+import ReportDialog from "@/components/ReportDialog";
 
 import PreloadContent from "@/components/PreloadContent";
 import ServerSideContent from "@/components/ServerSideContent";
