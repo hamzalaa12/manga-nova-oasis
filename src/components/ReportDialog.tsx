@@ -1,106 +1,138 @@
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Flag } from 'lucide-react';
+import { useReports, ReportType } from '@/hooks/useReports';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Flag, AlertTriangle } from 'lucide-react';
 
 interface ReportDialogProps {
-  mangaId?: string;
-  commentId?: string;
+  type: ReportType;
+  targetId?: string;
   reportedUserId?: string;
   children?: React.ReactNode;
+  className?: string;
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
-const ReportDialog = ({ mangaId, commentId, reportedUserId, children }: ReportDialogProps) => {
+const ReportDialog = ({ 
+  type, 
+  targetId, 
+  reportedUserId, 
+  children, 
+  className,
+  variant = 'outline',
+  size = 'sm'
+}: ReportDialogProps) => {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { submitReport } = useReports();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !reason) return;
+  const reasonOptions = [
+    { value: 'inappropriate_content', label: 'محتوى غير مناسب' },
+    { value: 'spam', label: 'رسائل مزعجة' },
+    { value: 'harassment', label: 'تحرش أو إساءة' },
+    { value: 'copyright', label: 'انتهاك حقوق الطبع' },
+    { value: 'fake_information', label: 'معلومات مزيفة' },
+    { value: 'offensive_language', label: 'لغة مسيئة' },
+    { value: 'violence', label: 'عنف أو تهديد' },
+    { value: 'adult_content', label: 'محتوى للبالغين' },
+    { value: 'other', label: 'أخرى' }
+  ];
+
+  const getTypeText = (type: ReportType): string => {
+    switch (type) {
+      case 'manga': return 'المانجا';
+      case 'comment': return 'التعليق';
+      case 'user': return 'المستخدم';
+      case 'chapter': return 'الفصل';
+      default: return 'المحتوى';
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      return;
+    }
+
+    if (!reason) {
+      return;
+    }
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('reports')
-        .insert({
-          reporter_id: user.id,
-          manga_id: mangaId,
-          comment_id: commentId,
-          reported_user_id: reportedUserId,
-          reason,
-          description: description || null
-        });
+      const success = await submitReport(
+        type,
+        reason,
+        description || undefined,
+        targetId,
+        reportedUserId
+      );
 
-      if (error) throw error;
-
-      toast({
-        title: 'تم إرسال البلاغ',
-        description: 'شكراً لك، سيتم مراجعة البلاغ قريباً'
-      });
-
-      setOpen(false);
-      setReason('');
-      setDescription('');
+      if (success) {
+        setOpen(false);
+        setReason('');
+        setDescription('');
+      }
     } catch (error) {
-      console.error('خطأ في إرسال البلاغ:', error);
-      toast({
-        title: 'خطأ',
-        description: 'فشل في إرسال البلاغ',
-        variant: 'destructive'
-      });
+      console.error('Error submitting report:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {children || (
-          <Button variant="outline" size="sm">
-            <Flag className="h-4 w-4 mr-2" />
+        {children ? (
+          children
+        ) : (
+          <Button 
+            variant={variant} 
+            size={size} 
+            className={className}
+          >
+            <Flag className="h-4 w-4 mr-1" />
             إبلاغ
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      
+      <DialogContent className="sm:max-w-[425px]" dir="rtl">
         <DialogHeader>
-          <DialogTitle>إرسال بلاغ</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+            إبلاغ عن {getTypeText(type)}
+          </DialogTitle>
           <DialogDescription>
-            ساعدنا في الحفاظ على مجتمع آمن بالإبلاغ عن المحتوى المخالف
+            ساعدنا في الحفاظ على مجتمع آمن ومناسب للجميع. 
+            جميع الإبلاغات سيتم مراجعتها بواسطة فريق الإدارة.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="reason">سبب البلاغ</Label>
-            <Select value={reason} onValueChange={setReason} required>
+            <Label htmlFor="reason">سبب الإبلاغ *</Label>
+            <Select value={reason} onValueChange={setReason}>
               <SelectTrigger>
-                <SelectValue placeholder="اختر سبب البلاغ" />
+                <SelectValue placeholder="اختر سبب الإبلاغ..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="spam">محتوى مزعج</SelectItem>
-                <SelectItem value="inappropriate">محتوى غير مناسب</SelectItem>
-                <SelectItem value="harassment">تحرش أو إساءة</SelectItem>
-                <SelectItem value="copyright">انتهاك حقوق الطبع</SelectItem>
-                <SelectItem value="fake">محتوى مزيف</SelectItem>
-                <SelectItem value="other">أخرى</SelectItem>
+                {reasonOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -109,26 +141,44 @@ const ReportDialog = ({ mangaId, commentId, reportedUserId, children }: ReportDi
             <Label htmlFor="description">تفاصيل إضافية (اختياري)</Label>
             <Textarea
               id="description"
+              placeholder="اكتب تفاصيل إضافية حول المشكلة..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="أضف تفاصيل إضافية إذا أردت..."
-              className="min-h-[80px]"
+              className="min-h-[100px]"
             />
+            <p className="text-xs text-muted-foreground">
+              أضف تفاصيل تساعد فريق الإدارة في فهم المشكلة بشكل أفضل
+            </p>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              إلغاء
-            </Button>
-            <Button type="submit" disabled={loading || !reason}>
-              {loading ? 'جاري الإرسال...' : 'إرسال البلاغ'}
-            </Button>
+          <div className="p-3 bg-muted rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>• سيتم مراجعة إبلاغك خلال 24-48 ساعة</p>
+                <p>• الإبلاغات الكاذبة قد تؤدي لعقوبات على حسابك</p>
+                <p>• لن يتم إشعار المستخدم المبلغ عنه بهوية المبلغ</p>
+              </div>
+            </div>
           </div>
-        </form>
+        </div>
+
+        <DialogFooter className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setOpen(false)}
+            disabled={loading}
+          >
+            إلغاء
+          </Button>
+          <Button 
+            onClick={handleSubmit}
+            disabled={!reason || loading}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {loading ? 'جاري الإرسال...' : 'إرسال الإبلاغ'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
