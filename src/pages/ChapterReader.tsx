@@ -116,8 +116,19 @@ const ChapterReader = () => {
 
       // Track view using the new system
       await trackChapterView(id);
-    } catch (error) {
-      console.error("Error fetching chapter details:", error);
+    } catch (error: any) {
+      console.error("Error fetching chapter details:", {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        chapterId: id,
+        error: error
+      });
+
+      // إظهار رسالة خطأ للمستخدم
+      setChapter(null);
+      setManga(null);
     } finally {
       setLoading(false);
     }
