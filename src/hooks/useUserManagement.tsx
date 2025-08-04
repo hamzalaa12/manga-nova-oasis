@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
-import { UserRole } from '@/types/user';
+import { UserRole, getRoleDisplayName } from '@/types/user';
 
 export interface UserProfile {
   id: string;
@@ -267,7 +267,7 @@ export const useUserManagement = () => {
 
       toast({
         title: 'تم حذف المستخدم',
-        description: 'تم حذف حساب المستخدم وجميع بياناته'
+        description: 'تم حذف حساب المستخدم وجميع بيانا��ه'
       });
 
       return true;
@@ -275,7 +275,7 @@ export const useUserManagement = () => {
       console.error('Error deleting user:', error);
       toast({
         title: 'خطأ',
-        description: 'فشل في حذف الم��تخدم',
+        description: 'فشل في حذف المستخدم',
         variant: 'destructive'
       });
       return false;
