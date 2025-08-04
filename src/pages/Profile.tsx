@@ -19,6 +19,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useProfile } from '@/hooks/useProfile';
 import { useReadingHistory } from '@/hooks/useReadingHistory';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import ProfileDashboard from '@/components/ProfileDashboard';
 
@@ -747,7 +748,7 @@ const AccountSettings = () => {
       {/* المنطق�� الخطرة */}
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle className="text-destructive">المنطقة الخطرة</CardTitle>
+          <CardTitle className="text-destructive">المنطق�� الخطرة</CardTitle>
           <CardDescription>عمليات لا يمكن التراجع عنها</CardDescription>
         </CardHeader>
         <CardContent>
@@ -783,12 +784,12 @@ const AdminPanelQuick = () => {
             لوحة الإدارة السريعة
           </CardTitle>
           <CardDescription>
-            الوصول السريع لوظائف الإدارة والمراقبة
+            الوصول السريع لوظا��ف الإدارة والمراقبة
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* الوصول لصفحة الإدارة الكاملة */}
+            {/* الوصول لصفحة الإدارة الكامل�� */}
             <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
               <CardContent className="p-4 text-center">
                 <Link to="/admin" className="block">
