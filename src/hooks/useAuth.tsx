@@ -59,8 +59,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadUserProfile = async (userId: string) => {
+  const loadUserProfile = async (userId: string, retryCount = 0) => {
     try {
+      console.log(`Loading profile for user: ${userId} (attempt ${retryCount + 1})`);
+
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
@@ -69,9 +71,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) {
         console.error('Error loading profile:', error);
+
+        // If profile doesn't exist, create it
+        if (error.code === 'PGRST116' && retryCount === 0) {
+          console.log('Profile not found, creating new one...');
+          const { data: userData } = await supabase.auth.getUser();
+          if (userData?.user) {
+            const { error: createError } = await supabase
+              .from('profiles')
+              .insert({
+                user_id: userData.user.id,
+                email: userData.user.email,
+                display_name: userData.user.user_metadata?.display_name || userData.user.email,
+                role: 'user'
+              });
+
+            if (!createError) {
+              // Retry loading the profile
+              return await loadUserProfile(userId, retryCount + 1);
+            }
+          }
+        }
         return;
       }
 
+      console.log('Profile loaded successfully:', profileData);
       setProfile(profileData);
       const role = profileData?.role as UserRole || 'user';
       setUserRole(role);
