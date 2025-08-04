@@ -231,7 +231,7 @@ const AdminDashboard = () => {
                 ) : filteredReports.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد إبلاغات جديدة</p>
+                    <p>لا توج�� إبلاغات جديدة</p>
                   </div>
                 ) : (
                   filteredReports.map((report) => (
@@ -250,7 +250,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* إد��رة المحتوى */}
+        {/* إدارة المحتوى */}
         <TabsContent value="content" className="space-y-4">
           <ContentModeration />
         </TabsContent>
@@ -260,11 +260,11 @@ const AdminDashboard = () => {
 };
 
 // مكون بطاقة المستخدم
-const UserCard = ({ 
-  user, 
-  onRoleChange, 
-  onBan, 
-  onUnban, 
+const UserCard = ({
+  user,
+  onRoleChange,
+  onBan,
+  onUnban,
   onDelete,
   banReason,
   setBanReason,
@@ -275,6 +275,8 @@ const UserCard = ({
 }: any) => {
   const [userStats, setUserStats] = useState({ commentsCount: 0, favoritesCount: 0, chaptersRead: 0 });
   const { getUserStats } = useUserManagement();
+
+  console.log(`UserCard rendered for user ${user.user_id} with role ${user.role} (updated: ${user.updated_at})`);
 
   useState(() => {
     getUserStats(user.user_id).then(setUserStats);
@@ -344,7 +346,7 @@ const UserCard = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="user">مستخدم عادي</SelectItem>
+              <SelectItem value="user">مستخد�� عادي</SelectItem>
               <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
               <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
               <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
