@@ -69,6 +69,7 @@ const ChapterReader = () => {
   const [manga, setManga] = useState<Manga | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showNavigation, setShowNavigation] = useState(false);
   const { updateReadingProgress } = useReadingHistory();
 
@@ -327,7 +328,7 @@ const ChapterReader = () => {
           }
           break;
         case "ArrowRight":
-          // السابق (للغة العربية)
+          // السابق (للغة العرب��ة)
           const prev = getPreviousChapter();
           if (prev && manga) {
             navigate(getChapterUrl(getMangaSlug(manga), prev.chapter_number));
