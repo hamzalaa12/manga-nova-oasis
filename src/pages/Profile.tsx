@@ -354,11 +354,44 @@ const FavoritesList = () => {
 const AvatarUploadButton = () => {
   const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
   const { profile } = useAuth();
+  const { toast } = useToast();
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      await uploadAvatar(file);
+      // تحقق من الملف قبل الرفع
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: 'خطأ',
+          description: 'يجب اختيار ملف صورة فقط',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'خطأ',
+          description: 'حجم الصورة يجب أن يكون أقل من 5 ميجابايت',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      try {
+        const result = await uploadAvatar(file);
+        if (result) {
+          // إعادة تعيين قيمة input لضمان تحديث الصورة عند اختيار نفس الملف
+          event.target.value = '';
+        }
+      } catch (error) {
+        console.error('خطأ في رفع الصورة:', error);
+        toast({
+          title: 'خطأ',
+          description: 'فشل في رفع الصورة. حاول مرة أخرى.',
+          variant: 'destructive'
+        });
+      }
     }
   };
 
@@ -366,7 +399,7 @@ const AvatarUploadButton = () => {
     <div className="absolute bottom-0 right-0">
       <input
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
         onChange={handleFileChange}
         className="hidden"
         id="avatar-upload"
@@ -375,9 +408,10 @@ const AvatarUploadButton = () => {
       <div className="flex gap-1">
         <Button
           size="sm"
-          className="w-8 h-8 rounded-full p-0"
+          className="w-8 h-8 rounded-full p-0 bg-primary hover:bg-primary/90"
           onClick={() => document.getElementById('avatar-upload')?.click()}
           disabled={uploading}
+          title={uploading ? 'جاري الرفع...' : 'تغيير الصورة الشخصية'}
         >
           {uploading ? (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
@@ -392,6 +426,7 @@ const AvatarUploadButton = () => {
             className="w-8 h-8 rounded-full p-0"
             onClick={removeAvatar}
             disabled={uploading}
+            title="حذف الصورة الشخصية"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
