@@ -266,6 +266,7 @@ const ChapterReader = () => {
       });
 
       // إظهار رسالة خطأ للمستخدم
+      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
       setChapter(null);
       setManga(null);
     } finally {
