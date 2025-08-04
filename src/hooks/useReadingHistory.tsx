@@ -183,6 +183,14 @@ export const useReadingHistory = () => {
     if (!user) return;
 
     try {
+      console.log('Updating reading progress:', {
+        user_id: user.id,
+        manga_id: mangaId,
+        chapter_id: chapterId,
+        page_number: pageNumber,
+        completed
+      });
+
       const { error } = await supabase
         .from('reading_progress')
         .upsert({
@@ -193,8 +201,6 @@ export const useReadingHistory = () => {
           completed,
           last_read_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,manga_id,chapter_id'
         });
 
       if (error) {
