@@ -250,7 +250,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* إدارة المحتوى */}
+        {/* إد��رة المحتوى */}
         <TabsContent value="content" className="space-y-4">
           <ContentModeration />
         </TabsContent>
@@ -293,7 +293,11 @@ const UserCard = ({
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
             <h3 className="font-medium">{user.display_name || 'بدون اسم'}</h3>
-            <Badge className={getRoleColor(user.role)} variant="secondary">
+            <Badge
+              key={`badge-${user.user_id}-${user.role}-${user.updated_at}`}
+              className={getRoleColor(user.role)}
+              variant="secondary"
+            >
               {getRoleDisplayName(user.role)}
             </Badge>
             {user.is_banned && (
