@@ -268,7 +268,7 @@ const MangaByGenre = () => {
                 title={item.title}
                 cover={item.cover_image_url}
                 rating={item.rating || 0}
-                views={item.views_count?.toString() || "0"}
+                views={item.views_count || 0}
                 status={item.status}
                 genre={item.genre?.[0] || ""}
                 lastUpdate={new Date(item.created_at).toLocaleDateString(

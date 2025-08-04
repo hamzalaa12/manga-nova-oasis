@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -14,6 +14,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Settings, Heart, History, Bell, Camera } from 'lucide-react';
 import { getRoleDisplayName, getRoleColor } from '@/types/user';
 import SEO from '@/components/SEO';
+import { useFavorites } from '@/hooks/useFavorites';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useProfile } from '@/hooks/useProfile';
+import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const { user, profile, userRole, loading } = useAuth();
@@ -161,8 +165,25 @@ const Profile = () => {
 
 // مكون إعدادات الملف الشخصي
 const ProfileSettings = () => {
-  const [displayName, setDisplayName] = useState('');
-  const [bio, setBio] = useState('');
+  const { profile } = useAuth();
+  const { updateProfile, loading } = useProfile();
+  const [displayName, setDisplayName] = useState(profile?.display_name || '');
+  const [bio, setBio] = useState(profile?.bio || '');
+
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.display_name || '');
+      setBio(profile.bio || '');
+    }
+  }, [profile]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await updateProfile({
+      display_name: displayName,
+      bio: bio
+    });
+  };
 
   return (
     <Card>
@@ -170,29 +191,33 @@ const ProfileSettings = () => {
         <CardTitle>تعديل الملف الشخصي</CardTitle>
         <CardDescription>قم بتعديل معلوماتك الشخصية هنا</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="displayName">الاسم المعروض</Label>
-          <Input
-            id="displayName"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="أدخل اسمك المعروض"
-          />
-        </div>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="displayName">الاسم المعروض</Label>
+            <Input
+              id="displayName"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="أدخل اسمك المعروض"
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="bio">نبذة عنك</Label>
-          <Textarea
-            id="bio"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            placeholder="اكتب نبذة مختصرة عنك..."
-            className="min-h-[100px]"
-          />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="bio">نبذة عنك</Label>
+            <Textarea
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="اكتب نبذة مختصرة عنك..."
+              className="min-h-[100px]"
+            />
+          </div>
 
-        <Button>حفظ التغييرات</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );
@@ -200,6 +225,25 @@ const ProfileSettings = () => {
 
 // مكون قائمة المفضلة
 const FavoritesList = () => {
+  const { favorites, loading } = useFavorites();
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>المانجا المفضلة</CardTitle>
+          <CardDescription>المانجا التي أضفتها إلى قائمة المفضلة</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -207,11 +251,45 @@ const FavoritesList = () => {
         <CardDescription>المانجا التي أضفتها إلى قائمة المفضلة</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-center py-8 text-muted-foreground">
-          <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>لا توجد مانجا في المفضلة بعد</p>
-          <p className="text-sm">ابدأ بإضافة مانجا إلى قائمة المفضلة!</p>
-        </div>
+        {favorites.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>لا توجد مانجا في المفضلة بعد</p>
+            <p className="text-sm">ابدأ بإضافة مانجا إلى قائمة المفضلة!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {favorites.map((favorite) => (
+              <Card key={favorite.id} className="overflow-hidden">
+                <div className="aspect-[3/4] relative">
+                  <img
+                    src={favorite.manga.cover_image_url || '/placeholder.svg'}
+                    alt={favorite.manga.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardContent className="p-3">
+                  <h3 className="font-semibold text-sm mb-1 line-clamp-2">
+                    {favorite.manga.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {favorite.manga.author}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="text-xs">
+                      ⭐ {favorite.manga.rating || 'N/A'}
+                    </Badge>
+                    <Button size="sm" variant="outline" asChild>
+                      <Link to={`/manga/${favorite.manga.slug || favorite.manga.id}`}>
+                        قراءة
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -238,18 +316,73 @@ const ReadingHistory = () => {
 
 // مكون قائمة الإشعارات
 const NotificationsList = () => {
+  const { notifications, loading, markAsRead, markAllAsRead } = useNotifications();
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>الإشعارات</CardTitle>
+          <CardDescription>آخر الإشعارات والتحديثات</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>الإشعارات</CardTitle>
-        <CardDescription>آخر الإشعارات والتحديثات</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>الإشعارات</CardTitle>
+          <CardDescription>آخر الإشعارات والتحديثات</CardDescription>
+        </div>
+        {notifications.length > 0 && (
+          <Button variant="outline" size="sm" onClick={markAllAsRead}>
+            تحديد الكل كمقروء
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
-        <div className="text-center py-8 text-muted-foreground">
-          <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>لا توجد إشعارات</p>
-          <p className="text-sm">ستظهر إشعاراتك هنا</p>
-        </div>
+        {notifications.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>لا توجد إشعارات</p>
+            <p className="text-sm">ستظهر إشعاراتك هنا</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`p-4 rounded-lg border ${
+                  notification.is_read ? 'bg-background' : 'bg-muted/50'
+                }`}
+                onClick={() => !notification.is_read && markAsRead(notification.id)}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="font-medium">{notification.title}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {new Date(notification.created_at).toLocaleDateString('ar')}
+                    </p>
+                  </div>
+                  {!notification.is_read && (
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 mt-1"></div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -257,29 +390,69 @@ const NotificationsList = () => {
 
 // مكون إعدادات الحساب
 const AccountSettings = () => {
+  const { changePassword, loading } = useProfile();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      // Handle password mismatch
+      return;
+    }
+    
+    await changePassword(currentPassword, newPassword);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>إعدادات الحساب</CardTitle>
         <CardDescription>إدارة حسابك وكلمة المرور</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="currentPassword">كلمة المرور الحالية</Label>
-          <Input id="currentPassword" type="password" />
-        </div>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="currentPassword">كلمة المرور الحالية</Label>
+            <Input 
+              id="currentPassword" 
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="newPassword">كلمة المرور الجديدة</Label>
-          <Input id="newPassword" type="password" />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="newPassword">كلمة المرور الجديدة</Label>
+            <Input 
+              id="newPassword" 
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
-          <Input id="confirmPassword" type="password" />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
+            <Input 
+              id="confirmPassword" 
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <Button variant="destructive">تغيير كلمة المرور</Button>
+          <Button type="submit" variant="destructive" disabled={loading}>
+            {loading ? 'جاري التغيير...' : 'تغيير كلمة المرور'}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );

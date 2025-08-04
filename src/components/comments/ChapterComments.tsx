@@ -152,8 +152,8 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chapter-comments", chapterId] });
       toast({
-        title: isPinned ? "تم إلغاء التثبيت" : "تم التثبيت",
-        description: isPinned ? "تم إلغاء تثبيت التعليق" : "تم تثبيت التعليق",
+        title: "تم تحديث التعليق",
+        description: "تم تحديث حالة التثبيت للتعليق",
       });
     },
   });
