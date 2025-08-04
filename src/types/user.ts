@@ -115,19 +115,21 @@ export const getUserRoleIcon = (role: UserRole): string => {
 export const hasPermission = (role: UserRole, permission: string): boolean => {
   switch (permission) {
     case "can_submit_content":
-      return ["beginner_fighter", "elite_fighter", "leader", "admin"].includes(
-        role,
-      );
+      return ["beginner_fighter", "elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     case "can_moderate_comments":
-      return ["elite_fighter", "leader", "admin"].includes(role);
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     case "can_ban_users":
-      return ["elite_fighter", "leader", "admin"].includes(role);
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     case "can_publish_directly":
-      return ["leader", "admin"].includes(role);
+      return ["tribe_leader", "admin", "site_admin"].includes(role);
     case "can_manage_users":
-      return role === "admin";
+      return ["admin", "site_admin"].includes(role);
     case "can_assign_roles":
-      return role === "admin";
+      return role === "site_admin";
+    case "can_pin_comments":
+      return ["tribe_leader", "admin", "site_admin"].includes(role);
+    case "can_delete_any_comment":
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     default:
       return false;
   }
