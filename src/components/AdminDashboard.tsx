@@ -70,7 +70,18 @@ const AdminDashboard = () => {
   );
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    await changeUserRole(userId, newRole);
+    console.log(`Admin dashboard: Changing user ${userId} role to ${newRole}`);
+
+    try {
+      const success = await changeUserRole(userId, newRole);
+      if (!success) {
+        console.error('Role change failed in useUserManagement');
+      } else {
+        console.log('Role change succeeded, data should be refreshed');
+      }
+    } catch (error) {
+      console.error('Error in handleRoleChange:', error);
+    }
   };
 
   const handleBanUser = async (userId: string) => {
@@ -473,7 +484,7 @@ const ReportCard = ({
               </Badge>
             </div>
             <p className="text-sm font-medium">
-              تم الإبلاغ بواسطة: {report.reporter.display_name || report.reporter.email}
+              تم الإبلاغ بوا��طة: {report.reporter.display_name || report.reporter.email}
             </p>
             <p className="text-xs text-muted-foreground">
               {new Date(report.created_at).toLocaleString('ar')}
@@ -513,7 +524,7 @@ const ReportCard = ({
 
         {report.manga && (
           <div className="text-sm">
-            <strong>المانجا المبلغ عنها:</strong> {report.manga.title}
+            <strong>المانجا المبل�� عنها:</strong> {report.manga.title}
           </div>
         )}
 
