@@ -84,24 +84,45 @@ export const useImageUpload = () => {
       }
 
       // Update user profile with new avatar URL
-      const { error: updateError } = await supabase
+      console.log('Updating avatar for user:', user.id, 'with URL:', avatarUrl);
+
+      const { data: updateData, error: updateError } = await supabase
         .from('profiles')
         .update({
           avatar_url: avatarUrl,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .select('*');
 
       if (updateError) {
+        console.error('Avatar update error:', updateError);
         throw updateError;
       }
 
-      // Refresh profile data
-      await refreshProfile();
+      console.log('Avatar update result:', updateData);
+
+      // Verify the update
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('user_id', user.id)
+        .single();
+
+      if (verifyError) {
+        console.error('Avatar verification error:', verifyError);
+      } else {
+        console.log('Avatar verified in database:', verifyData);
+      }
+
+      // Refresh profile data with a delay to ensure database consistency
+      setTimeout(async () => {
+        await refreshProfile();
+      }, 1000);
 
       toast({
         title: 'تم رفع الصورة',
-        description: 'تم تحديث صورتك الشخصية بنجاح'
+        description: 'تم تحديث صورتك الشخصية بنج��ح'
       });
 
       return avatarUrl;
