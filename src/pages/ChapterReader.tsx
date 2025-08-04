@@ -30,7 +30,7 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import SimpleComments from "@/components/SimpleComments";
+import AdvancedComments from "@/components/AdvancedComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
@@ -243,7 +243,7 @@ const ChapterReader = () => {
           navigate(-1);
           break;
         case "ArrowLeft":
-          // ا��تالي (للغة العربية)
+          // التالي (للغة العربية)
           const next = getNextChapter();
           if (next && manga) {
             navigate(getChapterUrl(getMangaSlug(manga), next.chapter_number));
