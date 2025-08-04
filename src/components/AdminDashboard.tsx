@@ -241,46 +241,7 @@ const AdminDashboard = () => {
 
         {/* إدارة المحتوى */}
         <TabsContent value="content" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>إدارة المحتوى</CardTitle>
-              <CardDescription>
-                إعدادات المحتوى ��المراجعة
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>تفعيل المراجعة التلقائية</Label>
-                    <p className="text-sm text-muted-foreground">
-                      مراجعة المحتوى الجديد تلقائياً قبل النشر
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>فلترة الكلمات المحظورة</Label>
-                    <p className="text-sm text-muted-foreground">
-                      منع الكلمات والعبارات غير المناسبة
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>قائمة الكلمات المحظورة</Label>
-                  <Textarea 
-                    placeholder="أدخل الكلمات المحظورة، ��ل كلمة في سطر منفصل..."
-                    className="min-h-[100px]"
-                  />
-                  <Button size="sm">حفظ القائمة</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ContentModeration />
         </TabsContent>
       </Tabs>
     </div>
@@ -512,7 +473,7 @@ const ReportCard = ({
               </Badge>
             </div>
             <p className="text-sm font-medium">
-              تم الإبلاغ ��واسطة: {report.reporter.display_name || report.reporter.email}
+              تم الإبلاغ بواسطة: {report.reporter.display_name || report.reporter.email}
             </p>
             <p className="text-xs text-muted-foreground">
               {new Date(report.created_at).toLocaleString('ar')}
@@ -552,7 +513,7 @@ const ReportCard = ({
 
         {report.manga && (
           <div className="text-sm">
-            <strong>المانجا ال��بلغ عنها:</strong> {report.manga.title}
+            <strong>المانجا المبلغ عنها:</strong> {report.manga.title}
           </div>
         )}
 
