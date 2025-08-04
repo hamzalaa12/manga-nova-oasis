@@ -196,8 +196,20 @@ export const useReadingHistory = () => {
       // Reload data
       loadReadingHistory();
       loadReadingStats();
-    } catch (error) {
-      console.error('Error updating reading progress:', error);
+    } catch (error: any) {
+      console.error('Error updating reading progress:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        mangaId,
+        chapterId,
+        userId: user?.id,
+        error: error
+      });
+
+      // لا نعرض toast هنا لأن هذا يحدث في الخلفية
+      // فقط نسجل الخطأ
     }
   };
 
