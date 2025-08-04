@@ -197,18 +197,40 @@ const ProfileSettings = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || loading) return;
+
+    console.log('Submitting profile update:', { displayName: displayName.trim(), bio: bio.trim() });
 
     setIsSubmitting(true);
     try {
+      const trimmedDisplayName = displayName.trim();
+      const trimmedBio = bio.trim();
+
+      if (!trimmedDisplayName) {
+        toast({
+          title: 'خطأ',
+          description: 'يجب إدخال اسم معروض',
+          variant: 'destructive'
+        });
+        return;
+      }
+
       const success = await updateProfile({
-        display_name: displayName.trim(),
-        bio: bio.trim()
+        display_name: trimmedDisplayName,
+        bio: trimmedBio
       });
 
       if (success) {
-        // إعادة تحميل بيانات المستخدم من قاعدة البيانات
-        await refreshProfile();
+        console.log('Profile update successful, refreshing...');
+
+        // Force refresh after successful update
+        setTimeout(async () => {
+          await refreshProfile();
+
+          // Update local state to reflect changes immediately
+          setDisplayName(trimmedDisplayName);
+          setBio(trimmedBio);
+        }, 500);
 
         toast({
           title: 'تم الحفظ',
@@ -304,7 +326,7 @@ const ProfileSettings = () => {
   );
 };
 
-// مكون قائمة المفضلة
+// مكون قا��مة المفضلة
 const FavoritesList = () => {
   const { favorites, loading } = useFavorites();
 
@@ -376,7 +398,7 @@ const FavoritesList = () => {
   );
 };
 
-// مكون رفع الصورة الشخصية
+// مك��ن رفع الصورة الشخصية
 const AvatarUploadButton = () => {
   const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
   const { profile } = useAuth();
