@@ -125,29 +125,54 @@ const ChapterReader = () => {
     try {
       console.log("📖 Tracking chapter view for ID:", chapterId);
       const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
 
-      // Add authorization header if user is logged in
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-        console.log("👤 User is logged in for chapter");
+      if (sessionData.session?.user && manga && chapter) {
+        const userId = sessionData.session.user.id;
 
+        // حفظ تقدم القراءة مباشرة في قاعدة البيانات
+        const { error: progressError } = await supabase
+          .from('reading_progress')
+          .upsert({
+            user_id: userId,
+            manga_id: manga.id,
+            chapter_id: chapterId,
+            page_number: 1, // الصفحة الأولى
+            completed: true, // تم قراءة الفصل
+            last_read_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,manga_id,chapter_id'
+          });
 
-      } else {
-        console.log("👤 Anonymous user reading chapter");
+        if (progressError) {
+          console.error('Error saving reading progress:', progressError);
+        } else {
+          console.log('✅ Reading progress saved successfully');
+        }
       }
 
-      const response = await supabase.functions.invoke("track-view", {
-        body: {
-          mangaId: chapterId,
-          type: "chapter",
-        },
-        headers,
-      });
+      // محاولة استخدام edge function كنسخ احتياطي
+      try {
+        const headers: HeadersInit = {
+          "Content-Type": "application/json",
+        };
 
-      console.log("✅ Track chapter view response:", response);
+        if (sessionData.session?.access_token) {
+          headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
+        }
+
+        const response = await supabase.functions.invoke("track-view", {
+          body: {
+            mangaId: chapterId,
+            type: "chapter",
+          },
+          headers,
+        });
+
+        console.log("✅ Track chapter view response:", response);
+      } catch (edgeFunctionError) {
+        console.warn("Edge function failed, but progress was saved directly:", edgeFunctionError);
+      }
     } catch (error) {
       console.error("❌ Error tracking chapter view:", error);
       // Don't fail the page load if view tracking fails
