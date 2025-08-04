@@ -53,6 +53,7 @@ import ReportDialog from "@/components/ReportDialog";
 import PreloadContent from "@/components/PreloadContent";
 import ServerSideContent from "@/components/ServerSideContent";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
+import { useViewTracking } from "@/hooks/useViewTracking";
 
 interface Manga {
   id: string;
@@ -722,7 +723,7 @@ const MangaDetails = () => {
 
                 {chapters.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    لا توجد فصول متاحة حالياً
+                    ل�� توجد فصول متاحة حالياً
                   </p>
                 ) : (
                   <div className="space-y-2">
