@@ -73,6 +73,7 @@ const ChapterReader = () => {
   const [error, setError] = useState<string | null>(null);
   const [showNavigation, setShowNavigation] = useState(false);
   const { updateReadingProgress } = useReadingHistory();
+  const { trackChapterView, trackMangaView } = useViewTracking();
 
   useEffect(() => {
     if (slug && chapterParam) {
