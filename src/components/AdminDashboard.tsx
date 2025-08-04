@@ -331,7 +331,11 @@ const UserCard = ({
 
         <div className="flex flex-col gap-2">
           {/* تغيير الرتبة */}
-          <Select value={user.role} onValueChange={(newRole) => onRoleChange(user.user_id, newRole)}>
+          <Select
+            key={`${user.user_id}-${user.role}-${user.updated_at}`}
+            value={user.role}
+            onValueChange={(newRole) => onRoleChange(user.user_id, newRole)}
+          >
             <SelectTrigger className="w-[150px]">
               <SelectValue />
             </SelectTrigger>
