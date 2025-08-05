@@ -85,8 +85,14 @@ export const useUserRestrictions = () => {
       }
 
       return data || false;
-    } catch (error) {
-      console.error('Error in checkUserRestriction:', error);
+    } catch (error: any) {
+      console.error('Error in checkUserRestriction:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
       return false;
     }
   };
@@ -172,7 +178,7 @@ export const useUserRestrictions = () => {
       console.error('Error removing restriction:', error);
       toast({
         title: 'خطأ',
-        description: `فشل في رفع القيد: ${error.message || 'خطأ غير معروف'}`,
+        description: `فشل في رفع القيد: ${error.message || 'خطأ غير مع��وف'}`,
         variant: 'destructive'
       });
       return false;
