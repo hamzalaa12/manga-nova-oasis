@@ -46,6 +46,7 @@ import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
+import SEOLinks from "@/components/SEOLinks";
 import ViewsCounter from "@/components/ViewsCounter";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReportDialog from "@/components/ReportDialog";
