@@ -309,7 +309,10 @@ const UserCard = ({
   banType,
   setBanType,
   banDuration,
-  setBanDuration
+  setBanDuration,
+  addRestriction,
+  removeRestriction,
+  getUserRestrictions
 }: any) => {
   const [userStats, setUserStats] = useState({ commentsCount: 0, favoritesCount: 0, chaptersRead: 0 });
   const { getUserStats } = useUserManagement();
@@ -332,7 +335,7 @@ const UserCard = ({
 
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
-            <h3 className="font-medium">{user.display_name || '��دون اسم'}</h3>
+            <h3 className="font-medium">{user.display_name || 'بدون اسم'}</h3>
             <Badge
               key={`badge-${user.user_id}-${user.role}-${user.updated_at}`}
               className={getRoleColor(user.role)}
