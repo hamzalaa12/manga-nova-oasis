@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag, Award, MessageSquare } from 'lucide-react';
+import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag, Award, MessageSquare, Plus, Edit, FileText, Globe } from 'lucide-react';
 import { getRoleDisplayName, getRoleColor, getUserRoleIcon, hasPermission } from '@/types/user';
 import SEO from '@/components/SEO';
 import UserPermissions from '@/components/UserPermissions';
@@ -851,7 +851,7 @@ const AccountSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="newPassword">كلمة المرور الجديدة</Label>
+              <Label htmlFor="newPassword">كلمة المرور ا��جديدة</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -999,7 +999,7 @@ const AdminPanelQuick = () => {
               )}
               {userRole === 'admin' && (
                 <>
-                  <p>• إدارة المستخدمين والمحتوى</p>
+                  <p>• إدارة المستخدمين ��المحتوى</p>
                   <p>• مراجع�� الإبلاغات</p>
                   <p>• حظر الم��تخدمين المسيئين</p>
                   <p>• إدارة التعليقات</p>
