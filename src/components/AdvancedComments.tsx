@@ -49,7 +49,7 @@ const AdvancedComments = ({ mangaId, chapterId, className }: AdvancedCommentsPro
   } = useComments(mangaId, chapterId);
 
   const { canComment, hasRestriction } = useUserPermissions();
-  const [newComment, setNewComment] = useState('');tate('');
+  const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
@@ -252,7 +252,7 @@ const AdvancedComments = ({ mangaId, chapterId, className }: AdvancedCommentsPro
                                 
                                 {permissions.canModerate && (
                                   <div className="space-y-2">
-                                    <Label htmlFor="deleteReason">سبب الحذف (اختياري)</Label>
+                                    <Label htmlFor="deleteReason">سبب الحذف (اخت��اري)</Label>
                                     <Input
                                       id="deleteReason"
                                       value={deleteReason}
