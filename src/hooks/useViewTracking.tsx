@@ -129,8 +129,14 @@ export const useViewTracking = () => {
       } else {
         console.log('✅ Chapter view tracked successfully');
       }
-    } catch (error) {
-      console.error('Error in trackChapterView:', error);
+    } catch (error: any) {
+      console.error('Error in trackChapterView:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
     }
   };
 
