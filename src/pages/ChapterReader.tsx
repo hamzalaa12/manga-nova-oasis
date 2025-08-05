@@ -157,8 +157,14 @@ const ChapterReader = () => {
         try {
           await updateReadingProgress(manga.id, chapterId, 1, true);
           console.log('✅ Reading progress saved via hook');
-        } catch (hookError) {
-          console.error('Hook failed, trying direct save:', hookError);
+        } catch (hookError: any) {
+          console.error('Hook failed, trying direct save:', {
+            message: hookError?.message || 'Unknown error',
+            code: hookError?.code,
+            details: hookError?.details,
+            hint: hookError?.hint,
+            error: hookError
+          });
 
           // نسخ احتياطي مباشر
           const { error: progressError } = await supabase
