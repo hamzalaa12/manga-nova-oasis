@@ -308,7 +308,7 @@ const ChapterReader = () => {
           navigate(-1);
           break;
         case "ArrowLeft":
-          // التالي (للغة العربية)
+          // التالي (للغ�� العربية)
           const next = getNextChapter();
           if (next && manga) {
             navigate(getChapterUrl(getMangaSlug(manga), next.chapter_number));
@@ -334,6 +334,31 @@ const ChapterReader = () => {
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>جاري تحميل الفصل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user is banned from reading
+  if (!canRead()) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="text-red-500 text-6xl mb-4">🚫</div>
+          <h2 className="text-xl font-bold mb-2">تم منعك من القراءة</h2>
+          <p className="text-gray-300 mb-4">
+            {isCompletelyBanned()
+              ? "تم حظرك بشكل كامل من استخدام الموقع"
+              : "تم منعك من قراءة المحتوى مؤقتاً"}
+          </p>
+          <Link to="/">
+            <Button
+              variant="outline"
+              className="text-white border-white hover:bg-white hover:text-black"
+            >
+              العودة للرئيسية
+            </Button>
+          </Link>
         </div>
       </div>
     );
