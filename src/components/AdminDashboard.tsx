@@ -29,7 +29,7 @@ import {
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { useReports } from '@/hooks/useReports';
 import { useRoleUpdate } from '@/hooks/useRoleUpdate';
-import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions\';seUserRestrictions';
+import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions\';serRestrictions';;
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
 import RestrictionsMenu from './RestrictionsMenu';
@@ -371,7 +371,7 @@ const UserCard = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          {/* تغيير الرتبة */}
+          {/* تغيير الرت��ة */}
           <Select
             key={`${user.user_id}-${user.role}-${user.updated_at}`}
             value={user.role}
@@ -469,7 +469,7 @@ const UserCard = ({
                   </div>
 
                   <AlertDialogFooter>
-                    <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                    <AlertDialogCancel>��لغاء</AlertDialogCancel>
                     <AlertDialogAction 
                       onClick={() => onBan(user.user_id)}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
