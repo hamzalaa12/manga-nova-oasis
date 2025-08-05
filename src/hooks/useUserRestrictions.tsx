@@ -214,7 +214,13 @@ export const useUserRestrictions = () => {
         .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
 
       if (error) {
-        console.error('Error getting user restrictions:', error);
+        console.error('Error getting user restrictions:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: error
+        });
         return [];
       }
 
