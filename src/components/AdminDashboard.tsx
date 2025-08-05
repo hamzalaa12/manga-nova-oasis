@@ -32,7 +32,7 @@ import { useRoleUpdate } from '@/hooks/useRoleUpdate';
 import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions\';seUserRestrictions';
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
-import RestrictionsMenu from './RestrictionsMenu\';enu';
+import RestrictionsMenu from './RestrictionsMenu';
 
 const AdminDashboard = () => {
   const {
@@ -179,7 +179,7 @@ const AdminDashboard = () => {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
           <TabsTrigger value="reports">الإبلاغات</TabsTrigger>
-          <TabsTrigger value="content">إدارة المحتوى</TabsTrigger>
+          <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
         </TabsList>
 
         {/* إدارة المستخدمين */}
