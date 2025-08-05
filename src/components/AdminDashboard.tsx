@@ -32,6 +32,7 @@ import { useRoleUpdate } from '@/hooks/useRoleUpdate';
 import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions\';seUserRestrictions';
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
+import RestrictionsMenu from './RestrictionsMenu\';/RestrictionsMenu';
 
 const AdminDashboard = () => {
   const {
