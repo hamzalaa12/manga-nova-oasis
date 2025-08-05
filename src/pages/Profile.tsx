@@ -313,7 +313,7 @@ const ProfileSettings = () => {
                 </p>
               </div>
               <div>
-                <Label>آخر تحديث للملف</Label>
+                <Label>آخر تحديث ل��ملف</Label>
                 <p className="text-sm text-muted-foreground mt-1">
                   {profile?.updated_at ? new Date(profile.updated_at).toLocaleDateString('ar') : 'غير متوفر'}
                 </p>
@@ -592,11 +592,11 @@ const ReadingHistoryComponent = () => {
           )}
         </CardHeader>
         <CardContent>
-          {readingHistory.length === 0 ? (
+          {readingHistory.filter((item) => item.manga && item.chapter).length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>لا يوجد سجل قراءة بعد</p>
-              <p className="text-sm">ابدأ بقراءة بعض الفصول!</p>
+              <p className="text-sm">ابدأ بقراءة بعض الفص��ل!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -865,7 +865,7 @@ const AccountSettings = () => {
               <div>
                 <h4 className="font-medium text-destructive">حذف الحساب</h4>
                 <p className="text-sm text-muted-foreground">
-                  حذف حسابك نهائياً وجميع البيانات المرتبطة به
+                  حذف حسابك نهائ��اً وجميع البيانات المرتبطة به
                 </p>
               </div>
               <Button variant="destructive" onClick={handleDeleteAccount}>
