@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { ShieldAlert, MessageSquareOff, BookOpen, UploadX, ShieldX } from 'lucide-react';
+import { ShieldAlert, MessageSquareOff, BookOpen, Upload, Shield } from 'lucide-react';
 import { RestrictionType } from '@/hooks/useUserRestrictions';
 
 interface RestrictionsMenuProps {
@@ -138,7 +138,7 @@ const RestrictionsMenu = ({
                 <DropdownMenuSeparator />
               </>
             ) : (
-              <p className="text-xs text-muted-foreground mb-2">لا توج�� قيود</p>
+              <p className="text-xs text-muted-foreground mb-2">لا توجد قيود</p>
             )}
             
             <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
@@ -242,7 +242,7 @@ const RestrictionsMenu = ({
           <AlertDialogHeader>
             <AlertDialogTitle>رفع القيد</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من رغبتك في رفع هذا القيد عن المستخدم؟
+              هل أنت متأ��د من رغبتك في رفع هذا القيد عن المستخدم؟
             </AlertDialogDescription>
           </AlertDialogHeader>
           
