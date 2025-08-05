@@ -226,9 +226,9 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   filteredUsers.map((user) => (
-                    <UserCard 
-                      key={user.id} 
-                      user={user} 
+                    <UserCard
+                      key={user.id}
+                      user={user}
                       onRoleChange={handleRoleChange}
                       onBan={handleBanUser}
                       onUnban={unbanUser}
@@ -239,6 +239,9 @@ const AdminDashboard = () => {
                       setBanType={setBanType}
                       banDuration={banDuration}
                       setBanDuration={setBanDuration}
+                      addRestriction={addRestriction}
+                      removeRestriction={removeRestriction}
+                      getUserRestrictions={getUserRestrictions}
                     />
                   ))
                 )}
@@ -329,7 +332,7 @@ const UserCard = ({
 
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
-            <h3 className="font-medium">{user.display_name || 'بدون اسم'}</h3>
+            <h3 className="font-medium">{user.display_name || '��دون اسم'}</h3>
             <Badge
               key={`badge-${user.user_id}-${user.role}-${user.updated_at}`}
               className={getRoleColor(user.role)}
