@@ -154,7 +154,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
         return {
           icon: "🥇",
           title: "قائد القبيلة",
-          description: "صلاحيات مقاتل النخبة + النشر المباشر وإد��رة المحتوى",
+          description: "صلاحيات مقاتل النخبة + النشر المباشر وإدارة المحتوى",
           permissions: [
             ...basePermissions,
             {
@@ -338,7 +338,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             ))}
           </div>
 
-          {/* ملاحظات حسب الرتبة */}
+          {/* م��احظات حسب الرتبة */}
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
               <Eye className="h-4 w-4" />
@@ -349,7 +349,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
                 <p>• يتطلب محتواك موافقة مدير الموقع قبل النشر</p>
               )}
               {(currentRole === "elite_fighter" || currentRole === "tribe_leader") && (
-                <p>• يمكنك حظر المستخدمين مؤقتاً فقط، الحظر الدائم يتطلب صلاحيات أ��لى</p>
+                <p>• يمكنك حظر المستخدمين مؤقتاً فقط، الحظر الدائم يتطلب صلاحيات أعلى</p>
               )}
               {currentRole === "admin" && (
                 <p>• لا يمكنك تغيير رتبة مستخدم إلى admin أو site_admin</p>
@@ -371,10 +371,92 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
               <p className="text-xs text-blue-700 dark:text-blue-300">
                 {currentRole === "user" && "كن نشطاً في المجتمع لتصبح مقاتل مبتدئ"}
                 {currentRole === "beginner_fighter" && "ساهم بمحتوى جيد واكسب ثقة المديرين"}
-                {currentRole === "elite_fighter" && "أظه�� قيادة ومساعدة في إدارة المجتمع"}
+                {currentRole === "elite_fighter" && "أظهر قيادة ومساعدة في إدارة المجتمع"}
                 {currentRole === "tribe_leader" && "تواصل مع إدارة الموقع للترشح لمنصب إداري"}
                 {currentRole === "admin" && "يتطلب ترشيح من مدير الموقع"}
               </p>
+            </div>
+          )}
+
+          {/* أزرار الإجراءات للإدارة */}
+          {currentRole !== "user" && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h4 className="font-medium text-sm mb-3 text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                الإجراءات المتاحة لك
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* رفع المحتوى */}
+                {(currentRole === "beginner_fighter" || currentRole === "elite_fighter" || currentRole === "tribe_leader" || currentRole === "admin" || currentRole === "site_admin") && (
+                  <>
+                    <Link to="/admin">
+                      <Button variant="outline" size="sm" className="w-full justify-start">
+                        <Plus className="h-4 w-4 mr-2" />
+                        إضافة مانجا جديدة
+                      </Button>
+                    </Link>
+                    <Link to="/admin">
+                      <Button variant="outline" size="sm" className="w-full justify-start">
+                        <FileText className="h-4 w-4 mr-2" />
+                        إضافة فصل جديد
+                      </Button>
+                    </Link>
+                  </>
+                )}
+
+                {/* إدارة التعليقات */}
+                {(currentRole === "elite_fighter" || currentRole === "tribe_leader" || currentRole === "admin" || currentRole === "site_admin") && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      إدارة التعليقات
+                    </Button>
+                  </Link>
+                )}
+
+                {/* إدارة المستخدمين */}
+                {(currentRole === "admin" || currentRole === "site_admin") && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Users className="h-4 w-4 mr-2" />
+                      إدارة المستخدمين
+                    </Button>
+                  </Link>
+                )}
+
+                {/* الإبلاغات */}
+                {(currentRole === "elite_fighter" || currentRole === "tribe_leader" || currentRole === "admin" || currentRole === "site_admin") && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Flag className="h-4 w-4 mr-2" />
+                      مراجعة البلاغات
+                    </Button>
+                  </Link>
+                )}
+
+                {/* إعدادات الموقع */}
+                {currentRole === "site_admin" && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Settings className="h-4 w-4 mr-2" />
+                      إعدادات الموقع
+                    </Button>
+                  </Link>
+                )}
+
+                {/* لوحة الإدارة الكاملة */}
+                <Link to="/admin" className="md:col-span-2">
+                  <Button className="w-full">
+                    <Globe className="h-4 w-4 mr-2" />
+                    الانتقال للوحة الإدارة الكاملة
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="mt-3 text-xs text-blue-700 dark:text-blue-300 text-center">
+                💡 جميع أعمالك الإدارية مسجلة ومراقبة للأمان
+              </div>
             </div>
           )}
         </div>
