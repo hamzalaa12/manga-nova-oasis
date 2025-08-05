@@ -88,6 +88,7 @@ export const useViewTracking = () => {
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
+          stringified: JSON.stringify(error, null, 2),
           error: error
         });
         
