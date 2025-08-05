@@ -177,7 +177,7 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs defaultValue="users" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
           <TabsTrigger value="reports">الإبلاغات</TabsTrigger>
           <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
@@ -257,7 +257,7 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle>إدارة الإبلاغات</CardTitle>
               <CardDescription>
-                مراجعة والرد على الإبلاغات الم����لة من المستخدمين
+                مراجعة والرد على الإبلاغات الم��سلة من المستخدمين
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -499,7 +499,7 @@ const UserCard = ({
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
                     هل أنت مت��كد من رغبتك في حذف هذا المستخدم نهائياً؟ 
-                    سيتم حذف جميع بياناته وتعليقاته ولا يمكن التراجع عن هذا الإجراء.
+                    سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع عن هذا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
