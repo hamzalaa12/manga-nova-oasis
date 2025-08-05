@@ -3,17 +3,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  BookOpen, 
-  Calendar, 
-  TrendingUp, 
-  Clock, 
-  Star, 
+import {
+  BookOpen,
+  Calendar,
+  TrendingUp,
+  Clock,
+  Star,
   Target,
   Award,
-  Activity
+  Activity,
+  Users,
+  Shield,
+  Flag,
+  MessageSquare,
+  Upload,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { hasPermission } from '@/types/user';
 import { useReadingHistory } from '@/hooks/useReadingHistory';
 import { useFavorites } from '@/hooks/useFavorites';
 import { supabase } from '@/integrations/supabase/client';
