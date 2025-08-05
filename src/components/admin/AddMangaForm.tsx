@@ -214,6 +214,26 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // التحقق من البيانات المطلوبة
+    if (!formData.title.trim()) {
+      toast({
+        title: 'خطأ',
+        description: 'يجب إدخال عنوان المانجا',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!formData.mangaType) {
+      toast({
+        title: 'خطأ',
+        description: 'يجب اختيار نوع المانجا',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
