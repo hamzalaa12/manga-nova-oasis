@@ -594,6 +594,15 @@ const ChapterReader = () => {
         </div>
       )}
 
+      {/* روابط SEO للتصفح */}
+      {chapter && manga && (
+        <div className="bg-background py-8">
+          <div className="container mx-auto px-4">
+            <SEOLinks type="chapter" data={{ ...chapter, manga }} />
+          </div>
+        </div>
+      )}
+
       {/* شريط التنقل السفلي - يظهر عند التمرير */}
       <div
         className={`fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
