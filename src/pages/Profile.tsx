@@ -237,8 +237,14 @@ const ProfileSettings = () => {
           description: 'تم تحديث ملفك الشخصي بنجاح'
         });
       }
-    } catch (error) {
-      console.error('Error updating profile:', error);
+    } catch (error: any) {
+      console.error('Error updating profile:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في حفظ التغييرات',
@@ -952,7 +958,7 @@ const AdminPanelQuick = () => {
               {userRole === 'elite_fighter' && (
                 <>
                   <p>• حذف التعليقات الم��يئة</p>
-                  <p>• حظر المستخدمين المسيئين</p>
+                  <p>��� حظر المستخدمين المسيئين</p>
                   <p>• الإشراف على المحتوى</p>
                 </>
               )}
