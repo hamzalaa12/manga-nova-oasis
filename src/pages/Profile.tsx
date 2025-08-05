@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag, Award } from 'lucide-react';
+import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag, Award, MessageSquare } from 'lucide-react';
 import { getRoleDisplayName, getRoleColor, getUserRoleIcon, hasPermission } from '@/types/user';
 import SEO from '@/components/SEO';
 import UserPermissions from '@/components/UserPermissions';
@@ -349,7 +349,7 @@ const ProfileSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle>معلومات الحساب</CardTitle>
-          <CardDescription>معلومات حسا��ك الأساسية</CardDescription>
+          <CardDescription>معلومات حسابك الأساسية</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -467,7 +467,7 @@ const AvatarUploadButton = () => {
     if (file) {
       console.log('File selected for upload:', file.name, file.type, file.size);
 
-      // تحقق من الملف قبل الرفع
+      // تحقق من الملف قبل ��لرفع
       if (!file.type.startsWith('image/')) {
         toast({
           title: 'خطأ',
@@ -546,7 +546,7 @@ const AvatarUploadButton = () => {
             className="w-8 h-8 rounded-full p-0"
             onClick={removeAvatar}
             disabled={uploading}
-            title="حذف الصورة الشخصية"
+            title="حذف الصورة ال��خصية"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -721,7 +721,7 @@ const NotificationsList = () => {
         <CardContent>
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">��اري التحميل...</p>
+            <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
           </div>
         </CardContent>
       </Card>
@@ -822,7 +822,7 @@ const AccountSettings = () => {
   const handleDeleteAccount = async () => {
     // هذا سيتطلب تأكيد إضافي من المستخدم
     toast({
-      title: 'تحذير',
+      title: 'تح��ير',
       description: 'هذه الميزة غير متوفرة حالياً. يرجى التواصل مع الدعم لحذف حسابك.',
       variant: 'destructive'
     });
@@ -866,7 +866,7 @@ const AccountSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">تأكيد كلمة المر��ر الجديدة</Label>
+              <Label htmlFor="confirmPassword">تأكيد كلمة المرور الجديدة</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -888,7 +888,7 @@ const AccountSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle>الأمان والخصوصية</CardTitle>
-          <CardDescription>إدارة إعدادات الأمان الخاصة بك</CardDescription>
+          <CardDescription>إدار�� إعدادات الأمان الخاصة بك</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -1001,7 +1001,7 @@ const AdminPanelQuick = () => {
                 <>
                   <p>• إدارة المستخدمين والمحتوى</p>
                   <p>• مراجع�� الإبلاغات</p>
-                  <p>• حظر المستخدمين المسيئين</p>
+                  <p>• حظر الم��تخدمين المسيئين</p>
                   <p>• إدارة التعليقات</p>
                 </>
               )}
