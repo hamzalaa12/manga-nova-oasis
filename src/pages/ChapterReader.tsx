@@ -36,7 +36,7 @@ import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useViewTracking } from "@/hooks/useViewTracking";
-import { useUserPermissions } from "@/hooks/useUserPermissions\";ons";
+import { useUserPermissions } from "@/hooks/useUserPermissions\";s\";rPermissions";
 
 interface Chapter {
   id: string;
