@@ -590,7 +590,7 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-                  {/* أزرار التفاعل */}
+                  {/* أزرار التف��عل */}
                   <div className="flex gap-2 mt-6">
                     <FavoriteButton
                       mangaId={manga.id}
@@ -847,6 +847,13 @@ const MangaDetails = () => {
           onOpenChange={setIsEditDialogOpen}
           onMangaUpdated={fetchMangaDetails}
         />
+      )}
+
+      {/* روابط SEO للتصفح */}
+      {manga && (
+        <section className="container mx-auto px-4 py-8">
+          <SEOLinks type="manga" data={manga} />
+        </section>
       )}
 
       <Footer />
