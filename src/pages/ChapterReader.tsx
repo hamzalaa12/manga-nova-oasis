@@ -74,7 +74,6 @@ const ChapterReader = () => {
   const [showNavigation, setShowNavigation] = useState(false);
   const { updateReadingProgress } = useReadingHistory();
   const { trackChapterView, trackMangaView } = useViewTracking();
-  const { canRead, isCompletelyBanned } = useUserPermissions();
 
   useEffect(() => {
     if (slug && chapterParam) {
@@ -368,7 +367,7 @@ const ChapterReader = () => {
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
           <div className="text-red-500 text-6xl mb-4">⚠���</div>
-          <h2 className="text-xl font-bold mb-2">حدث خطأ</h2>
+          <h2 className="text-xl font-bold mb-2">حدث خ��أ</h2>
           <p className="text-gray-300 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
