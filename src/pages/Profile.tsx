@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag, Award } from 'lucide-react';
-import { getRoleDisplayName, getRoleColor } from '@/types/user';
+import { getRoleDisplayName, getRoleColor, getUserRoleIcon, hasPermission } from '@/types/user';
 import SEO from '@/components/SEO';
 import UserPermissions from '@/components/UserPermissions';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -119,7 +119,7 @@ const Profile = () => {
                 </TabsTrigger>
                 <TabsTrigger value="permissions" className="flex items-center gap-2">
                   <Award className="h-4 w-4" />
-                  صلاحياتي
+                  ��لاحياتي
                 </TabsTrigger>
                 <TabsTrigger value="favorites" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
@@ -306,7 +306,7 @@ const ProfileSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle>معلومات الحساب</CardTitle>
-          <CardDescription>معلومات ح��ابك الأساسية</CardDescription>
+          <CardDescription>معلومات حسابك الأساسية</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -456,7 +456,7 @@ const AvatarUploadButton = () => {
             console.log('Profile refreshed after avatar upload');
           }, 1000);
 
-          // إعادة تعيين قيمة input لضمان تحديث الصورة عند اختيار نفس الملف
+          // إعادة تعيين قيمة input لضمان تحديث الصورة عند اختيار ��فس الملف
           event.target.value = '';
         } else {
           console.error('Avatar upload returned null result');
@@ -591,7 +591,7 @@ const ReadingHistoryComponent = () => {
               <History className="h-5 w-5" />
               سجل القراءة الحديث
             </CardTitle>
-            <CardDescription>آخ�� الفصول التي قرأتها</CardDescription>
+            <CardDescription>آخر الفصول التي قرأتها</CardDescription>
           </div>
           {readingHistory.length > 0 && (
             <Button variant="outline" size="sm" onClick={clearReadingHistory}>
