@@ -109,7 +109,7 @@ const AdminDashboard = () => {
         }, 1500);
       } else {
         console.error('Role change failed - reverting UI change');
-        // إذا فشل، أرجع التغيير في الواجهة
+        // إذا فشل�� أرجع التغيير في الواجهة
         setLocalUsers(users);
       }
     } catch (error) {
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* إدارة المحتوى */}
+        {/* إدارة ا��محتوى */}
         <TabsContent value="content" className="space-y-4">
           <ContentModeration />
         </TabsContent>
@@ -319,9 +319,9 @@ const UserCard = ({
 
   console.log(`UserCard rendered for user ${user.user_id} with role ${user.role} (updated: ${user.updated_at})`);
 
-  useState(() => {
+  useEffect(() => {
     getUserStats(user.user_id).then(setUserStats);
-  });
+  }, [user.user_id, getUserStats]);
 
   return (
     <Card className="p-4">
@@ -371,7 +371,7 @@ const UserCard = ({
 
           {user.ban_reason && (
             <div className="p-2 bg-destructive/10 border border-destructive/20 rounded text-sm">
-              <strong>سبب الحظر:</strong> {user.ban_reason}
+              <strong>سبب ا��حظر:</strong> {user.ban_reason}
             </div>
           )}
         </div>
@@ -497,7 +497,7 @@ const UserCard = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
-                    هل أنت متأكد من رغبتك في حذف هذا المستخدم نهائياً؟ 
+                    هل أنت مت��كد من رغبتك في حذف هذا المستخدم نهائياً؟ 
                     سيتم حذف جميع بياناته وتعليقاته ولا يمكن التراجع عن هذا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
