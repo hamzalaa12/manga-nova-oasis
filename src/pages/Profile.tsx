@@ -153,6 +153,10 @@ const Profile = () => {
                 <ProfileSettings />
               </TabsContent>
 
+              <TabsContent value="permissions" className="mt-6">
+                <UserPermissions userRole={userRole} />
+              </TabsContent>
+
               <TabsContent value="favorites" className="mt-6">
                 <FavoritesList />
               </TabsContent>
@@ -302,7 +306,7 @@ const ProfileSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle>معلومات الحساب</CardTitle>
-          <CardDescription>معلومات حسابك الأساسية</CardDescription>
+          <CardDescription>معلومات ح��ابك الأساسية</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -369,7 +373,7 @@ const FavoritesList = () => {
           <div className="text-center py-8 text-muted-foreground">
             <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>لا توجد مانجا في المفضلة بعد</p>
-            <p className="text-sm">��بدأ بإضافة مانجا إلى قائمة المفضلة!</p>
+            <p className="text-sm">ابدأ بإضافة مانجا إلى قائمة المفضلة!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -587,7 +591,7 @@ const ReadingHistoryComponent = () => {
               <History className="h-5 w-5" />
               سجل القراءة الحديث
             </CardTitle>
-            <CardDescription>آخر الفصول التي قرأتها</CardDescription>
+            <CardDescription>آخ�� الفصول التي قرأتها</CardDescription>
           </div>
           {readingHistory.length > 0 && (
             <Button variant="outline" size="sm" onClick={clearReadingHistory}>
@@ -748,7 +752,7 @@ const AccountSettings = () => {
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: '��طأ',
+        title: 'خطأ',
         description: 'كلمات المرور غير متطابقة',
         variant: 'destructive'
       });
