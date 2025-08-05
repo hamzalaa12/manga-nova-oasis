@@ -117,7 +117,13 @@ export const useUserRestrictions = () => {
       });
 
       if (error) {
-        console.error('Error adding restriction:', error);
+        console.error('Error adding restriction:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: error
+        });
         throw error;
       }
 
@@ -178,7 +184,7 @@ export const useUserRestrictions = () => {
       console.error('Error removing restriction:', error);
       toast({
         title: 'خطأ',
-        description: `فشل في رفع القيد: ${error.message || 'خطأ غير مع��وف'}`,
+        description: `فشل في رفع القيد: ${error.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
       return false;
