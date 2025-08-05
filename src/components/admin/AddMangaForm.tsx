@@ -74,7 +74,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
         if (!file.type.startsWith('image/')) {
           toast({
             title: 'خطأ',
-            description: 'يجب أن يكون الملف صورة',
+            description: 'يجب أن يكون الملف ��ورة',
             variant: 'destructive'
           });
           return null;
@@ -265,7 +265,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">ال��صف</label>
+        <label className="block text-sm font-medium mb-2">الوصف</label>
         <Textarea
           value={formData.description}
           onChange={(e) =>
@@ -277,15 +277,102 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
 
       <div>
         <label className="block text-sm font-medium mb-2">
-          رابط صورة الغلاف
+          صورة الغلاف
         </label>
-        <Input
-          value={formData.coverImageUrl}
-          onChange={(e) =>
-            setFormData({ ...formData, coverImageUrl: e.target.value })
-          }
-          placeholder="https://example.com/cover.jpg"
-        />
+
+        <Tabs value={coverImageMethod} onValueChange={(value) => setCoverImageMethod(value as 'url' | 'upload')}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="url" className="flex items-center gap-2">
+              <Link className="h-4 w-4" />
+              رابط الصورة
+            </TabsTrigger>
+            <TabsTrigger value="upload" className="flex items-center gap-2">
+              <Upload className="h-4 w-4" />
+              رفع صورة
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="url" className="space-y-3">
+            <Input
+              value={formData.coverImageUrl}
+              onChange={(e) => {
+                setFormData({ ...formData, coverImageUrl: e.target.value });
+                setPreviewImage(e.target.value);
+              }}
+              placeholder="https://example.com/cover.jpg"
+            />
+          </TabsContent>
+
+          <TabsContent value="upload" className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={imageUploading}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {imageUploading ? "جاري الرفع..." : "اختيار صورة"}
+              </Button>
+
+              {formData.coverImageUrl && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearImage}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  حذف
+                </Button>
+              )}
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
+
+            <p className="text-xs text-muted-foreground">
+              الحد الأقصى: 5 ميجابايت • أنواع مدعومة: JPG, PNG, GIF, WebP
+            </p>
+          </TabsContent>
+        </Tabs>
+
+        {/* معاينة الصورة */}
+        {(previewImage || formData.coverImageUrl) && (
+          <div className="mt-3">
+            <div className="relative inline-block">
+              <img
+                src={previewImage || formData.coverImageUrl}
+                alt="معاينة صورة الغلاف"
+                className="w-32 h-48 object-cover rounded-lg border"
+                onError={() => {
+                  setPreviewImage(null);
+                  toast({
+                    title: 'خطأ',
+                    description: 'فشل في تحميل الصورة',
+                    variant: 'destructive'
+                  });
+                }}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearImage}
+                className="absolute -top-2 -right-2 h-6 w-6 p-0 bg-red-500 text-white rounded-full hover:bg-red-600"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
