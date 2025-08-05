@@ -61,8 +61,14 @@ export const useViewTracking = () => {
       } else {
         console.log('✅ Manga view tracked successfully');
       }
-    } catch (error) {
-      console.error('Error in trackMangaView:', error);
+    } catch (error: any) {
+      console.error('Error in trackMangaView:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
     }
   };
 
