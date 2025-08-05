@@ -14,7 +14,13 @@ export const useViewTracking = () => {
       });
 
       if (error) {
-        console.error('Error tracking manga view:', error);
+        console.error('Error tracking manga view:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: error
+        });
         
         // Fallback: get current count and increment
         try {
