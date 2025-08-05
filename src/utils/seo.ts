@@ -30,8 +30,8 @@ export const generatePageMeta = (
     case 'chapter':
       if (!data) return null;
       return {
-        title: `${data.manga.title} - الفصل ${data.chapter_number} | مانجا العرب`,
-        description: `اقرأ الفصل ${data.chapter_number} من مانجا ${data.manga.title} مترجم بجودة عالية مجاناً. ${data.title || ''} تابع آخر الفصول على مانجا العرب.`,
+        title: `${data.manga.title} - الفصل ${data.chapter_number} - Sanime`,
+        description: `اقرأ الفصل ${data.chapter_number} من مانجا ${data.manga.title} بجودة عالية على موقع Sanime.`,
         keywords: `${data.manga.title} الفصل ${data.chapter_number}, مانجا ${data.manga.title}, قراءة الفصل ${data.chapter_number}`,
         url: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
         canonical: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
@@ -152,7 +152,7 @@ export const generateStructuredData = (page: string, data?: any) => {
 };
 
 export const generateSitemapUrls = async () => {
-  // هذه دالة لتوليد URLs للـ sitemap
+  // ه��ه دالة لتوليد URLs للـ sitemap
   // يمكن استخدامها في build time لتوليد sitemap.xml
   const urls = [
     {
