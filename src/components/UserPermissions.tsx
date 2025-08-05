@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Shield, 
-  User, 
-  Edit3, 
-  Upload, 
-  MessageSquare, 
-  Ban, 
-  Eye, 
-  Star, 
-  Users, 
-  Settings, 
+import {
+  Shield,
+  User,
+  Edit3,
+  Upload,
+  MessageSquare,
+  Ban,
+  Eye,
+  Star,
+  Users,
+  Settings,
   Bell,
   Heart,
   History,
   BookOpen,
   Trash2,
-  UserX
+  UserX,
+  Plus,
+  FileText,
+  Globe,
+  Flag,
+  CheckCircle
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { UserRole, getRoleDisplayName, getRoleColor, getUserRoleIcon } from '@/types/user';
 
 interface UserPermissionsProps {
@@ -125,7 +132,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Upload className="h-4 w-4" />,
               title: "رفع مانجا أو فصل جديد",
-              description: "يتطلب موافقة من مدير الموقع قبل الن��ر",
+              description: "يتطلب موافقة من مدير الموقع قبل النشر",
               available: true
             },
             {
@@ -147,7 +154,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
         return {
           icon: "🥇",
           title: "قائد القبيلة",
-          description: "صلاحيات مقاتل النخبة + النشر المباشر وإدارة المحتوى",
+          description: "صلاحيات مقاتل النخبة + النشر المباشر وإد��رة المحتوى",
           permissions: [
             ...basePermissions,
             {
@@ -159,7 +166,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Edit3 className="h-4 w-4" />,
               title: "تعديل المحتوى",
-              description: "تعديل أو حذ�� المانجا والفصول",
+              description: "تعديل أو حذف المانجا والفصول",
               available: true
             },
             {
@@ -342,7 +349,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
                 <p>• يتطلب محتواك موافقة مدير الموقع قبل النشر</p>
               )}
               {(currentRole === "elite_fighter" || currentRole === "tribe_leader") && (
-                <p>• يمكنك حظر المستخدمين مؤقتاً فقط، الحظر الدائم يتطلب صلاحيات أعلى</p>
+                <p>• يمكنك حظر المستخدمين مؤقتاً فقط، الحظر الدائم يتطلب صلاحيات أ��لى</p>
               )}
               {currentRole === "admin" && (
                 <p>• لا يمكنك تغيير رتبة مستخدم إلى admin أو site_admin</p>
@@ -364,7 +371,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
               <p className="text-xs text-blue-700 dark:text-blue-300">
                 {currentRole === "user" && "كن نشطاً في المجتمع لتصبح مقاتل مبتدئ"}
                 {currentRole === "beginner_fighter" && "ساهم بمحتوى جيد واكسب ثقة المديرين"}
-                {currentRole === "elite_fighter" && "أظهر قيادة ومساعدة في إدارة المجتمع"}
+                {currentRole === "elite_fighter" && "أظه�� قيادة ومساعدة في إدارة المجتمع"}
                 {currentRole === "tribe_leader" && "تواصل مع إدارة الموقع للترشح لمنصب إداري"}
                 {currentRole === "admin" && "يتطلب ترشيح من مدير الموقع"}
               </p>
