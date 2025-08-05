@@ -208,7 +208,7 @@ const ProfileDashboard = () => {
       {
         id: 'chapter_10',
         title: 'قارئ نشط',
-        description: 'قراءة 10 فصول',
+        description: 'قراء�� 10 فصول',
         icon: '🔥',
         unlocked: userStats.totalChapters >= 10,
         progress: Math.min(userStats.totalChapters, 10),
@@ -422,6 +422,92 @@ const ProfileDashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* إحصائيات الإدارة */}
+      {userRole !== "user" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              إحصائيات الإدارة
+            </CardTitle>
+            <CardDescription>
+              أنشطتك وصلاحياتك الإدارية
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* رفع المحتوى */}
+              {hasPermission(userRole, "can_submit_content") && (
+                <div className="text-center p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                  <p className="text-xl font-bold text-green-900 dark:text-green-100">المحتوى</p>
+                  <p className="text-sm text-green-700 dark:text-green-300">رفع مباشر</p>
+                </div>
+              )}
+
+              {/* إدارة التعليقات */}
+              {hasPermission(userRole, "can_moderate_comments") && (
+                <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <MessageSquare className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                  <p className="text-xl font-bold text-blue-900 dark:text-blue-100">التعليقات</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">إدارة ومراقبة</p>
+                </div>
+              )}
+
+              {/* حظر المستخدمين */}
+              {hasPermission(userRole, "can_ban_users") && (
+                <div className="text-center p-4 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <Flag className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+                  <p className="text-xl font-bold text-orange-900 dark:text-orange-100">الحظر</p>
+                  <p className="text-sm text-orange-700 dark:text-orange-300">إدارة المخالفين</p>
+                </div>
+              )}
+
+              {/* إدارة المستخدمين */}
+              {hasPermission(userRole, "can_manage_users") && (
+                <div className="text-center p-4 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <Users className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                  <p className="text-xl font-bold text-purple-900 dark:text-purple-100">المستخدمين</p>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">إدارة شاملة</p>
+                </div>
+              )}
+            </div>
+
+            {/* أز��ار الإجراءات السريعة */}
+            <div className="mt-6 pt-4 border-t">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {hasPermission(userRole, "can_submit_content") && (
+                  <a href="/admin" className="block">
+                    <div className="p-3 text-center bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer">
+                      <Upload className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-sm font-medium">إضافة محتوى</p>
+                    </div>
+                  </a>
+                )}
+
+                {hasPermission(userRole, "can_moderate_comments") && (
+                  <a href="/admin" className="block">
+                    <div className="p-3 text-center bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer">
+                      <Eye className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-sm font-medium">مراجعة التعليقات</p>
+                    </div>
+                  </a>
+                )}
+
+                {hasPermission(userRole, "can_manage_users") && (
+                  <a href="/admin" className="block">
+                    <div className="p-3 text-center bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer">
+                      <Users className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+                      <p className="text-sm font-medium">إدارة المستخدمين</p>
+                    </div>
+                  </a>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
