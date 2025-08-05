@@ -35,8 +35,7 @@ import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
-import { useViewTracking } from "@/hooks/useViewTracking";
-import { useUserPermissions } from "@/hooks/useUserPermissions\";rPermissions\";useUserPermissions";
+import { useViewTracking } from "@/hooks/useViewTracking\";iewTracking\";ing\";ViewTracking";
 
 interface Chapter {
   id: string;
