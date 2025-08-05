@@ -36,7 +36,7 @@ import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useViewTracking } from "@/hooks/useViewTracking";
-import { useUserPermissions } from "@/hooks/useUserPermissions\";erPermissions\";rPermissions";
+import { useUserPermissions } from "@/hooks/useUserPermissions\";ons";
 
 interface Chapter {
   id: string;
@@ -368,7 +368,7 @@ const ChapterReader = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <div className="text-red-500 text-6xl mb-4">⚠���</div>
           <h2 className="text-xl font-bold mb-2">حدث خطأ</h2>
           <p className="text-gray-300 mb-4">{error}</p>
           <button
