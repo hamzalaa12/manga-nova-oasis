@@ -332,15 +332,28 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
             <div
               onDragOver={handleDragOver}
               onDrop={handleDrop}
-              className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                imageUploading
+                  ? 'border-primary bg-primary/5'
+                  : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+              }`}
+              onClick={() => !imageUploading && fileInputRef.current?.click()}
             >
               <div className="flex flex-col items-center gap-2">
-                <Image className="h-8 w-8 text-muted-foreground" />
-                <p className="text-sm font-medium">اسحب ال��ورة هنا أو اضغط للاختيار</p>
-                <p className="text-xs text-muted-foreground">
-                  الحد الأقصى: 5 ميجابايت • أنواع مدعومة: JPG, PNG, GIF, WebP
-                </p>
+                {imageUploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <p className="text-sm font-medium text-primary">جاري رفع الصورة...</p>
+                  </>
+                ) : (
+                  <>
+                    <Image className="h-8 w-8 text-muted-foreground" />
+                    <p className="text-sm font-medium">اسحب الصورة هنا أو اضغط للاختيار</p>
+                    <p className="text-xs text-muted-foreground">
+                      الحد الأقصى: 5 ميجابايت • أنواع مدعومة: JPG, PNG, GIF, WebP
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
