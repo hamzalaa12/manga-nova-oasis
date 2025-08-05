@@ -47,8 +47,9 @@ const AdvancedComments = ({ mangaId, chapterId, className }: AdvancedCommentsPro
     deleteComment, 
     pinComment 
   } = useComments(mangaId, chapterId);
-  
-  const [newComment, setNewComment] = useState('');
+
+  const { canComment, hasRestriction } = useUserPermissions();
+  const [newComment, setNewComment] = useState('');tate('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
