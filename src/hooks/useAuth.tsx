@@ -106,8 +106,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const role = profileData?.role as UserRole || 'user';
       setUserRole(role);
       setIsAdmin(['admin', 'site_admin'].includes(profileData?.role || 'user'));
-    } catch (error) {
-      console.error('Error loading profile:', error);
+    } catch (error: any) {
+      console.error('Error loading profile:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
     }
   };
 
