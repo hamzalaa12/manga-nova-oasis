@@ -50,7 +50,7 @@ const RestrictionsMenu = ({
 
   const restrictionOptions = [
     { value: 'comment_ban', label: 'منع التعليق', icon: MessageSquareOff, color: 'bg-yellow-500' },
-    { value: 'read_ban', label: 'منع القراءة', icon: BookOpenX, color: 'bg-orange-500' },
+    { value: 'read_ban', label: 'منع القراءة', icon: BookOpen, color: 'bg-orange-500' },
     { value: 'upload_ban', label: 'منع الرفع', icon: UploadX, color: 'bg-red-500' },
     { value: 'complete_ban', label: 'حظر كامل', icon: ShieldX, color: 'bg-red-700' },
   ];
@@ -138,7 +138,7 @@ const RestrictionsMenu = ({
                 <DropdownMenuSeparator />
               </>
             ) : (
-              <p className="text-xs text-muted-foreground mb-2">لا توجد قيود</p>
+              <p className="text-xs text-muted-foreground mb-2">لا توج�� قيود</p>
             )}
             
             <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
