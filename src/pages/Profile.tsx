@@ -71,10 +71,11 @@ const Profile = () => {
                 
                 <CardTitle className="flex items-center justify-center gap-2">
                   {profile?.display_name || 'مستخدم'}
-                  <Badge 
+                  <Badge
                     className={getRoleColor(userRole)}
                     variant="secondary"
                   >
+                    <span className="mr-1">{getUserRoleIcon(userRole)}</span>
                     {getRoleDisplayName(userRole)}
                   </Badge>
                 </CardTitle>
@@ -119,7 +120,7 @@ const Profile = () => {
                 </TabsTrigger>
                 <TabsTrigger value="permissions" className="flex items-center gap-2">
                   <Award className="h-4 w-4" />
-                  ��لاحياتي
+                  صلاحياتي
                 </TabsTrigger>
                 <TabsTrigger value="favorites" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
@@ -296,7 +297,7 @@ const ProfileSettings = () => {
             </div>
 
             <Button type="submit" disabled={isSubmitting || loading}>
-              {(isSubmitting || loading) ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+              {(isSubmitting || loading) ? '��اري الحفظ...' : 'حفظ التغييرات'}
             </Button>
           </form>
         </CardContent>
@@ -366,7 +367,7 @@ const FavoritesList = () => {
     <Card>
       <CardHeader>
         <CardTitle>المانجا المفضلة</CardTitle>
-        <CardDescription>المانجا التي أضفتها إلى قائمة المفضلة</CardDescription>
+        <CardDescription>المانجا التي أضفتها إ��ى قائمة المفضلة</CardDescription>
       </CardHeader>
       <CardContent>
         {favorites.length === 0 ? (
@@ -456,7 +457,7 @@ const AvatarUploadButton = () => {
             console.log('Profile refreshed after avatar upload');
           }, 1000);
 
-          // إعادة تعيين قيمة input لضمان تحديث الصورة عند اختيار ��فس الملف
+          // إعادة تعيين قيمة input لضمان تحديث الصورة عند اختيار نفس الملف
           event.target.value = '';
         } else {
           console.error('Avatar upload returned null result');
@@ -520,7 +521,7 @@ const ReadingHistoryComponent = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        {/* إحصائيات القراءة */}
+        {/* إح��ائيات القراءة */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
