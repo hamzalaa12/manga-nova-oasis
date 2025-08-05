@@ -83,11 +83,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setProfile(updatedProfile);
             const role = updatedProfile?.role as UserRole || 'user';
             setUserRole(role);
-            setIsAdmin(['admin', 'site_admin'].includes(role));
+            setIsAdmin(['tribe_leader', 'admin', 'site_admin'].includes(role));
 
             console.log('Profile state updated:', {
               role,
-              isAdmin: ['admin', 'site_admin'].includes(role)
+              isAdmin: ['tribe_leader', 'admin', 'site_admin'].includes(role)
             });
           }
         }
