@@ -33,6 +33,7 @@ import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestriction
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
 import RestrictionsMenu from './RestrictionsMenu';
+import SitemapManager from './admin/SitemapManager';
 
 const AdminDashboard = () => {
   const {
@@ -256,7 +257,7 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle>إدارة الإبلاغات</CardTitle>
               <CardDescription>
-                مراجعة والرد على الإبلاغات الم��سلة من المستخدمين
+                مراجعة والرد على الإبلاغات الم����لة من المستخدمين
               </CardDescription>
             </CardHeader>
             <CardContent>
