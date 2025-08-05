@@ -66,6 +66,105 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     setGenres(genres.filter((genre) => genre !== genreToRemove));
   };
 
+  const handleImageUpload = async (file: File) => {
+    try {
+      // Create custom upload function for manga covers
+      const uploadCoverImage = async (file: File): Promise<string | null> => {
+        // Validate file
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: 'خطأ',
+            description: 'يجب أن يكون الملف صورة',
+            variant: 'destructive'
+          });
+          return null;
+        }
+
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: 'خطأ',
+            description: 'حجم الصورة يجب أن يكون أقل من 5 ميجابايت',
+            variant: 'destructive'
+          });
+          return null;
+        }
+
+        try {
+          // Upload to Supabase Storage
+          const fileExt = file.name.split('.').pop();
+          const fileName = `manga_cover_${Date.now()}.${fileExt}`;
+          const filePath = `manga-covers/${fileName}`;
+
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('user-content')
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: true
+            });
+
+          if (uploadError) {
+            console.warn('Supabase storage upload failed, using base64 fallback:', uploadError);
+            // Fallback to base64
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = () => resolve(reader.result as string);
+              reader.onerror = (error) => reject(error);
+            });
+          } else {
+            // Get public URL
+            const { data: publicUrlData } = supabase.storage
+              .from('user-content')
+              .getPublicUrl(filePath);
+            return publicUrlData.publicUrl;
+          }
+        } catch (storageError) {
+          console.warn('Storage failed, using base64 fallback:', storageError);
+          // Fallback to base64
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+          });
+        }
+      };
+
+      const imageUrl = await uploadCoverImage(file);
+      if (imageUrl) {
+        setFormData({ ...formData, coverImageUrl: imageUrl });
+        setPreviewImage(imageUrl);
+        toast({
+          title: 'تم رفع الصورة',
+          description: 'تم رفع صورة الغلاف بنجاح'
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      toast({
+        title: 'خطأ',
+        description: 'فشل في رفع صورة الغلاف',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const clearImage = () => {
+    setFormData({ ...formData, coverImageUrl: "" });
+    setPreviewImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const generateUniqueSlug = async (title: string): Promise<string> => {
     const baseSlug = createSlug(title);
     let finalSlug = baseSlug;
@@ -166,7 +265,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">الوصف</label>
+        <label className="block text-sm font-medium mb-2">ال��صف</label>
         <Textarea
           value={formData.description}
           onChange={(e) =>
