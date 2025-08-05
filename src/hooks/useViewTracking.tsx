@@ -150,7 +150,13 @@ export const useViewTracking = () => {
         .single();
 
       if (error) {
-        console.error(`Error getting ${type} views:`, error);
+        console.error(`Error getting ${type} views:`, {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: error
+        });
         return 0;
       }
 
