@@ -453,7 +453,7 @@ const AvatarUploadButton = () => {
           console.error('Avatar upload returned null result');
         }
       } catch (error) {
-        console.error('خطأ في رفع الصورة:', error);
+        console.error('خ��أ في رفع الصورة:', error);
         toast({
           title: 'خطأ',
           description: 'فشل في رفع الصورة. حاول مرة أخرى.',
@@ -606,15 +606,15 @@ const ReadingHistoryComponent = () => {
                   className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <img
-                    src={item.manga.cover_image_url || '/placeholder.svg'}
-                    alt={item.manga.title}
+                    src={item.manga?.cover_image_url || '/placeholder.svg'}
+                    alt={item.manga?.title || 'مانجا'}
                     className="w-12 h-16 object-cover rounded"
                   />
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium line-clamp-1">{item.manga.title}</h4>
+                    <h4 className="font-medium line-clamp-1">{item.manga?.title || 'مانجا غير معروفة'}</h4>
                     <p className="text-sm text-muted-foreground">
-                      الفصل {item.chapter.chapter_number}
-                      {item.chapter.title && ` - ${item.chapter.title}`}
+                      الفصل {item.chapter?.chapter_number || 'غير معروف'}
+                      {item.chapter?.title && ` - ${item.chapter.title}`}
                     </p>
                     <div className="flex items-center gap-4 mt-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
