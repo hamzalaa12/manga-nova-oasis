@@ -234,7 +234,7 @@ const ProfileSettings = () => {
 
         toast({
           title: 'تم الحفظ',
-          description: 'تم تحديث ملفك الشخصي بنجاح'
+          description: 'تم تحديث ملف�� الشخصي بنجاح'
         });
       }
     } catch (error: any) {
@@ -600,7 +600,10 @@ const ReadingHistoryComponent = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {readingHistory.slice(0, 10).map((item) => (
+              {readingHistory
+                .filter((item) => item.manga && item.chapter) // Only show items with valid manga and chapter data
+                .slice(0, 10)
+                .map((item) => (
                 <div
                   key={item.id}
                   className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -682,7 +685,7 @@ const NotificationsList = () => {
         </div>
         {notifications.length > 0 && (
           <Button variant="outline" size="sm" onClick={markAllAsRead}>
-            تحديد الكل كمقروء
+            تحديد الك�� كمقروء
           </Button>
         )}
       </CardHeader>
@@ -811,7 +814,7 @@ const AccountSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">تأكيد كلمة ا��مرور الجديدة</Label>
+              <Label htmlFor="confirmPassword">تأكيد كلمة المرور الجديدة</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -945,7 +948,7 @@ const AdminPanelQuick = () => {
               {userRole === 'admin' && (
                 <>
                   <p>• إدارة المستخدمين والمحتوى</p>
-                  <p>• مراجعة الإبلاغات</p>
+                  <p>• مراجع�� الإبلاغات</p>
                   <p>• حظر المستخدمين المسيئين</p>
                   <p>• إدارة التعليقات</p>
                 </>
@@ -976,7 +979,7 @@ const AdminPanelQuick = () => {
           <div className="mt-4 text-center">
             <Button asChild>
               <Link to="/admin">
-                الانتقال للوحة الإدارة الكاملة
+                الانتقال للوحة الإدارة الكام��ة
               </Link>
             </Button>
           </div>
