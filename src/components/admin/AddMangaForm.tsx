@@ -165,6 +165,30 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        handleImageUpload(file);
+      } else {
+        toast({
+          title: 'خطأ',
+          description: 'يجب أن يكون الملف صورة',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
   const generateUniqueSlug = async (title: string): Promise<string> => {
     const baseSlug = createSlug(title);
     let finalSlug = baseSlug;
