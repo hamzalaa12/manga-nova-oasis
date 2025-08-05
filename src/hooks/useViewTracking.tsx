@@ -10,9 +10,11 @@ export const useViewTracking = () => {
 
       // Use RPC function for reliable tracking
       console.log('📞 Calling RPC: track_manga_view with params:', { manga_uuid: mangaId });
-      const { error } = await supabase.rpc('track_manga_view', {
+      const result = await supabase.rpc('track_manga_view', {
         manga_uuid: mangaId
       });
+      console.log('📞 RPC Result:', result);
+      const { error } = result;
 
       if (error) {
         console.log('🚨 Error tracking manga view:');
