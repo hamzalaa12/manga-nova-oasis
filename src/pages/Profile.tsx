@@ -102,6 +102,48 @@ const Profile = () => {
                     <p className="text-sm">{profile.bio}</p>
                   </div>
                 )}
+
+                {/* معاينة سريعة للصلاحيات */}
+                <div className="mt-4 pt-4 border-t">
+                  <h4 className="text-sm font-medium mb-2 flex items-center gap-1">
+                    <Award className="h-3 w-3" />
+                    صلاحياتك الرئيسية
+                  </h4>
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    {userRole !== "user" && hasPermission(userRole, "can_submit_content") && (
+                      <div className="flex items-center gap-1">
+                        <Upload className="h-3 w-3 text-green-500" />
+                        <span>رفع المحتوى</span>
+                      </div>
+                    )}
+                    {hasPermission(userRole, "can_moderate_comments") && (
+                      <div className="flex items-center gap-1">
+                        <MessageSquare className="h-3 w-3 text-blue-500" />
+                        <span>إدارة التعليقات</span>
+                      </div>
+                    )}
+                    {hasPermission(userRole, "can_ban_users") && (
+                      <div className="flex items-center gap-1">
+                        <Shield className="h-3 w-3 text-orange-500" />
+                        <span>حظر المستخدمين</span>
+                      </div>
+                    )}
+                    {hasPermission(userRole, "can_manage_users") && (
+                      <div className="flex items-center gap-1">
+                        <Users className="h-3 w-3 text-purple-500" />
+                        <span>إدارة المستخدمين</span>
+                      </div>
+                    )}
+                    <div className="text-center mt-2">
+                      <button
+                        onClick={() => setActiveTab('permissions')}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        عرض كامل الصلاحيات ←
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -297,7 +339,7 @@ const ProfileSettings = () => {
             </div>
 
             <Button type="submit" disabled={isSubmitting || loading}>
-              {(isSubmitting || loading) ? '��اري الحفظ...' : 'حفظ التغييرات'}
+              {(isSubmitting || loading) ? 'جاري الحفظ...' : 'حفظ التغييرات'}
             </Button>
           </form>
         </CardContent>
@@ -307,7 +349,7 @@ const ProfileSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle>معلومات الحساب</CardTitle>
-          <CardDescription>معلومات حسابك الأساسية</CardDescription>
+          <CardDescription>معلومات حسا��ك الأساسية</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -367,7 +409,7 @@ const FavoritesList = () => {
     <Card>
       <CardHeader>
         <CardTitle>المانجا المفضلة</CardTitle>
-        <CardDescription>المانجا التي أضفتها إ��ى قائمة المفضلة</CardDescription>
+        <CardDescription>المانجا التي أضفتها إلى قائمة المفضلة</CardDescription>
       </CardHeader>
       <CardContent>
         {favorites.length === 0 ? (
@@ -521,7 +563,7 @@ const ReadingHistoryComponent = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        {/* إح��ائيات القراءة */}
+        {/* إحصائيات القراءة */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -679,7 +721,7 @@ const NotificationsList = () => {
         <CardContent>
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+            <p className="mt-2 text-muted-foreground">��اري التحميل...</p>
           </div>
         </CardContent>
       </Card>
@@ -824,7 +866,7 @@ const AccountSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">تأكيد كلمة المرور الجديدة</Label>
+              <Label htmlFor="confirmPassword">تأكيد كلمة المر��ر الجديدة</Label>
               <Input
                 id="confirmPassword"
                 type="password"
