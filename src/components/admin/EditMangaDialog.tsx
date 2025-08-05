@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,9 +29,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { X, Plus, Search, Upload, Image, Link } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useImageUpload } from "@/hooks/useImageUpload";
 import { AVAILABLE_GENRES } from "@/constants/genres";
 
 interface Manga {
@@ -79,12 +81,16 @@ const EditMangaDialog = ({
   onMangaUpdated,
 }: EditMangaDialogProps) => {
   const { toast } = useToast();
+  const { uploadAvatar, uploading: imageUploading } = useImageUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedGenres, setSelectedGenres] = useState<string[]>(
     manga.genre || [],
   );
   const [newGenre, setNewGenre] = useState("");
   const [genreSearch, setGenreSearch] = useState("");
+  const [coverImageMethod, setCoverImageMethod] = useState<'url' | 'upload'>('url');
+  const [previewImage, setPreviewImage] = useState<string | null>(manga.cover_image_url || null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -112,6 +118,110 @@ const EditMangaDialog = ({
         !selectedGenres.includes(genre),
     );
   }, [genreSearch, selectedGenres]);
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      // Create custom upload function for manga covers
+      const uploadCoverImage = async (file: File): Promise<string | null> => {
+        // Validate file
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: 'خطأ',
+            description: 'يجب أن يكون الملف صورة',
+            variant: 'destructive'
+          });
+          return null;
+        }
+
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: 'خطأ',
+            description: 'حجم الصورة يجب أن يكون أقل من 5 ميجابايت',
+            variant: 'destructive'
+          });
+          return null;
+        }
+
+        try {
+          // Upload to Supabase Storage
+          const fileExt = file.name.split('.').pop();
+          const fileName = `manga_cover_${Date.now()}.${fileExt}`;
+          const filePath = `manga-covers/${fileName}`;
+
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('user-content')
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (uploadError) {
+            console.error('Supabase upload error:', uploadError);
+            throw uploadError;
+          }
+
+          // Get public URL
+          const { data: publicUrlData } = supabase.storage
+            .from('user-content')
+            .getPublicUrl(filePath);
+
+          return publicUrlData.publicUrl;
+        } catch (storageError) {
+          console.error('Storage upload failed, using base64 fallback:', storageError);
+          
+          // Fallback to base64
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              resolve(e.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+      };
+
+      const imageUrl = await uploadCoverImage(file);
+      if (imageUrl) {
+        form.setValue('cover_image_url', imageUrl);
+        setPreviewImage(imageUrl);
+        toast({
+          title: 'نجح!',
+          description: 'تم رفع الصورة بنجاح'
+        });
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({
+        title: 'خطأ',
+        description: 'فشل في رفع الصورة',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      handleImageUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
 
   const addGenre = (genre: string) => {
     if (genre && !selectedGenres.includes(genre)) {
@@ -169,7 +279,7 @@ const EditMangaDialog = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>تحرير المانجا</DialogTitle>
-          <DialogDescription>قم بتحديث معلومات المانجا</DialogDescription>
+          <DialogDescription>قم بتحديث معلومات ال��انجا</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -230,19 +340,99 @@ const EditMangaDialog = ({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="cover_image_url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>رابط صورة الغلاف</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="url" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            {/* صورة الغلاف */}
+            <div className="space-y-4">
+              <FormLabel>صورة الغلاف</FormLabel>
+              
+              <Tabs value={coverImageMethod} onValueChange={(value) => setCoverImageMethod(value as 'url' | 'upload')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="url" className="flex items-center gap-2">
+                    <Link className="h-4 w-4" />
+                    رابط
+                  </TabsTrigger>
+                  <TabsTrigger value="upload" className="flex items-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    رفع ملف
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="url" className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="cover_image_url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>رابط صورة الغلاف</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="url" 
+                            placeholder="https://example.com/image.jpg"
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setPreviewImage(e.target.value);
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+
+                <TabsContent value="upload" className="space-y-4">
+                  <div
+                    className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-muted-foreground/50 transition-colors cursor-pointer"
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onClick={handleFileSelect}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="h-8 w-8 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">اسحب الصورة هنا أو اضغط للاختيار</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, WEBP حتى 5MB</p>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              {/* معاينة الصورة */}
+              {previewImage && (
+                <div className="space-y-2">
+                  <FormLabel>معاينة الصورة</FormLabel>
+                  <div className="relative w-32 h-48 mx-auto">
+                    <img
+                      src={previewImage}
+                      alt="معاينة الغلاف"
+                      className="w-full h-full object-cover rounded-lg border"
+                      onError={() => setPreviewImage(null)}
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                      onClick={() => {
+                        setPreviewImage(null);
+                        form.setValue('cover_image_url', '');
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
               )}
-            />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -377,7 +567,7 @@ const EditMangaDialog = ({
 
               {/* إضافة تصنيف جديد */}
               <div className="space-y-3">
-                {/* صندوق البحث في الت��نيفات */}
+                {/* صندوق البحث في التصنيفات */}
                 <div className="relative">
                   <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
