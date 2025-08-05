@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { ShieldAlert, MessageSquareOff, BookOpenX, UploadX, ShieldX } from 'lucide-react';
+import { ShieldAlert, MessageSquareOff, BookOpen, UploadX, ShieldX } from 'lucide-react';
 import { RestrictionType } from '@/hooks/useUserRestrictions';
 
 interface RestrictionsMenuProps {
