@@ -144,6 +144,63 @@ const Profile = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* أدوات الإدارة السريعة */}
+                {(userRole !== "user") && (
+                  <div className="mt-4 pt-4 border-t">
+                    <h4 className="text-sm font-medium mb-3 flex items-center gap-1">
+                      <Shield className="h-3 w-3" />
+                      أدوات الإدارة السريعة
+                    </h4>
+                    <div className="space-y-2">
+                      {/* رفع محتوى */}
+                      {hasPermission(userRole, "can_submit_content") && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link to="/admin" className="block">
+                            <Button size="sm" variant="outline" className="w-full text-xs h-8">
+                              <Plus className="h-3 w-3 mr-1" />
+                              إضافة مانجا
+                            </Button>
+                          </Link>
+                          <Link to="/admin" className="block">
+                            <Button size="sm" variant="outline" className="w-full text-xs h-8">
+                              <FileText className="h-3 w-3 mr-1" />
+                              إضافة فصل
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
+
+                      {/* إدارة المحتوى */}
+                      {hasPermission(userRole, "can_moderate_comments") && (
+                        <Link to="/admin" className="block">
+                          <Button size="sm" variant="outline" className="w-full text-xs h-8">
+                            <MessageSquare className="h-3 w-3 mr-1" />
+                            إدارة التعليقات
+                          </Button>
+                        </Link>
+                      )}
+
+                      {/* إدارة المستخدمين */}
+                      {hasPermission(userRole, "can_manage_users") && (
+                        <Link to="/admin" className="block">
+                          <Button size="sm" variant="outline" className="w-full text-xs h-8">
+                            <Users className="h-3 w-3 mr-1" />
+                            إدارة المستخدمين
+                          </Button>
+                        </Link>
+                      )}
+
+                      {/* لوحة الإدارة الكاملة */}
+                      <Link to="/admin" className="block">
+                        <Button size="sm" className="w-full text-xs h-8">
+                          <Globe className="h-3 w-3 mr-1" />
+                          لوحة الإدارة الكاملة
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -851,7 +908,7 @@ const AccountSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="newPassword">كلمة المرور ا��جديدة</Label>
+              <Label htmlFor="newPassword">كلمة المرور الجديدة</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -999,7 +1056,7 @@ const AdminPanelQuick = () => {
               )}
               {userRole === 'admin' && (
                 <>
-                  <p>• إدارة المستخدمين ��المحتوى</p>
+                  <p>• إدارة المستخدمين والمحتوى</p>
                   <p>• مراجع�� الإبلاغات</p>
                   <p>• حظر الم��تخدمين المسيئين</p>
                   <p>• إدارة التعليقات</p>
