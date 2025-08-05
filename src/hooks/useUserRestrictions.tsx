@@ -225,8 +225,14 @@ export const useUserRestrictions = () => {
       }
 
       return data?.map(r => r.restriction_type as RestrictionType) || [];
-    } catch (error) {
-      console.error('Error in getUserRestrictions:', error);
+    } catch (error: any) {
+      console.error('Error in getUserRestrictions:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
       return [];
     }
   };
