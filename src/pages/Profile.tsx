@@ -108,7 +108,7 @@ const Profile = () => {
           {/* محتوى الملف الشخصي */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-7' : 'grid-cols-6'}`}>
+              <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-8' : 'grid-cols-7'}`}>
                 <TabsTrigger value="dashboard" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
                   لوحة المعلومات
@@ -116,6 +116,10 @@ const Profile = () => {
                 <TabsTrigger value="profile" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   الملف الشخصي
+                </TabsTrigger>
+                <TabsTrigger value="permissions" className="flex items-center gap-2">
+                  <Award className="h-4 w-4" />
+                  صلاحياتي
                 </TabsTrigger>
                 <TabsTrigger value="favorites" className="flex items-center gap-2">
                   <Heart className="h-4 w-4" />
@@ -180,7 +184,7 @@ const Profile = () => {
   );
 };
 
-// مكون إعدادات ��ل��لف الشخصي
+// مكون إعدادات ال��لف الشخصي
 const ProfileSettings = () => {
   const { profile, user, refreshProfile } = useAuth();
   const { updateProfile, loading } = useProfile();
@@ -333,7 +337,7 @@ const ProfileSettings = () => {
   );
 };
 
-// مك��ن قا��مة المفضلة
+// مكون قا��مة المفضلة
 const FavoritesList = () => {
   const { favorites, loading } = useFavorites();
 
@@ -365,7 +369,7 @@ const FavoritesList = () => {
           <div className="text-center py-8 text-muted-foreground">
             <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>لا توجد مانجا في المفضلة بعد</p>
-            <p className="text-sm">ابدأ بإضافة مانجا إلى قائمة المفضلة!</p>
+            <p className="text-sm">��بدأ بإضافة مانجا إلى قائمة المفضلة!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -405,7 +409,7 @@ const FavoritesList = () => {
   );
 };
 
-// مك��ن رفع ��لصورة الشخصية
+// مك��ن رفع الصورة الشخصية
 const AvatarUploadButton = () => {
   const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
   const { profile, refreshProfile } = useAuth();
@@ -744,8 +748,8 @@ const AccountSettings = () => {
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: 'خطأ',
-        description: 'كلما�� المرور غير متطابقة',
+        title: '��طأ',
+        description: 'كلمات المرور غير متطابقة',
         variant: 'destructive'
       });
       return;
