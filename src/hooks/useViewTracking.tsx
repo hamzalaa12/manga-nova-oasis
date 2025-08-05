@@ -77,9 +77,10 @@ export const useViewTracking = () => {
 
   const trackChapterView = async (chapterId: string) => {
     try {
-      console.log('Tracking chapter view for:', chapterId);
-      
+      console.log('🔍 Tracking chapter view for:', chapterId);
+
       // Use RPC function for reliable tracking
+      console.log('📞 Calling RPC: track_chapter_view with params:', { chapter_uuid: chapterId });
       const { error } = await supabase.rpc('track_chapter_view', {
         chapter_uuid: chapterId
       });
