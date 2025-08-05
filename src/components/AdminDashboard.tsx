@@ -37,6 +37,7 @@ import RestrictionsMenu from './RestrictionsMenu';
 import SitemapManager from './admin/SitemapManager';
 
 const AdminDashboard = () => {
+  const { user: currentUser, refreshProfile } = useAuth();
   const {
     users,
     loading: usersLoading,
@@ -168,7 +169,7 @@ const AdminDashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي الإبلاغات</CardTitle>
+            <CardTitle className="text-sm font-medium">إجمالي الإ��لاغات</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -198,7 +199,7 @@ const AdminDashboard = () => {
               <div className="flex flex-col md:flex-row gap-4 mb-6">
                 <div className="flex-1">
                   <Input
-                    placeholder="البحث بالاسم أو البريد الإلكتروني..."
+                    placeholder="البحث بال��سم أو البريد الإلكتروني..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -397,7 +398,7 @@ const UserCard = ({
               <SelectItem value="user">مستخدم عادي</SelectItem>
               <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
               <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
-              <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
+              <SelectItem value="tribe_leader">ق��ئد قبيلة</SelectItem>
               <SelectItem value="admin">مدير</SelectItem>
               <SelectItem value="site_admin">مدير الموقع</SelectItem>
             </SelectContent>
