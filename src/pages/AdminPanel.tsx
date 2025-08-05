@@ -8,7 +8,7 @@ import SEO from '@/components/SEO';
 
 const AdminPanel = () => {
   const { userRole } = useAuth();
-  const isAdmin = ['admin', 'site_admin'].includes(userRole as string);
+  const isAdmin = ['tribe_leader', 'admin', 'site_admin'].includes(userRole as string);
 
   if (!isAdmin) {
     return (
