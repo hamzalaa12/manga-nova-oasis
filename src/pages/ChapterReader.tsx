@@ -75,6 +75,7 @@ const ChapterReader = () => {
   const [showNavigation, setShowNavigation] = useState(false);
   const { updateReadingProgress } = useReadingHistory();
   const { trackChapterView, trackMangaView } = useViewTracking();
+  const { canRead, isCompletelyBanned } = useUserPermissions();
 
   useEffect(() => {
     if (slug && chapterParam) {
@@ -131,7 +132,7 @@ const ChapterReader = () => {
         error: error
       });
 
-      // إظهار رسالة خطأ للمستخدم
+      // إظهار رسالة خطأ للم��تخدم
       setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
       setChapter(null);
       setManga(null);
