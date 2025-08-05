@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
           // Load user profile and role
           setTimeout(async () => {
@@ -58,6 +58,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Set up real-time subscription for profile changes
+  useEffect(() => {
+    if (!user?.id) return;
+
+    console.log('Setting up profile subscription for user:', user.id);
+
+    const profileSubscription = supabase
+      .channel('profile_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Profile updated in real-time:', payload);
+
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            const updatedProfile = payload.new;
+            setProfile(updatedProfile);
+            const role = updatedProfile?.role as UserRole || 'user';
+            setUserRole(role);
+            setIsAdmin(['admin', 'site_admin'].includes(role));
+
+            console.log('Profile state updated:', {
+              role,
+              isAdmin: ['admin', 'site_admin'].includes(role)
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up profile subscription');
+      supabase.removeChannel(profileSubscription);
+    };
+  }, [user?.id]);
 
   const loadUserProfile = async (userId: string, retryCount = 0) => {
     try {
