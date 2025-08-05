@@ -27,6 +27,12 @@ const Index = () => {
       <Hero />
       <ChaptersGrid />
       <MangaGrid />
+
+      {/* روابط SEO للتصفح */}
+      <section className="container mx-auto px-4 py-8">
+        <SEOLinks type="home" />
+      </section>
+
       <Footer />
       <AdminPanel />
     </div>
