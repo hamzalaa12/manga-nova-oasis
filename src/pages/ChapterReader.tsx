@@ -182,7 +182,13 @@ const ChapterReader = () => {
             });
 
           if (progressError) {
-            console.error('Error saving reading progress:', progressError);
+            console.error('Error saving reading progress:', {
+              message: progressError?.message || 'Unknown error',
+              code: progressError?.code,
+              details: progressError?.details,
+              hint: progressError?.hint,
+              error: progressError
+            });
           } else {
             console.log('✅ Reading progress saved directly');
           }
