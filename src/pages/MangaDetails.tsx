@@ -193,10 +193,6 @@ const MangaDetails = () => {
     }
   };
 
-c6R3VYLgYLA53X
-LgYLA53X
-
-
   const getStatusInArabic = (status: string) => {
     switch (status) {
       case "ongoing":
