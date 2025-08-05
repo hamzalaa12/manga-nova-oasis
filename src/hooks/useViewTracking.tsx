@@ -107,12 +107,24 @@ export const useViewTracking = () => {
             .eq('id', chapterId);
 
           if (updateError) {
-            console.error('Fallback update failed:', updateError);
+            console.error('Fallback update failed:', {
+              message: updateError?.message || 'Unknown error',
+              code: updateError?.code,
+              details: updateError?.details,
+              hint: updateError?.hint,
+              error: updateError
+            });
           } else {
             console.log('✅ Chapter view tracked via fallback');
           }
-        } catch (fallbackError) {
-          console.error('Fallback failed:', fallbackError);
+        } catch (fallbackError: any) {
+          console.error('Fallback failed:', {
+            message: fallbackError?.message || 'Unknown error',
+            code: fallbackError?.code,
+            details: fallbackError?.details,
+            hint: fallbackError?.hint,
+            error: fallbackError
+          });
         }
       } else {
         console.log('✅ Chapter view tracked successfully');
