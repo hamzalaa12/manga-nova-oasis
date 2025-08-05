@@ -60,13 +60,20 @@ export const useViewTracking = () => {
       if (error) {
         console.error('Error tracking chapter view:', error);
         
-        // Fallback: direct update
+        // Fallback: get current count and increment
         try {
+          const { data: currentData, error: fetchError } = await supabase
+            .from('chapters')
+            .select('views_count')
+            .eq('id', chapterId)
+            .single();
+
+          if (fetchError) throw fetchError;
+
+          const currentCount = currentData?.views_count || 0;
           const { error: updateError } = await supabase
             .from('chapters')
-            .update({
-              views_count: supabase.sql`COALESCE(views_count, 0) + 1`
-            })
+            .update({ views_count: currentCount + 1 })
             .eq('id', chapterId);
 
           if (updateError) {
