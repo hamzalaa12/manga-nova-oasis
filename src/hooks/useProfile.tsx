@@ -30,7 +30,13 @@ export const useProfile = () => {
         .single();
 
       if (checkError) {
-        console.error('Error checking existing profile:', checkError);
+        console.error('Error checking existing profile:', {
+          message: checkError?.message || 'Unknown error',
+          code: checkError?.code,
+          details: checkError?.details,
+          hint: checkError?.hint,
+          error: checkError
+        });
         throw new Error('لم يتم العثور على الملف الشخصي');
       }
 
