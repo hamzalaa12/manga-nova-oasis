@@ -41,6 +41,21 @@ interface RolePermissions {
 }
 
 const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className = "" }) => {
+  const [currentRole, setCurrentRole] = useState<UserRole>(userRole);
+  const [isRoleChanged, setIsRoleChanged] = useState(false);
+
+  // React to role changes with animation
+  useEffect(() => {
+    if (currentRole !== userRole) {
+      setIsRoleChanged(true);
+      // Update role after a brief moment to show animation
+      setTimeout(() => {
+        setCurrentRole(userRole);
+        setIsRoleChanged(false);
+      }, 500);
+    }
+  }, [userRole, currentRole]);
+
   const getRolePermissions = (role: UserRole): RolePermissions => {
     const basePermissions: Permission[] = [
       {
