@@ -8,7 +8,7 @@ export const generatePageMeta = (
     case 'home':
       return {
         title: "مانجا العرب - اقرأ المانجا والمانهوا مترجمة مجاناً",
-        description: "أفضل موقع لقراءة ال��انجا والمانهوا والمانها مترجمة بجودة عالية مجاناً. آلاف الفصول المترجمة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير.",
+        description: "أفضل موقع لقراءة المانجا والمانهوا والمانها مترجمة بجودة عالية مجاناً. آلاف الفصول المترجمة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير.",
         keywords: "مانجا, مانهوا, مانها, قراءة مانجا, مانجا مترجمة, manga, manhwa, manhua, anime, ون بيس, ناروتو, أتاك أون تايتان",
         url: baseUrl,
         canonical: baseUrl,
@@ -122,28 +122,44 @@ export const generateStructuredData = (page: string, data?: any) => {
       if (!data) return null;
       return {
         "@context": "https://schema.org",
-        "@type": "Article",
+        "@type": "ComicStory",
         "@id": `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
+        name: `${data.manga.title} - الفصل ${data.chapter_number}`,
         headline: `${data.manga.title} - الفصل ${data.chapter_number}`,
         description: data.title || `الفصل ${data.chapter_number} من ${data.manga.title}`,
-        author: {
-          "@type": "Person",
-          name: data.manga.author || "مؤلف غير معروف"
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "مانجا العرب"
-        },
         url: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
         image: data.manga.cover_image_url,
         datePublished: data.created_at,
         dateModified: data.updated_at || data.created_at,
         inLanguage: "ar",
+        author: {
+          "@type": "Person",
+          name: data.manga.author || "مؤلف غير معروف"
+        },
+        creator: {
+          "@type": "Person",
+          name: data.manga.author || "مؤلف غير معروف"
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Sanime",
+          url: baseUrl
+        },
         isPartOf: {
-          "@type": "Book",
+          "@type": "ComicSeries",
           name: data.manga.title,
-          url: `${baseUrl}/manga/${data.manga.slug}`
-        }
+          url: `${baseUrl}/manga/${data.manga.slug}`,
+          author: {
+            "@type": "Person",
+            name: data.manga.author || "مؤلف غير معروف"
+          }
+        },
+        position: data.chapter_number,
+        genre: data.manga.genre || [],
+        numberOfPages: data.pages?.length || 0,
+        accessMode: "visual",
+        accessibilityFeature: "highContrast",
+        accessibilityControl: "fullKeyboardControl"
       };
       
     default:
