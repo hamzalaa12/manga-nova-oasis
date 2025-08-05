@@ -33,6 +33,7 @@ import ViewsCounter from "@/components/ViewsCounter";
 import AdvancedComments from "@/components/AdvancedComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
+import SEOLinks from "@/components/SEOLinks";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useViewTracking } from "@/hooks/useViewTracking";
@@ -131,7 +132,7 @@ const ChapterReader = () => {
       });
 
       // إظهار رسالة خطأ للم��تخدم
-      setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
+      setError('فشل في تحميل ا��فصل. يرجى المحاولة مرة أخرى.');
       setChapter(null);
       setManga(null);
     } finally {
@@ -446,7 +447,7 @@ const ChapterReader = () => {
               </div>
             </div>
 
-            {/* الوسط - عنوان المانجا والفصل */}
+            {/* الوسط - عنوان المانجا و��لفصل */}
             <div className="text-center flex-1 px-4">
               <h1 className="text-lg font-bold text-white truncate">
                 <Link
