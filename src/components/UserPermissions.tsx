@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -235,7 +235,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             },
             {
               icon: <Bell className="h-4 w-4" />,
-              title: "جميع الإش��ارات",
+              title: "جميع الإشعارات",
               description: "استقبال كل أنواع الإشعارات",
               available: true
             }
