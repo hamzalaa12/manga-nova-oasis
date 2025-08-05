@@ -24,7 +24,11 @@ interface AddMangaFormProps {
 
 const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
   const { toast } = useToast();
+  const { uploadAvatar, uploading: imageUploading } = useImageUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [coverImageMethod, setCoverImageMethod] = useState<'url' | 'upload'>('url');
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -131,7 +135,7 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-2">العنو��ن *</label>
+          <label className="block text-sm font-medium mb-2">العنوان *</label>
           <Input
             value={formData.title}
             onChange={(e) =>
