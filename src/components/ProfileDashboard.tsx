@@ -54,7 +54,7 @@ interface Achievement {
 }
 
 const ProfileDashboard = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { stats } = useReadingHistory();
   const { favorites } = useFavorites();
   const [advancedStats, setAdvancedStats] = useState<AdvancedStats>({
@@ -234,7 +234,7 @@ const ProfileDashboard = () => {
       },
       {
         id: 'manga_5',
-        title: 'مستكشف المانجا',
+        title: 'م��تكشف المانجا',
         description: 'قراءة 5 مانجا مختلفة',
         icon: '🌟',
         unlocked: userStats.totalManga >= 5,
@@ -273,7 +273,7 @@ const ProfileDashboard = () => {
         <CardContent className="p-6">
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+            <p className="mt-2 text-muted-foreground">جاري التحمي��...</p>
           </div>
         </CardContent>
       </Card>
