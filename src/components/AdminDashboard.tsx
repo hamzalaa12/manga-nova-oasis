@@ -32,7 +32,7 @@ import { useRoleUpdate } from '@/hooks/useRoleUpdate';
 import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions\';seUserRestrictions';
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
-import RestrictionsMenu from './RestrictionsMenu\';/RestrictionsMenu';
+import RestrictionsMenu from './RestrictionsMenu\';enu';
 
 const AdminDashboard = () => {
   const {
@@ -114,7 +114,7 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error in handleRoleChange:', error);
-      // إذا حدث خطأ، أرجع التغيير في الواجهة
+      // إذا حدث خطأ، أرجع التغيير في الوا��هة
       setLocalUsers(users);
     }
   };
