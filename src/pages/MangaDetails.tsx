@@ -193,41 +193,9 @@ const MangaDetails = () => {
     }
   };
 
-  const trackMangaView = async (mangaId: string) => {
-    try {
-      console.log("🔍 Tracking manga view for ID:", mangaId);
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
+c6R3VYLgYLA53X
+LgYLA53X
 
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-        console.log("👤 User is logged in");
-      } else {
-        console.log("👤 Anonymous user");
-      }
-
-      const response = await supabase.functions.invoke("track-view", {
-        body: {
-          mangaId: mangaId,
-          type: "manga",
-        },
-        headers,
-      });
-
-      console.log("✅ Track view response:", response);
-
-      // Update the view count in state instead of reloading
-      if (manga) {
-        setManga((prev) =>
-          prev ? { ...prev, views_count: (prev.views_count || 0) + 1 } : prev,
-        );
-      }
-    } catch (error: any) {
-      console.error("❌ Error tracking view:", error);
-    }
-  };
 
   const getStatusInArabic = (status: string) => {
     switch (status) {
@@ -805,7 +773,7 @@ const MangaDetails = () => {
                                   >
                                     <DollarSign className="h-4 w-4 ml-2" />
                                     {chapter.is_premium
-                                      ? "جعله مجاني"
+                                      ? "ج��له مجاني"
                                       : "جعله مدفوع"}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
