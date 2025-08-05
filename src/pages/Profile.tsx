@@ -11,9 +11,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag } from 'lucide-react';
+import { User, Settings, Heart, History, Bell, Camera, Trash2, Upload, BarChart3, Calendar, BookOpen, Star, Shield, Users, Flag, Award } from 'lucide-react';
 import { getRoleDisplayName, getRoleColor } from '@/types/user';
 import SEO from '@/components/SEO';
+import UserPermissions from '@/components/UserPermissions';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useProfile } from '@/hooks/useProfile';
@@ -179,7 +180,7 @@ const Profile = () => {
   );
 };
 
-// مكون إعدادات ال��لف الشخصي
+// مكون إعدادات ��ل��لف الشخصي
 const ProfileSettings = () => {
   const { profile, user, refreshProfile } = useAuth();
   const { updateProfile, loading } = useProfile();
@@ -332,7 +333,7 @@ const ProfileSettings = () => {
   );
 };
 
-// مكون قا��مة المفضلة
+// مك��ن قا��مة المفضلة
 const FavoritesList = () => {
   const { favorites, loading } = useFavorites();
 
@@ -404,7 +405,7 @@ const FavoritesList = () => {
   );
 };
 
-// مك��ن رفع الصورة الشخصية
+// مك��ن رفع ��لصورة الشخصية
 const AvatarUploadButton = () => {
   const { uploadAvatar, removeAvatar, uploading } = useImageUpload();
   const { profile, refreshProfile } = useAuth();
@@ -744,7 +745,7 @@ const AccountSettings = () => {
     if (newPassword !== confirmPassword) {
       toast({
         title: 'خطأ',
-        description: 'كلمات المرور غير متطابقة',
+        description: 'كلما�� المرور غير متطابقة',
         variant: 'destructive'
       });
       return;
