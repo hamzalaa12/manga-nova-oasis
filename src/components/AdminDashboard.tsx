@@ -29,7 +29,7 @@ import {
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { useReports } from '@/hooks/useReports';
 import { useRoleUpdate } from '@/hooks/useRoleUpdate';
-import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions\';serRestrictions';;
+import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions';
 import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
 import RestrictionsMenu from './RestrictionsMenu';
