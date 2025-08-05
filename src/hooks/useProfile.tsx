@@ -53,7 +53,13 @@ export const useProfile = () => {
         .select('*');
 
       if (error) {
-        console.error('Update profile error:', error);
+        console.error('Update profile error:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: error
+        });
         throw error;
       }
 
@@ -82,7 +88,7 @@ export const useProfile = () => {
 
       return true;
     } catch (error: any) {
-      console.error('خطأ في تحديث الملف الشخصي:', error);
+      console.error('خطأ في تحد��ث الملف الشخصي:', error);
       toast({
         title: 'خطأ',
         description: `فشل في تحديث الملف الشخصي: ${error.message || 'خطأ غير معروف'}`,
