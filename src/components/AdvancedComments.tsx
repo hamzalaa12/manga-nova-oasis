@@ -26,7 +26,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useComments, Comment } from '@/hooks/useComments';
 import { useAuth } from '@/hooks/useAuth';
 import { useReports } from '@/hooks/useReports';
-import { useUserPermissions } from '@/hooks/useUserPermissions\';ermissions\';ons';
+import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { getUserRoleIcon, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ReportDialog from './ReportDialog';
 
