@@ -253,7 +253,7 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle>إدارة الإبلاغات</CardTitle>
               <CardDescription>
-                مراجعة والرد على الإبلاغات المرسلة من المستخدمين
+                مراجعة والرد على الإبلاغات الم��سلة من المستخدمين
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -391,6 +391,15 @@ const UserCard = ({
           </Select>
 
           <div className="flex gap-1">
+            {/* Restrictions Menu */}
+            <RestrictionsMenu
+              userId={user.user_id}
+              userName={user.display_name || user.email}
+              addRestriction={addRestriction}
+              removeRestriction={removeRestriction}
+              getUserRestrictions={getUserRestrictions}
+            />
+
             {user.is_banned ? (
               <Button 
                 size="sm" 
