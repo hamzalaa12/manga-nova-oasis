@@ -16,13 +16,20 @@ export const useViewTracking = () => {
       if (error) {
         console.error('Error tracking manga view:', error);
         
-        // Fallback: direct update
+        // Fallback: get current count and increment
         try {
+          const { data: currentData, error: fetchError } = await supabase
+            .from('manga')
+            .select('views_count')
+            .eq('id', mangaId)
+            .single();
+
+          if (fetchError) throw fetchError;
+
+          const currentCount = currentData?.views_count || 0;
           const { error: updateError } = await supabase
             .from('manga')
-            .update({
-              views_count: supabase.sql`COALESCE(views_count, 0) + 1`
-            })
+            .update({ views_count: currentCount + 1 })
             .eq('id', mangaId);
 
           if (updateError) {
