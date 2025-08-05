@@ -8,7 +8,7 @@ export const generatePageMeta = (
     case 'home':
       return {
         title: "مانجا العرب - اقرأ المانجا والمانهوا مترجمة مجاناً",
-        description: "أفضل موقع لقراءة المانجا والمانهوا والمانها مترجمة بجودة عالية مجاناً. آلاف الفصول المترجمة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير.",
+        description: "أفضل موقع لقراءة ال��انجا والمانهوا والمانها مترجمة بجودة عالية مجاناً. آلاف الفصول المترجمة من أشهر المانجا مثل ون بيس، ناروتو، أتاك أون تايتان وغيرها الكثير.",
         keywords: "مانجا, مانهوا, مانها, قراءة مانجا, مانجا مترجمة, manga, manhwa, manhua, anime, ون بيس, ناروتو, أتاك أون تايتان",
         url: baseUrl,
         canonical: baseUrl,
@@ -18,8 +18,8 @@ export const generatePageMeta = (
     case 'manga':
       if (!data) return null;
       return {
-        title: `${data.title} - قراءة مانجا مترجمة | مانجا العرب`,
-        description: `اقرأ مانجا ${data.title} مترجمة بجودة عالية مجاناً. ${data.description || ''} تابع جميع فصول ${data.title} على مانجا العرب.`,
+        title: `${data.title} - قراءة مانجا مترجمة | Sanime`,
+        description: `اقرأ مانجا ${data.title} مترجمة بجودة عالية مجاناً. ${data.description || ''} تابع جميع فصول ${data.title} على Sanime.`,
         keywords: `${data.title}, مانجا ${data.title}, قراءة ${data.title}, ${data.author || ''}, ${data.genres?.join(', ') || ''}`,
         url: `${baseUrl}/manga/${data.slug}`,
         canonical: `${baseUrl}/manga/${data.slug}`,
@@ -152,7 +152,7 @@ export const generateStructuredData = (page: string, data?: any) => {
 };
 
 export const generateSitemapUrls = async () => {
-  // ه��ه دالة لتوليد URLs للـ sitemap
+  // هذه دالة لتوليد URLs للـ sitemap
   // يمكن استخدامها في build time لتوليد sitemap.xml
   const urls = [
     {
