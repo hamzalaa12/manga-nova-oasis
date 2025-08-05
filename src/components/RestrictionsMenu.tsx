@@ -51,8 +51,8 @@ const RestrictionsMenu = ({
   const restrictionOptions = [
     { value: 'comment_ban', label: 'منع التعليق', icon: MessageSquareOff, color: 'bg-yellow-500' },
     { value: 'read_ban', label: 'منع القراءة', icon: BookOpen, color: 'bg-orange-500' },
-    { value: 'upload_ban', label: 'منع الرفع', icon: UploadX, color: 'bg-red-500' },
-    { value: 'complete_ban', label: 'حظر كامل', icon: ShieldX, color: 'bg-red-700' },
+    { value: 'upload_ban', label: 'منع الرفع', icon: Upload, color: 'bg-red-500' },
+    { value: 'complete_ban', label: 'حظر كامل', icon: Shield, color: 'bg-red-700' },
   ];
 
   useEffect(() => {
@@ -240,9 +240,9 @@ const RestrictionsMenu = ({
       <AlertDialog open={isRemoving} onOpenChange={setIsRemoving}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>رفع القيد</AlertDialogTitle>
+            <AlertDialogTitle>��فع القيد</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأ��د من رغبتك في رفع هذا القيد عن المستخدم؟
+              هل أنت متأكد من رغبتك في رفع هذا القيد عن المستخدم؟
             </AlertDialogDescription>
           </AlertDialogHeader>
           
