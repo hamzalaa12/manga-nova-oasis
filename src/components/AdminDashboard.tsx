@@ -106,6 +106,15 @@ const AdminDashboard = () => {
       const success = await updateUserRole(userId, newRole);
       if (success) {
         console.log('Role change succeeded, refreshing user data');
+
+        // إذا كان المستخدم المحدث هو المستخدم الحالي، حدث الملف الشخصي
+        if (userId === currentUser?.id) {
+          console.log('Current user role changed, refreshing profile');
+          setTimeout(() => {
+            refreshProfile();
+          }, 1000);
+        }
+
         // إعادة تحميل بيانات المستخدمين بعد تأخير
         setTimeout(() => {
           refreshUsers();
@@ -169,7 +178,7 @@ const AdminDashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي الإ��لاغات</CardTitle>
+            <CardTitle className="text-sm font-medium">إجمالي الإبلاغات</CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -199,7 +208,7 @@ const AdminDashboard = () => {
               <div className="flex flex-col md:flex-row gap-4 mb-6">
                 <div className="flex-1">
                   <Input
-                    placeholder="البحث بال��سم أو البريد الإلكتروني..."
+                    placeholder="البحث بالاسم أو البريد الإلكتروني..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -379,7 +388,7 @@ const UserCard = ({
 
           {user.ban_reason && (
             <div className="p-2 bg-destructive/10 border border-destructive/20 rounded text-sm">
-              <strong>سبب ا��حظر:</strong> {user.ban_reason}
+              <strong>سبب ا����ظر:</strong> {user.ban_reason}
             </div>
           )}
         </div>
@@ -398,7 +407,7 @@ const UserCard = ({
               <SelectItem value="user">مستخدم عادي</SelectItem>
               <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
               <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
-              <SelectItem value="tribe_leader">ق��ئد قبيلة</SelectItem>
+              <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
               <SelectItem value="admin">مدير</SelectItem>
               <SelectItem value="site_admin">مدير الموقع</SelectItem>
             </SelectContent>
@@ -505,7 +514,7 @@ const UserCard = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
-                    هل أنت مت��كد من رغبتك في حذف هذا المستخدم نهائياً؟ 
+                    هل أنت مت��ك�� من رغبتك في حذف هذا المستخدم نهائياً؟ 
                     سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع عن هذا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
