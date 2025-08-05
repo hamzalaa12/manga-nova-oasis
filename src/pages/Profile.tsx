@@ -630,15 +630,17 @@ const ReadingHistoryComponent = () => {
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <Button size="sm" variant="outline" asChild>
-                      <Link to={`/manga/${item.manga.slug || item.manga_id}`}>
+                      <Link to={`/manga/${item.manga?.slug || item.manga_id || ''}`}>
                         عرض المانجا
                       </Link>
                     </Button>
-                    <Button size="sm" asChild>
-                      <Link to={`/read/${item.manga.slug || item.manga_id}/${item.chapter.chapter_number}`}>
-                        متابعة القراءة
-                      </Link>
-                    </Button>
+                    {item.chapter?.chapter_number && (
+                      <Button size="sm" asChild>
+                        <Link to={`/read/${item.manga?.slug || item.manga_id || ''}/${item.chapter.chapter_number}`}>
+                          متابعة القراءة
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -809,7 +811,7 @@ const AccountSettings = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">تأكيد كلمة المرور الجديدة</Label>
+              <Label htmlFor="confirmPassword">تأكيد كلمة ا��مرور الجديدة</Label>
               <Input
                 id="confirmPassword"
                 type="password"
