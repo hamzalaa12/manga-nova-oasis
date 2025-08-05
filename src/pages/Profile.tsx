@@ -145,6 +145,18 @@ const Profile = () => {
                   </div>
                 </div>
 
+                {/* بطاقة الوصول السريع للإدارة */}
+                {(userRole !== "user") && (
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="text-center">
+                      <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium ${getRoleColor(userRole)} text-white`}>
+                        <Shield className="h-3 w-3" />
+                        <span>عضو في فريق الإدارة</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* أدوات الإدارة السريعة */}
                 {(userRole !== "user") && (
                   <div className="mt-4 pt-4 border-t">
