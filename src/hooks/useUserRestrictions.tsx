@@ -143,7 +143,13 @@ export const useUserRestrictions = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Error adding restriction:', error);
+      console.error('Error adding restriction:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
       toast({
         title: 'خطأ',
         description: `فشل في إضافة القيد: ${error.message || 'خطأ غير معروف'}`,
