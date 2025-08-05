@@ -161,8 +161,14 @@ export const useViewTracking = () => {
       }
 
       return data?.views_count || 0;
-    } catch (error) {
-      console.error(`Error in getViewsCount for ${type}:`, error);
+    } catch (error: any) {
+      console.error(`Error in getViewsCount for ${type}:`, {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
       return 0;
     }
   };
