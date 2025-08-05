@@ -47,8 +47,14 @@ export const useUserRestrictions = () => {
 
       if (error) throw error;
       setRestrictions(data || []);
-    } catch (error) {
-      console.error('Error loading restrictions:', error);
+    } catch (error: any) {
+      console.error('Error loading restrictions:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في تحميل قائمة القيود',
@@ -122,7 +128,7 @@ export const useUserRestrictions = () => {
       console.error('Error adding restriction:', error);
       toast({
         title: 'خطأ',
-        description: `فشل في إضافة القيد: ${error.message || 'خطأ غير معروف'}`,
+        description: `فش�� في إضافة القيد: ${error.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
       return false;
