@@ -257,7 +257,7 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle>إدارة الإبلاغات</CardTitle>
               <CardDescription>
-                مراجعة والرد على الإبلاغات الم��سلة من المستخدمين
+                مراجعة والرد على الإبلاغات الم��سلة من المس��خدمين
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -292,6 +292,11 @@ const AdminDashboard = () => {
         {/* إدارة ا��محتوى */}
         <TabsContent value="content" className="space-y-4">
           <ContentModeration />
+        </TabsContent>
+
+        {/* تحسين محركات البحث */}
+        <TabsContent value="seo" className="space-y-4">
+          <SitemapManager />
         </TabsContent>
       </Tabs>
     </div>
