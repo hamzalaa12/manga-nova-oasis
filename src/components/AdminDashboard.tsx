@@ -45,16 +45,23 @@ const AdminDashboard = () => {
   } = useUserManagement();
 
   const { updateUserRole } = useRoleUpdate();
-  
-  const { 
-    reports, 
-    stats: reportStats, 
-    loading: reportsLoading, 
-    updateReportStatus, 
+
+  const {
+    reports,
+    stats: reportStats,
+    loading: reportsLoading,
+    updateReportStatus,
     deleteReport,
     getStatusText,
-    getReasonText 
+    getReasonText
   } = useReports();
+
+  const {
+    restrictions,
+    addRestriction,
+    removeRestriction,
+    getUserRestrictions
+  } = useUserRestrictions();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole | 'all'>('all');
@@ -63,7 +70,7 @@ const AdminDashboard = () => {
   const [banDuration, setBanDuration] = useState('7'); // days
   const [localUsers, setLocalUsers] = useState(users);
 
-  // تحديث المستخدمين المحليين عند تغيير البيانات الأصلية
+  // ت��ديث المستخدمين المحليين عند تغيير البيانات الأصلية
   useEffect(() => {
     setLocalUsers(users);
   }, [users]);
