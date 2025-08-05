@@ -125,7 +125,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Upload className="h-4 w-4" />,
               title: "رفع مانجا أو فصل جديد",
-              description: "يتطلب موافقة من مدير الموقع قبل النشر",
+              description: "يتطلب موافقة من مدير الموقع قبل الن��ر",
               available: true
             },
             {
@@ -159,7 +159,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Edit3 className="h-4 w-4" />,
               title: "تعديل المحتوى",
-              description: "تعديل أو حذف المانجا والفصول",
+              description: "تعديل أو حذ�� المانجا والفصول",
               available: true
             },
             {
@@ -262,17 +262,30 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
     }
   };
 
-  const roleData = getRolePermissions(userRole);
+  const roleData = getRolePermissions(currentRole);
 
   return (
-    <Card className={className}>
+    <div className={className}>
+      {/* إشعار تغيير الرتبة */}
+      {isRoleChanged && (
+        <Card className="mb-4 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+              <span className="font-medium">تم تحديث رتبتك...</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card className={`transition-all duration-500 ${isRoleChanged ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
           <span className="text-2xl">{roleData.icon}</span>
           <div>
             <div className="flex items-center gap-2">
               <span>صلاحياتك الحالية</span>
-              <Badge className={getRoleColor(userRole)} variant="secondary">
+              <Badge className={getRoleColor(currentRole)} variant="secondary">
                 {roleData.title}
               </Badge>
             </div>
@@ -325,16 +338,16 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
               ملاحظات مهمة
             </h4>
             <div className="text-xs text-muted-foreground space-y-1">
-              {userRole === "beginner_fighter" && (
+              {currentRole === "beginner_fighter" && (
                 <p>• يتطلب محتواك موافقة مدير الموقع قبل النشر</p>
               )}
-              {(userRole === "elite_fighter" || userRole === "tribe_leader") && (
+              {(currentRole === "elite_fighter" || currentRole === "tribe_leader") && (
                 <p>• يمكنك حظر المستخدمين مؤقتاً فقط، الحظر الدائم يتطلب صلاحيات أعلى</p>
               )}
-              {userRole === "admin" && (
+              {currentRole === "admin" && (
                 <p>• لا يمكنك تغيير رتبة مستخدم إلى admin أو site_admin</p>
               )}
-              {userRole === "site_admin" && (
+              {currentRole === "site_admin" && (
                 <p>• تملك جميع الصلاحيات، استخدمها بحكمة</p>
               )}
               <p>• جميع الأعمال الإدارية مسجلة ومراقبة</p>
@@ -342,24 +355,25 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
           </div>
 
           {/* ترقية الرتبة */}
-          {userRole !== "site_admin" && (
+          {currentRole !== "site_admin" && (
             <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
               <h4 className="font-medium text-sm mb-2 text-blue-900 dark:text-blue-100 flex items-center gap-2">
                 <Star className="h-4 w-4" />
                 الترقية للرتبة التالية
               </h4>
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                {userRole === "user" && "كن نشطاً في المجتمع لتصبح مقاتل مبتدئ"}
-                {userRole === "beginner_fighter" && "ساهم بمحتوى جيد واكسب ثقة المديرين"}
-                {userRole === "elite_fighter" && "أظهر قيادة ومساعدة في إدارة المجتمع"}
-                {userRole === "tribe_leader" && "تواصل مع إدارة الموقع للترشح لمنصب إداري"}
-                {userRole === "admin" && "يتطلب ترشيح من مدير الموقع"}
+                {currentRole === "user" && "كن نشطاً في المجتمع لتصبح مقاتل مبتدئ"}
+                {currentRole === "beginner_fighter" && "ساهم بمحتوى جيد واكسب ثقة المديرين"}
+                {currentRole === "elite_fighter" && "أظهر قيادة ومساعدة في إدارة المجتمع"}
+                {currentRole === "tribe_leader" && "تواصل مع إدارة الموقع للترشح لمنصب إداري"}
+                {currentRole === "admin" && "يتطلب ترشيح من مدير الموقع"}
               </p>
             </div>
           )}
         </div>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 
