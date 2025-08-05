@@ -363,6 +363,20 @@ const AdvancedComments = ({ mangaId, chapterId, className }: AdvancedCommentsPro
           </div>
         )}
 
+        {/* رسالة للمستخدمين المحظورين من التعليق */}
+        {!canComment() && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+            <p className="text-red-600 font-medium">
+              تم منعك من إضافة التعليقات
+            </p>
+            <p className="text-red-500 text-sm mt-1">
+              {hasRestriction('complete_ban')
+                ? 'تم حظرك بشكل كامل من الموقع'
+                : 'تم منعك من التعليق مؤقتاً'}
+            </p>
+          </div>
+        )}
+
         {/* قائمة التعليقات */}
         <div className="space-y-6">
           {loading ? (
