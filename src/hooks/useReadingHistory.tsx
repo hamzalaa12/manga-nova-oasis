@@ -224,8 +224,12 @@ export const useReadingHistory = () => {
       }
 
       // Reload data in background
-      loadReadingHistory().catch(console.error);
-      loadReadingStats().catch(console.error);
+      loadReadingHistory().catch(error => {
+        console.error('Error reloading reading history:', error);
+      });
+      loadReadingStats().catch(error => {
+        console.error('Error reloading reading stats:', error);
+      });
 
       return true;
     } catch (error: any) {
