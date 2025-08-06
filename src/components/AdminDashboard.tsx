@@ -86,6 +86,9 @@ const AdminDashboard = () => {
     if (canManageUsers) {
       return 'users';
     }
+    if (canViewUsers) {
+      return 'users';
+    }
     if (canModerateComments) {
       return 'reports';
     }
@@ -169,7 +172,7 @@ const AdminDashboard = () => {
         }, 1500);
       } else {
         console.error('Role change failed - reverting UI change');
-        // إذا فشل�� أرجع التغيير في الواجهة
+        // إذا ف��ل�� أرجع التغيير في الواجهة
         setLocalUsers(users);
       }
     } catch (error) {
