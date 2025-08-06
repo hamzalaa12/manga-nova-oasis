@@ -284,11 +284,12 @@ const ChapterReader = () => {
             if (success) {
               console.log('📖 Chapter marked as completed via scroll');
             } else {
-              console.warn('❌ Failed to mark chapter as completed via scroll');
+              console.error('❌ Failed to mark chapter as completed via scroll - updateReadingProgress returned false');
             }
           })
           .catch((error) => {
-            console.error('❌ Error in scroll completion tracking:', {
+            console.error('❌ Error in scroll completion tracking:', error);
+            console.error('❌ Error details:', {
               message: error?.message || 'Unknown error',
               code: error?.code,
               details: error?.details,
@@ -297,7 +298,13 @@ const ChapterReader = () => {
               chapterId: chapter.id,
               errorType: typeof error,
               errorString: String(error),
-              errorJSON: JSON.stringify(error, null, 2)
+              errorJSON: (() => {
+                try {
+                  return JSON.stringify(error, null, 2);
+                } catch (e) {
+                  return 'Could not stringify error: ' + String(e);
+                }
+              })()
             });
           });
       }
