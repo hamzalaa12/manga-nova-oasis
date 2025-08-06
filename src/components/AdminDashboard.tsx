@@ -309,7 +309,7 @@ const AdminDashboard = () => {
 
         {/* إدارة ا��محتوى */}
         <TabsContent value="content" className="space-y-4">
-          <ContentModeration />
+          <ContentManagement />
         </TabsContent>
 
         {/* تحسين محركات البحث */}
