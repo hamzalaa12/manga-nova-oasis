@@ -245,7 +245,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className={cn("w-[400px] p-0")} align="start">
-            <Command>
+            <Command shouldFilter={false}>
               <CommandInput
                 placeholder="ابحث عن المانجا..."
                 value={searchQuery}
@@ -401,7 +401,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                 <Input
                   value={page.url || ""}
                   onChange={(e) => updatePageUrl(index, e.target.value)}
-                  placeholder={`رابط الصفحة ${index + 1}`}
+                  placeholder={`راب�� الصفحة ${index + 1}`}
                   className="w-full"
                 />
               ) : (
@@ -438,7 +438,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
         className="w-full"
         disabled={isLoading || !formData.mangaId || !formData.chapterNumber}
       >
-        {isLoading ? "جاري الإضافة..." : "إضافة الفصل"}
+        {isLoading ? "جاري ال��ضافة..." : "إضافة الفصل"}
       </Button>
     </form>
   );
