@@ -625,13 +625,18 @@ const MangaDetails = () => {
                       <p className="text-sm font-medium mb-2">التصنيفات:</p>
                       <div className="flex flex-wrap gap-1 justify-center">
                         {manga.genre.map((genre, index) => (
-                          <Badge
+                          <Link
                             key={index}
-                            variant="outline"
-                            className="text-xs"
+                            to={`/genre/${encodeURIComponent(genre.toLowerCase())}`}
+                            className="hover:scale-105 transition-transform"
                           >
-                            {genre}
-                          </Badge>
+                            <Badge
+                              variant="outline"
+                              className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                            >
+                              {genre}
+                            </Badge>
+                          </Link>
                         ))}
                       </div>
                     </div>
@@ -678,7 +683,7 @@ const MangaDetails = () => {
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
-                              الفصول المرتبطة بها أ��ضاً. ��ذا الإجراء لا يمكن
+                              الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
@@ -829,7 +834,7 @@ const MangaDetails = () => {
                                   >
                                     <Lock className="h-4 w-4 ml-2" />
                                     {chapter.is_private
-                                      ? "نشر الفصل"
+                                      ? "نش�� الفصل"
                                       : "جعله خاص"}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
