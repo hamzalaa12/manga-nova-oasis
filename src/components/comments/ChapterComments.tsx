@@ -21,6 +21,7 @@ interface Comment {
   is_deleted: boolean;
   deleted_by?: string;
   deleted_reason?: string;
+  is_spoiler?: boolean;
   created_at: string;
   updated_at: string;
   profiles?: {
