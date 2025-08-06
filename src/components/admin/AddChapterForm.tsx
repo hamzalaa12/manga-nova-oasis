@@ -80,6 +80,13 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     }
   };
 
+  const filteredMangaList = mangaList.filter(manga =>
+    manga.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    manga.manga_type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const selectedManga = mangaList.find(manga => manga.id === formData.mangaId);
+
   const addPage = () => {
     setPages([...pages, { type: "url", url: "" }]);
   };
