@@ -48,6 +48,8 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [mangaList, setMangaList] = useState<Manga[]>([]);
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
     mangaId: "",
     chapterNumber: "",
