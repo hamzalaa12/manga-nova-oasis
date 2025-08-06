@@ -16,7 +16,13 @@ export const useRoleUpdate = () => {
         .eq('user_id', userId);
 
       if (error) {
-        console.error('Role update error:', error);
+        console.error('Role update error:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: JSON.stringify(error, null, 2)
+        });
         
         // إذا فشل، جرب مع RPC
         const { error: rpcError } = await supabase.rpc('change_user_role', {
@@ -25,7 +31,13 @@ export const useRoleUpdate = () => {
         });
 
         if (rpcError) {
-          console.error('RPC error:', rpcError);
+          console.error('RPC error:', {
+            message: rpcError?.message || 'Unknown error',
+            code: rpcError?.code,
+            details: rpcError?.details,
+            hint: rpcError?.hint,
+            error: JSON.stringify(rpcError, null, 2)
+          });
           throw new Error(rpcError.message || 'فشل في تحديث الرتبة');
         }
       }
@@ -39,7 +51,13 @@ export const useRoleUpdate = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Final role update error:', error);
+      console.error('Final role update error:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       
       toast({
         title: 'خطأ',
