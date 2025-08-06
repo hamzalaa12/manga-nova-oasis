@@ -36,6 +36,7 @@ import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
 import ContentModeration from './ContentModeration';
 import RestrictionsMenu from './RestrictionsMenu';
 import SitemapManager from './admin/SitemapManager';
+import ContentManagement from './admin/ContentManagement';
 
 const AdminDashboard = () => {
   const { user: currentUser, refreshProfile } = useAuth();
