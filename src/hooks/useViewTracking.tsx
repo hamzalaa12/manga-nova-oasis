@@ -76,7 +76,15 @@ export const useViewTracking = () => {
         .eq('id', chapterId);
 
       if (chapterError) {
-        console.error('Error updating chapter views:', chapterError);
+        console.error('Error updating chapter views:', {
+          message: chapterError?.message || 'Unknown error',
+          code: chapterError?.code,
+          details: chapterError?.details,
+          hint: chapterError?.hint,
+          chapterId,
+          errorString: String(chapterError),
+          errorObject: chapterError
+        });
       }
     } catch (error: any) {
       console.error('Error tracking chapter view:', {
