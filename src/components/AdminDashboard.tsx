@@ -39,6 +39,7 @@ import SitemapManager from './admin/SitemapManager';
 
 const AdminDashboard = () => {
   const { user: currentUser, refreshProfile } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     users,
     loading: usersLoading,
@@ -50,6 +51,9 @@ const AdminDashboard = () => {
   } = useUserManagement();
 
   const { updateUserRole } = useRoleUpdate();
+
+  // التبويب الحالي من URL أو افتراضي
+  const currentTab = searchParams.get('tab') || 'users';
 
   const {
     reports,
@@ -108,7 +112,7 @@ const AdminDashboard = () => {
       if (success) {
         console.log('Role change succeeded, refreshing user data');
 
-        // إذا كان المستخدم المحدث هو ��لمستخدم الحالي، حدث الملف الشخصي
+        // إذا كان المستخدم المحدث هو المستخدم الحالي، حدث الملف الشخصي
         if (userId === currentUser?.id) {
           console.log('Current user role changed, refreshing profile');
           setTimeout(() => {
@@ -225,7 +229,7 @@ const AdminDashboard = () => {
                     <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
                     <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
                     <SelectItem value="admin">مدير</SelectItem>
-                    <SelectItem value="site_admin">مدير الموق��</SelectItem>
+                    <SelectItem value="site_admin">مدير الموقع</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -516,7 +520,7 @@ const UserCard = ({
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
                     هل أنت مت��ك�� من رغبتك في حذف هذا المستخدم نهائياً؟ 
-                    سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع عن هذا الإجراء.
+                    سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع عن ه��ا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
