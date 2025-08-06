@@ -142,8 +142,10 @@ export const useViewTracking = () => {
         hint: error?.hint,
         chapterId,
         mangaId,
+        errorType: typeof error,
         errorString: String(error),
-        errorObject: error
+        errorJSON: JSON.stringify(error, null, 2),
+        stack: error?.stack
       });
     }
   }, []);
