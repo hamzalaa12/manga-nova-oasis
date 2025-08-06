@@ -188,8 +188,11 @@ export const useReadingHistory = () => {
     chapterId: string,
     pageNumber: number,
     completed: boolean = false
-  ) => {
-    if (!user) return;
+  ): Promise<boolean> => {
+    if (!user) {
+      console.warn('Cannot update reading progress: user not logged in');
+      return false;
+    }
 
     try {
       console.log('Updating reading progress:', {
@@ -216,9 +219,11 @@ export const useReadingHistory = () => {
         throw error;
       }
 
-      // Reload data
-      loadReadingHistory();
-      loadReadingStats();
+      // Reload data in background
+      loadReadingHistory().catch(console.error);
+      loadReadingStats().catch(console.error);
+
+      return true;
     } catch (error: any) {
       console.error('Error updating reading progress:', {
         message: error?.message || 'Unknown error',
@@ -228,11 +233,12 @@ export const useReadingHistory = () => {
         mangaId,
         chapterId,
         userId: user?.id,
-        error: error
+        errorString: String(error),
+        errorObject: error
       });
 
-      // لا نعرض toast هنا لأن هذا يحدث في الخلفية
-      // فقط نسجل الخطأ
+      // Return false to indicate failure
+      return false;
     }
   };
 
