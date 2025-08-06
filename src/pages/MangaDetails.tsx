@@ -337,6 +337,30 @@ const MangaDetails = () => {
     }
   };
 
+  const loadUserRating = async (mangaId: string) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("manga_ratings")
+        .select("rating")
+        .eq("user_id", user.id)
+        .eq("manga_id", mangaId)
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        console.error("Error loading user rating:", error);
+        return;
+      }
+
+      if (data) {
+        setUserRating(data.rating);
+      }
+    } catch (error: any) {
+      console.error("Error loading user rating:", error);
+    }
+  };
+
   const handleRating = async (rating: number) => {
     if (!user) {
       toast({
@@ -708,7 +732,7 @@ const MangaDetails = () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
-                              هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
+                              هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جم��ع
                               الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
