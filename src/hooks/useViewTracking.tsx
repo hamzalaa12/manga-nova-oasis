@@ -61,46 +61,77 @@ export const useViewTracking = () => {
       const token = session?.access_token;
 
       // Track manga view (chapters contribute to manga views for now)
-      await supabase.functions.invoke('track-view', {
-        body: { mangaId: mangaId, type: 'manga' },
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      });
-
-      // Also increment chapter views count directly
-      // First get the current count, then increment it
-      const { data: currentChapter, error: fetchError } = await supabase
-        .from('chapters')
-        .select('views_count')
-        .eq('id', chapterId)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching current chapter views:', fetchError);
-        return;
+      try {
+        await supabase.functions.invoke('track-view', {
+          body: { mangaId: mangaId, type: 'manga' },
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+      } catch (mangaViewError) {
+        console.error('Error tracking manga view via function:', {
+          message: mangaViewError?.message || 'Unknown error',
+          mangaId,
+          errorType: typeof mangaViewError,
+          errorString: String(mangaViewError),
+          errorJSON: JSON.stringify(mangaViewError, null, 2)
+        });
       }
 
-      const newViewsCount = (currentChapter?.views_count || 0) + 1;
+      // Also increment chapter views count directly
+      try {
+        // First get the current count, then increment it
+        const { data: currentChapter, error: fetchError } = await supabase
+          .from('chapters')
+          .select('views_count')
+          .eq('id', chapterId)
+          .single();
 
-      const { error: chapterError } = await supabase
-        .from('chapters')
-        .update({
-          views_count: newViewsCount,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', chapterId);
+        if (fetchError) {
+          console.error('Error fetching current chapter views:', {
+            message: fetchError?.message || 'Unknown error',
+            code: fetchError?.code,
+            details: fetchError?.details,
+            hint: fetchError?.hint,
+            chapterId,
+            errorType: typeof fetchError,
+            errorString: String(fetchError),
+            errorJSON: JSON.stringify(fetchError, null, 2)
+          });
+          return;
+        }
 
-      if (chapterError) {
-        console.error('Error updating chapter views:', {
-          message: chapterError?.message || 'Unknown error',
-          code: chapterError?.code,
-          details: chapterError?.details,
-          hint: chapterError?.hint,
+        const newViewsCount = (currentChapter?.views_count || 0) + 1;
+
+        const { error: chapterError } = await supabase
+          .from('chapters')
+          .update({
+            views_count: newViewsCount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', chapterId);
+
+        if (chapterError) {
+          console.error('Error updating chapter views:', {
+            message: chapterError?.message || 'Unknown error',
+            code: chapterError?.code,
+            details: chapterError?.details,
+            hint: chapterError?.hint,
+            chapterId,
+            currentViews: currentChapter?.views_count,
+            newViews: newViewsCount,
+            errorType: typeof chapterError,
+            errorString: String(chapterError),
+            errorJSON: JSON.stringify(chapterError, null, 2)
+          });
+        } else {
+          console.log('✅ Chapter views updated successfully:', { chapterId, newViewsCount });
+        }
+      } catch (updateError) {
+        console.error('Unexpected error updating chapter views:', {
+          message: updateError?.message || 'Unknown error',
           chapterId,
-          currentViews: currentChapter?.views_count,
-          newViews: newViewsCount,
-          errorType: typeof chapterError,
-          errorString: String(chapterError),
-          errorJSON: JSON.stringify(chapterError, null, 2)
+          errorType: typeof updateError,
+          errorString: String(updateError),
+          errorJSON: JSON.stringify(updateError, null, 2)
         });
       }
     } catch (error: any) {
