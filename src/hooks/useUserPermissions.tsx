@@ -32,14 +32,26 @@ export const useUserPermissions = () => {
         .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
 
       if (error) {
-        console.error('Error checking user restrictions:', error);
+        console.error('Error checking user restrictions:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: JSON.stringify(error, null, 2)
+        });
         setRestrictions([]);
       } else {
         const userRestrictions = data?.map(r => r.restriction_type as RestrictionType) || [];
         setRestrictions(userRestrictions);
       }
     } catch (error) {
-      console.error('Error in checkUserRestrictions:', error);
+      console.error('Error in checkUserRestrictions:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       setRestrictions([]);
     } finally {
       setLoading(false);
