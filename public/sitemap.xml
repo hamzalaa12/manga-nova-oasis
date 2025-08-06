@@ -1,109 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  
-  <!-- Homepage -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://manga-arab.com/</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-  
-  <!-- Manga Types -->
   <url>
-    <loc>https://manga-arab.com/type/manga</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/type/manga</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
-    <loc>https://manga-arab.com/type/manhwa</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/type/manhwa</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
   <url>
-    <loc>https://manga-arab.com/type/manhua</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/type/manhua</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
-  <!-- Genres -->
   <url>
-    <loc>https://manga-arab.com/genre/action</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/genre/أكشن</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
-  
   <url>
-    <loc>https://manga-arab.com/genre/adventure</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/genre/مغامرة</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
-  
   <url>
-    <loc>https://manga-arab.com/genre/comedy</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/genre/كوميديا</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
-  
   <url>
-    <loc>https://manga-arab.com/genre/drama</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/genre/دراما</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
-  
   <url>
-    <loc>https://manga-arab.com/genre/fantasy</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/genre/خيال</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
-  
   <url>
-    <loc>https://manga-arab.com/genre/romance</loc>
-    <lastmod>2024-12-24</lastmod>
+    <loc>https://sanime.site/genre/رومانسي</loc>
+    <lastmod>2024-08-05</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
-  
-  <url>
-    <loc>https://manga-arab.com/genre/slice-of-life</loc>
-    <lastmod>2024-12-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://manga-arab.com/genre/supernatural</loc>
-    <lastmod>2024-12-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://manga-arab.com/genre/thriller</loc>
-    <lastmod>2024-12-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <url>
-    <loc>https://manga-arab.com/genre/horror</loc>
-    <lastmod>2024-12-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  
-  <!-- Note: Individual manga and chapter pages should be added dynamically -->
-  <!-- This is a static sitemap for main navigation pages -->
-  
 </urlset>

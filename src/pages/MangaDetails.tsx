@@ -12,6 +12,8 @@ import {
   Lock,
   DollarSign,
   MoreHorizontal,
+  Flag,
+  Heart,
 } from "lucide-react";
 import { parseMangaIdentifier, getChapterUrl, getMangaSlug } from "@/lib/slug";
 import { ensureMangaHasSlugs } from "@/utils/ensureSlugs";
@@ -44,11 +46,15 @@ import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
+import SEOLinks from "@/components/SEOLinks";
 import ViewsCounter from "@/components/ViewsCounter";
+import FavoriteButton from "@/components/FavoriteButton";
+import ReportDialog from "@/components/ReportDialog";
 
 import PreloadContent from "@/components/PreloadContent";
 import ServerSideContent from "@/components/ServerSideContent";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
+import { useViewTracking } from "@/hooks/useViewTracking";
 
 interface Manga {
   id: string;
@@ -84,6 +90,7 @@ const MangaDetails = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+  const { trackMangaView } = useViewTracking();
   const [manga, setManga] = useState<Manga | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -184,42 +191,6 @@ const MangaDetails = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const trackMangaView = async (mangaId: string) => {
-    try {
-      console.log("🔍 Tracking manga view for ID:", mangaId);
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
-
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-        console.log("👤 User is logged in");
-      } else {
-        console.log("👤 Anonymous user");
-      }
-
-      const response = await supabase.functions.invoke("track-view", {
-        body: {
-          mangaId: mangaId,
-          type: "manga",
-        },
-        headers,
-      });
-
-      console.log("✅ Track view response:", response);
-
-      // Update the view count in state instead of reloading
-      if (manga) {
-        setManga((prev) =>
-          prev ? { ...prev, views_count: (prev.views_count || 0) + 1 } : prev,
-        );
-      }
-    } catch (error: any) {
-      console.error("❌ Error tracking view:", error);
     }
   };
 
@@ -483,7 +454,7 @@ const MangaDetails = () => {
         "@id": currentUrl,
         name: manga.title,
         description:
-          manga.description || `اقرأ مانجا ${manga.title} مترجمة بجودة عالية`,
+          manga.description || `اقرأ م��نجا ${manga.title} مترجمة بجودة عالية`,
         image: manga.cover_image_url,
         author: {
           "@type": "Person",
@@ -619,7 +590,24 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-
+                  {/* أزرار التف��عل */}
+                  <div className="flex gap-2 mt-6">
+                    <FavoriteButton
+                      mangaId={manga.id}
+                      className="flex-1"
+                    />
+                    <ReportDialog
+                      type="manga"
+                      targetId={manga.id}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <Flag className="h-4 w-4" />
+                        إبلاغ
+                      </div>
+                    </ReportDialog>
+                  </div>
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-4">
@@ -701,7 +689,7 @@ const MangaDetails = () => {
 
                 {chapters.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    لا توجد فصول متاحة حالياً
+                    ل�� توجد فصول متاحة حالياً
                   </p>
                 ) : (
                   <div className="space-y-2">
@@ -782,7 +770,7 @@ const MangaDetails = () => {
                                   >
                                     <DollarSign className="h-4 w-4 ml-2" />
                                     {chapter.is_premium
-                                      ? "جعله مجاني"
+                                      ? "ج��له مجاني"
                                       : "جعله مدفوع"}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
@@ -815,7 +803,7 @@ const MangaDetails = () => {
                                         </AlertDialogTitle>
                                         <AlertDialogDescription>
                                           هل أنت متأكد من حذف الفصل{" "}
-                                          {chapter.chapter_number}؟ هذا الإجراء
+                                          {chapter.chapter_number}؟ ه��ا الإجراء
                                           لا يمكن التراجع عنه.
                                         </AlertDialogDescription>
                                       </AlertDialogHeader>
@@ -859,6 +847,13 @@ const MangaDetails = () => {
           onOpenChange={setIsEditDialogOpen}
           onMangaUpdated={fetchMangaDetails}
         />
+      )}
+
+      {/* روابط SEO للتصفح */}
+      {manga && (
+        <section className="container mx-auto px-4 py-8">
+          <SEOLinks type="manga" data={manga} />
+        </section>
       )}
 
       <Footer />

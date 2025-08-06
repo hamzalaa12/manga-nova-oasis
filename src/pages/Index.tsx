@@ -5,6 +5,7 @@ import ChaptersGrid from "@/components/ChaptersGrid";
 import Footer from "@/components/Footer";
 import AdminPanel from "@/components/AdminPanel";
 import SEO from "@/components/SEO";
+import SEOLinks from "@/components/SEOLinks";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
 const Index = () => {

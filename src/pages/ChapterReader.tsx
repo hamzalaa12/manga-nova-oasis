@@ -30,9 +30,13 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import SimpleComments from "@/components/SimpleComments";
+import AdvancedComments from "@/components/AdvancedComments";
+import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
+import SEOLinks from "@/components/SEOLinks";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
+import { useReadingHistory } from "@/hooks/useReadingHistory";
+import { useViewTracking } from "@/hooks/useViewTracking";
 
 interface Chapter {
   id: string;
@@ -67,7 +71,10 @@ const ChapterReader = () => {
   const [manga, setManga] = useState<Manga | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showNavigation, setShowNavigation] = useState(false);
+  const { updateReadingProgress } = useReadingHistory();
+  const { trackChapterView, trackMangaView } = useViewTracking();
 
   useEffect(() => {
     if (slug && chapterParam) {
@@ -80,6 +87,7 @@ const ChapterReader = () => {
   }, [slug, chapterParam, id]);
 
   const fetchChapterDetails = async () => {
+    setError(null);
     try {
       // Fetch chapter details
       const { data: chapterData, error: chapterError } = await supabase
@@ -112,43 +120,87 @@ const ChapterReader = () => {
       setAllChapters(chaptersData || []);
 
       // Track view using the new system
-      await trackChapterView(id);
-    } catch (error) {
-      console.error("Error fetching chapter details:", error);
+      await trackChapterViewOld(id);
+    } catch (error: any) {
+      console.error("Error fetching chapter details:", {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        chapterId: id,
+        error: error
+      });
+
+      // إظهار رسالة خطأ للم��تخدم
+      setError('فشل في تحميل ا��فصل. يرجى المحاولة مرة أخرى.');
+      setChapter(null);
+      setManga(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const trackChapterView = async (chapterId: string) => {
+  const trackChapterViewOld = async (chapterId: string) => {
     try {
       console.log("📖 Tracking chapter view for ID:", chapterId);
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: HeadersInit = {
-        "Content-Type": "application/json",
-      };
 
-      // Add authorization header if user is logged in
-      if (sessionData.session?.access_token) {
-        headers["Authorization"] = `Bearer ${sessionData.session.access_token}`;
-        console.log("👤 User is logged in for chapter");
+      // Track chapter view using new system
+      await trackChapterView(chapterId);
 
-
-      } else {
-        console.log("👤 Anonymous user reading chapter");
+      // Track manga view as well
+      if (manga) {
+        await trackMangaView(manga.id);
       }
 
-      const response = await supabase.functions.invoke("track-view", {
-        body: {
-          mangaId: chapterId,
-          type: "chapter",
-        },
-        headers,
-      });
+      // Save reading progress for logged users
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData.session?.user && manga && chapter) {
+        try {
+          await updateReadingProgress(manga.id, chapterId, 1, true);
+          console.log('✅ Reading progress saved via hook');
+        } catch (hookError: any) {
+          console.error('Hook failed, trying direct save:', {
+            message: hookError?.message || 'Unknown error',
+            code: hookError?.code,
+            details: hookError?.details,
+            hint: hookError?.hint,
+            error: hookError
+          });
 
-      console.log("✅ Track chapter view response:", response);
-    } catch (error) {
-      console.error("❌ Error tracking chapter view:", error);
+          // نسخ احتياطي مباشر
+          const { error: progressError } = await supabase
+            .from('reading_progress')
+            .upsert({
+              user_id: sessionData.session.user.id,
+              manga_id: manga.id,
+              chapter_id: chapterId,
+              page_number: 1,
+              completed: true,
+              last_read_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }, {
+              onConflict: 'user_id,manga_id,chapter_id'
+            });
+
+          if (progressError) {
+            console.error('Error saving reading progress:', {
+              message: progressError?.message || 'Unknown error',
+              code: progressError?.code,
+              details: progressError?.details,
+              hint: progressError?.hint,
+              error: progressError
+            });
+          } else {
+            console.log('✅ Reading progress saved directly');
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error("❌ Error tracking chapter view:", {
+        message: error?.message || 'Unknown error',
+        chapterId,
+        error: error
+      });
       // Don't fail the page load if view tracking fails
     }
   };
@@ -158,6 +210,7 @@ const ChapterReader = () => {
   const fetchChapterBySlugAndNumber = async () => {
     if (!slug || !chapterParam) return;
 
+    setError(null);
     try {
       const chapterNumber = parseFloat(chapterParam);
       const identifier = parseMangaIdentifier(slug);
@@ -198,9 +251,20 @@ const ChapterReader = () => {
       setAllChapters(chaptersData || []);
 
       // Track chapter view
-      await trackChapterView(chapterData.id);
-    } catch (error) {
-      console.error("Error fetching chapter by slug and number:", error);
+      await trackChapterViewOld(chapterData.id);
+    } catch (error: any) {
+      console.error("Error fetching chapter by slug and number:", {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: error
+      });
+
+      // إظهار رسالة خطأ للمستخدم
+      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
+      setChapter(null);
+      setManga(null);
     } finally {
       setLoading(false);
     }
@@ -222,17 +286,30 @@ const ChapterReader = () => {
       : null;
   };
 
-  // Scroll detection for navigation visibility
+  // Scroll detection for navigation visibility and completion tracking
   useEffect(() => {
+    let hasTrackedCompletion = false;
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
       // Show navigation when scrolled down more than 100px
       setShowNavigation(scrollY > 100);
+
+      // Track completion when user reaches 90% of the page
+      const scrollPercentage = (scrollY + windowHeight) / documentHeight;
+      if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga) {
+        hasTrackedCompletion = true;
+        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true);
+        console.log('📖 Chapter marked as completed via scroll');
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [chapter, manga, updateReadingProgress]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -242,7 +319,7 @@ const ChapterReader = () => {
           navigate(-1);
           break;
         case "ArrowLeft":
-          // التالي (للغة العربية)
+          // التالي (للغ�� العربية)
           const next = getNextChapter();
           if (next && manga) {
             navigate(getChapterUrl(getMangaSlug(manga), next.chapter_number));
@@ -268,6 +345,26 @@ const ChapterReader = () => {
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>جاري تحميل الفصل...</p>
+        </div>
+      </div>
+    );
+  }
+
+
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠���</div>
+          <h2 className="text-xl font-bold mb-2">حدث خ��أ</h2>
+          <p className="text-gray-300 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          >
+            إعادة المحاولة
+          </button>
         </div>
       </div>
     );
@@ -350,7 +447,7 @@ const ChapterReader = () => {
               </div>
             </div>
 
-            {/* الوسط - عنوان المانجا والفصل */}
+            {/* الوسط - عنوان المانجا و��لفصل */}
             <div className="text-center flex-1 px-4">
               <h1 className="text-lg font-bold text-white truncate">
                 <Link
@@ -367,7 +464,7 @@ const ChapterReader = () => {
                   to="/"
                   className="hover:text-white transition-colors"
                 >
-                  الرئيسية
+                  ال��ئيسية
                 </Link>
                 <span>/</span>
                 <Link
@@ -391,6 +488,17 @@ const ChapterReader = () => {
               >
                 <Menu className="h-4 w-4" />
               </Button>
+
+              {/* زر الإبلاغ */}
+              <ReportDialog
+                type="chapter"
+                targetId={chapter.id}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10 border border-white/20 rounded-full w-10 h-10 p-0"
+              >
+                <Flag className="h-4 w-4" />
+              </ReportDialog>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -479,8 +587,19 @@ const ChapterReader = () => {
 
       {/* التعليقات */}
       {chapter && (
-        <div className="bg-gradient-to-t from-gray-900 to-black py-8">
-          <SimpleComments chapterId={chapter.id} mangaId={manga.id} />
+        <div className="bg-background py-8">
+          <div className="container mx-auto px-4">
+            <AdvancedComments chapterId={chapter.id} mangaId={manga.id} />
+          </div>
+        </div>
+      )}
+
+      {/* روابط SEO للتصفح */}
+      {chapter && manga && (
+        <div className="bg-background py-8">
+          <div className="container mx-auto px-4">
+            <SEOLinks type="chapter" data={{ ...chapter, manga }} />
+          </div>
         </div>
       )}
 

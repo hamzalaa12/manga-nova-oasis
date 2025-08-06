@@ -4,8 +4,9 @@ export type UserRole =
   | "user"
   | "beginner_fighter"
   | "elite_fighter"
-  | "leader"
-  | "admin";
+  | "tribe_leader"
+  | "admin"
+  | "site_admin";
 
 
 
@@ -61,10 +62,12 @@ export const getRoleDisplayName = (role: UserRole): string => {
     case "beginner_fighter":
       return "مقاتل مبتدئ";
     case "elite_fighter":
-      return "مقاتل نخبوي";
-    case "leader":
-      return "زعيم الطائفة";
+      return "مقاتل نخبة";
+    case "tribe_leader":
+      return "قائد قبيلة";
     case "admin":
+      return "مدير";
+    case "site_admin":
       return "مدير الموقع";
     default:
       return "مستخدم عادي";
@@ -79,31 +82,54 @@ export const getRoleColor = (role: UserRole): string => {
       return "bg-green-500";
     case "elite_fighter":
       return "bg-blue-500";
-    case "leader":
+    case "tribe_leader":
       return "bg-purple-500";
     case "admin":
+      return "bg-orange-500";
+    case "site_admin":
       return "bg-red-500";
     default:
       return "bg-gray-500";
   }
 };
 
+export const getUserRoleIcon = (role: UserRole): string => {
+  switch (role) {
+    case "user":
+      return "👤";
+    case "beginner_fighter":
+      return "⚔️";
+    case "elite_fighter":
+      return "🏆";
+    case "tribe_leader":
+      return "👑";
+    case "admin":
+      return "🛡️";
+    case "site_admin":
+      return "⚡";
+    default:
+      return "👤";
+  }
+};
+
 export const hasPermission = (role: UserRole, permission: string): boolean => {
   switch (permission) {
     case "can_submit_content":
-      return ["beginner_fighter", "elite_fighter", "leader", "admin"].includes(
-        role,
-      );
+      return ["beginner_fighter", "elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     case "can_moderate_comments":
-      return ["elite_fighter", "leader", "admin"].includes(role);
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     case "can_ban_users":
-      return ["elite_fighter", "leader", "admin"].includes(role);
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     case "can_publish_directly":
-      return ["leader", "admin"].includes(role);
+      return ["tribe_leader", "admin", "site_admin"].includes(role);
     case "can_manage_users":
-      return role === "admin";
+      return ["admin", "site_admin"].includes(role);
     case "can_assign_roles":
-      return role === "admin";
+      return role === "site_admin";
+    case "can_pin_comments":
+      return ["tribe_leader", "admin", "site_admin"].includes(role);
+    case "can_delete_any_comment":
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
     default:
       return false;
   }

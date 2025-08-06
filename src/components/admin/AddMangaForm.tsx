@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,9 +10,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { X, Search, Upload, Image, Link } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useImageUpload } from "@/hooks/useImageUpload";
 import { createSlug } from "@/lib/slug";
 import { AVAILABLE_GENRES } from "@/constants/genres";
 
@@ -22,7 +24,11 @@ interface AddMangaFormProps {
 
 const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
   const { toast } = useToast();
+  const { uploadAvatar, uploading: imageUploading } = useImageUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [coverImageMethod, setCoverImageMethod] = useState<'url' | 'upload'>('url');
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -60,6 +66,129 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
     setGenres(genres.filter((genre) => genre !== genreToRemove));
   };
 
+  const handleImageUpload = async (file: File) => {
+    try {
+      // Create custom upload function for manga covers
+      const uploadCoverImage = async (file: File): Promise<string | null> => {
+        // Validate file
+        if (!file.type.startsWith('image/')) {
+          toast({
+            title: 'خطأ',
+            description: 'يجب أن يكون الملف ��ورة',
+            variant: 'destructive'
+          });
+          return null;
+        }
+
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: 'خطأ',
+            description: 'حجم الصورة يجب أن يكون أقل من 5 ميجابايت',
+            variant: 'destructive'
+          });
+          return null;
+        }
+
+        try {
+          // Upload to Supabase Storage
+          const fileExt = file.name.split('.').pop();
+          const fileName = `manga_cover_${Date.now()}.${fileExt}`;
+          const filePath = `manga-covers/${fileName}`;
+
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('user-content')
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: true
+            });
+
+          if (uploadError) {
+            console.warn('Supabase storage upload failed, using base64 fallback:', uploadError);
+            // Fallback to base64
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = () => resolve(reader.result as string);
+              reader.onerror = (error) => reject(error);
+            });
+          } else {
+            // Get public URL
+            const { data: publicUrlData } = supabase.storage
+              .from('user-content')
+              .getPublicUrl(filePath);
+            return publicUrlData.publicUrl;
+          }
+        } catch (storageError) {
+          console.warn('Storage failed, using base64 fallback:', storageError);
+          // Fallback to base64
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+          });
+        }
+      };
+
+      const imageUrl = await uploadCoverImage(file);
+      if (imageUrl) {
+        setFormData({ ...formData, coverImageUrl: imageUrl });
+        setPreviewImage(imageUrl);
+        toast({
+          title: 'تم رفع الصورة',
+          description: 'تم رفع صورة الغلاف بنجاح'
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      toast({
+        title: 'خطأ',
+        description: 'فشل في رفع صورة الغلاف',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const clearImage = () => {
+    setFormData({ ...formData, coverImageUrl: "" });
+    setPreviewImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        handleImageUpload(file);
+      } else {
+        toast({
+          title: 'خطأ',
+          description: 'يجب أن يكون الملف صورة',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
   const generateUniqueSlug = async (title: string): Promise<string> => {
     const baseSlug = createSlug(title);
     let finalSlug = baseSlug;
@@ -85,6 +214,26 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // التحقق من البيانات المطلوبة
+    if (!formData.title.trim()) {
+      toast({
+        title: 'خطأ',
+        description: 'يجب إدخال عنوان المانجا',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!formData.mangaType) {
+      toast({
+        title: 'خطأ',
+        description: 'يجب اختيار نوع المانجا',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -172,15 +321,127 @@ const AddMangaForm = ({ onSuccess }: AddMangaFormProps) => {
 
       <div>
         <label className="block text-sm font-medium mb-2">
-          رابط صورة الغلاف
+          صورة الغلاف
         </label>
-        <Input
-          value={formData.coverImageUrl}
-          onChange={(e) =>
-            setFormData({ ...formData, coverImageUrl: e.target.value })
-          }
-          placeholder="https://example.com/cover.jpg"
-        />
+
+        <Tabs value={coverImageMethod} onValueChange={(value) => setCoverImageMethod(value as 'url' | 'upload')}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="url" className="flex items-center gap-2">
+              <Link className="h-4 w-4" />
+              رابط الصورة
+            </TabsTrigger>
+            <TabsTrigger value="upload" className="flex items-center gap-2">
+              <Upload className="h-4 w-4" />
+              رفع صورة
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="url" className="space-y-3">
+            <Input
+              value={formData.coverImageUrl}
+              onChange={(e) => {
+                setFormData({ ...formData, coverImageUrl: e.target.value });
+                setPreviewImage(e.target.value);
+              }}
+              placeholder="https://example.com/cover.jpg"
+            />
+          </TabsContent>
+
+          <TabsContent value="upload" className="space-y-3">
+            {/* منطقة السحب والإفلات */}
+            <div
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                imageUploading
+                  ? 'border-primary bg-primary/5'
+                  : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+              }`}
+              onClick={() => !imageUploading && fileInputRef.current?.click()}
+            >
+              <div className="flex flex-col items-center gap-2">
+                {imageUploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <p className="text-sm font-medium text-primary">جاري رفع الصورة...</p>
+                  </>
+                ) : (
+                  <>
+                    <Image className="h-8 w-8 text-muted-foreground" />
+                    <p className="text-sm font-medium">اسحب الصورة هنا أو اضغط للاختيار</p>
+                    <p className="text-xs text-muted-foreground">
+                      الحد الأقصى: 5 ميجابايت • أنواع مدعومة: JPG, PNG, GIF, WebP
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={imageUploading}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {imageUploading ? "جاري الرفع..." : "اختيار صورة"}
+              </Button>
+
+              {formData.coverImageUrl && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearImage}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  حذف
+                </Button>
+              )}
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
+          </TabsContent>
+        </Tabs>
+
+        {/* معاينة الصورة */}
+        {(previewImage || formData.coverImageUrl) && (
+          <div className="mt-3">
+            <div className="relative inline-block">
+              <img
+                src={previewImage || formData.coverImageUrl}
+                alt="معاينة صورة الغلاف"
+                className="w-32 h-48 object-cover rounded-lg border"
+                onError={() => {
+                  setPreviewImage(null);
+                  toast({
+                    title: 'خطأ',
+                    description: 'فشل في تحميل الصورة',
+                    variant: 'destructive'
+                  });
+                }}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearImage}
+                className="absolute -top-2 -right-2 h-6 w-6 p-0 bg-red-500 text-white rounded-full hover:bg-red-600"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

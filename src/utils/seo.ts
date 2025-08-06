@@ -18,8 +18,8 @@ export const generatePageMeta = (
     case 'manga':
       if (!data) return null;
       return {
-        title: `${data.title} - قراءة مانجا مترجمة | مانجا العرب`,
-        description: `اقرأ مانجا ${data.title} مترجمة بجودة عالية مجاناً. ${data.description || ''} تابع جميع فصول ${data.title} على مانجا العرب.`,
+        title: `${data.title} - قراءة مانجا مترجمة | Sanime`,
+        description: `اقرأ مانجا ${data.title} مترجمة بجودة عالية مجاناً. ${data.description || ''} تابع جميع فصول ${data.title} على Sanime.`,
         keywords: `${data.title}, مانجا ${data.title}, قراءة ${data.title}, ${data.author || ''}, ${data.genres?.join(', ') || ''}`,
         url: `${baseUrl}/manga/${data.slug}`,
         canonical: `${baseUrl}/manga/${data.slug}`,
@@ -30,8 +30,8 @@ export const generatePageMeta = (
     case 'chapter':
       if (!data) return null;
       return {
-        title: `${data.manga.title} - الفصل ${data.chapter_number} | مانجا العرب`,
-        description: `اقرأ الفصل ${data.chapter_number} من مانجا ${data.manga.title} مترجم بجودة عالية مجاناً. ${data.title || ''} تابع آخر الفصول على مانجا العرب.`,
+        title: `${data.manga.title} - الفصل ${data.chapter_number} - Sanime`,
+        description: `اقرأ الفصل ${data.chapter_number} من مانجا ${data.manga.title} بجودة عالية على موقع Sanime.`,
         keywords: `${data.manga.title} الفصل ${data.chapter_number}, مانجا ${data.manga.title}, قراءة الفصل ${data.chapter_number}`,
         url: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
         canonical: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
@@ -122,28 +122,44 @@ export const generateStructuredData = (page: string, data?: any) => {
       if (!data) return null;
       return {
         "@context": "https://schema.org",
-        "@type": "Article",
+        "@type": "ComicStory",
         "@id": `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
+        name: `${data.manga.title} - الفصل ${data.chapter_number}`,
         headline: `${data.manga.title} - الفصل ${data.chapter_number}`,
         description: data.title || `الفصل ${data.chapter_number} من ${data.manga.title}`,
-        author: {
-          "@type": "Person",
-          name: data.manga.author || "مؤلف غير معروف"
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "مانجا العرب"
-        },
         url: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
         image: data.manga.cover_image_url,
         datePublished: data.created_at,
         dateModified: data.updated_at || data.created_at,
         inLanguage: "ar",
+        author: {
+          "@type": "Person",
+          name: data.manga.author || "مؤلف غير معروف"
+        },
+        creator: {
+          "@type": "Person",
+          name: data.manga.author || "مؤلف غير معروف"
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Sanime",
+          url: baseUrl
+        },
         isPartOf: {
-          "@type": "Book",
+          "@type": "ComicSeries",
           name: data.manga.title,
-          url: `${baseUrl}/manga/${data.manga.slug}`
-        }
+          url: `${baseUrl}/manga/${data.manga.slug}`,
+          author: {
+            "@type": "Person",
+            name: data.manga.author || "مؤلف غير معروف"
+          }
+        },
+        position: data.chapter_number,
+        genre: data.manga.genre || [],
+        numberOfPages: data.pages?.length || 0,
+        accessMode: "visual",
+        accessibilityFeature: "highContrast",
+        accessibilityControl: "fullKeyboardControl"
       };
       
     default:

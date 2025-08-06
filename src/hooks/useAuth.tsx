@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
           // Load user profile and role
           setTimeout(async () => {
@@ -59,8 +59,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadUserProfile = async (userId: string) => {
+  // Set up real-time subscription for profile changes
+  useEffect(() => {
+    if (!user?.id) return;
+
+    console.log('Setting up profile subscription for user:', user.id);
+
+    const profileSubscription = supabase
+      .channel('profile_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Profile updated in real-time:', payload);
+
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            const updatedProfile = payload.new;
+            setProfile(updatedProfile);
+            const role = updatedProfile?.role as UserRole || 'user';
+            setUserRole(role);
+            setIsAdmin(['tribe_leader', 'admin', 'site_admin'].includes(role));
+
+            console.log('Profile state updated:', {
+              role,
+              isAdmin: ['tribe_leader', 'admin', 'site_admin'].includes(role)
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up profile subscription');
+      supabase.removeChannel(profileSubscription);
+    };
+  }, [user?.id]);
+
+  const loadUserProfile = async (userId: string, retryCount = 0) => {
     try {
+      console.log(`Loading profile for user: ${userId} (attempt ${retryCount + 1})`);
+
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
@@ -68,22 +111,59 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (error) {
-        console.error('Error loading profile:', error);
+        console.error('Error loading profile:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          error: JSON.stringify(error, null, 2)
+        });
+
+        // If profile doesn't exist, create it
+        if (error.code === 'PGRST116' && retryCount === 0) {
+          console.log('Profile not found, creating new one...');
+          const { data: userData } = await supabase.auth.getUser();
+          if (userData?.user) {
+            const { error: createError } = await supabase
+              .from('profiles')
+              .insert({
+                user_id: userData.user.id,
+                email: userData.user.email,
+                display_name: userData.user.user_metadata?.display_name || userData.user.email,
+                role: 'user'
+              });
+
+            if (!createError) {
+              // Retry loading the profile
+              return await loadUserProfile(userId, retryCount + 1);
+            }
+          }
+        }
         return;
       }
 
+      console.log('Profile loaded successfully:', profileData);
       setProfile(profileData);
       const role = profileData?.role as UserRole || 'user';
       setUserRole(role);
-      setIsAdmin(['admin', 'site_admin'].includes(profileData?.role || 'user'));
-    } catch (error) {
-      console.error('Error loading profile:', error);
+      setIsAdmin(['tribe_leader', 'admin', 'site_admin'].includes(profileData?.role || 'user'));
+    } catch (error: any) {
+      console.error('Error loading profile:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
     }
   };
 
   const refreshProfile = async () => {
     if (user) {
+      console.log('Refreshing profile for user:', user.id);
       await loadUserProfile(user.id);
+      // Force a small delay to ensure UI updates
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
   };
 
