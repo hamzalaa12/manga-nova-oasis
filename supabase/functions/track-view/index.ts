@@ -22,10 +22,6 @@ serve(async (req) => {
 
     console.log(`Processing ${type} view for ID: ${mangaId}`);
 
-    // For now, treat all views as manga views until chapter_views table is created
-    const tableName = "manga_views";
-    const idField = "manga_id";
-
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
