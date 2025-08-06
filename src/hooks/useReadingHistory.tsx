@@ -109,8 +109,8 @@ export const useReadingHistory = () => {
     }
   };
 
-  const loadReadingStats = async () => {
-    if (!user) return;
+  const loadReadingStats = async (): Promise<boolean> => {
+    if (!user) return false;
 
     try {
       // Get total manga read
