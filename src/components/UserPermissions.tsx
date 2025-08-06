@@ -143,7 +143,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             },
             {
               icon: <Ban className="h-4 w-4" />,
-              title: "حظر المستخدمين",
+              title: "حظر المست��دمين",
               description: "حظر أصحاب التعليقات المسيئة",
               available: true
             }
@@ -160,7 +160,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Upload className="h-4 w-4" />,
               title: "رفع ونشر مباشر",
-              description: "��فع مانجا أو فصل بدون الحاجة لموافقة",
+              description: "رفع مانجا أو فصل بدون الحاجة لموافقة",
               available: true
             },
             {
@@ -177,7 +177,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             },
             {
               icon: <Ban className="h-4 w-4" />,
-              title: "حظر المستخدمين",
+              title: "ح��ر المستخدمين",
               description: "حظر المستخدمين المسيئين",
               available: true
             }
@@ -194,7 +194,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Upload className="h-4 w-4" />,
               title: "رفع ونشر مباشر",
-              description: "رفع وإدارة أ�� محتوى",
+              description: "رفع وإدارة أي محتوى",
               available: true
             },
             {
@@ -212,7 +212,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Edit3 className="h-4 w-4" />,
               title: "تغيير الرتب",
-              description: "تغيير رتب المستخدمين (user ← beginner_fighter)",
+              description: "تغيي�� رتب المستخدمين (user ← beginner_fighter)",
               available: true
             },
             {
@@ -357,7 +357,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
               {currentRole === "site_admin" && (
                 <p>• تملك جميع الصلاحيات، استخدمها بحكمة</p>
               )}
-              <p>• جميع الأعمال الإدارية مسجلة ومرا��بة</p>
+              <p>• جميع الأعمال الإدارية مسجلة ومراقبة</p>
             </div>
           </div>
 
@@ -407,7 +407,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
 
                 {/* إدارة التعليقات */}
                 {(currentRole === "elite_fighter" || currentRole === "tribe_leader" || currentRole === "admin" || currentRole === "site_admin") && (
-                  <Link to="/admin">
+                  <Link to="/admin?tab=reports">
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <MessageSquare className="h-4 w-4 mr-2" />
                       إدارة التعليقات
@@ -417,7 +417,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
 
                 {/* إدارة المستخدمين */}
                 {(currentRole === "admin" || currentRole === "site_admin") && (
-                  <Link to="/admin">
+                  <Link to="/admin?tab=users">
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Users className="h-4 w-4 mr-2" />
                       إدارة المستخدمين
@@ -427,7 +427,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
 
                 {/* الإبلاغات */}
                 {(currentRole === "elite_fighter" || currentRole === "tribe_leader" || currentRole === "admin" || currentRole === "site_admin") && (
-                  <Link to="/admin">
+                  <Link to="/admin?tab=reports">
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Flag className="h-4 w-4 mr-2" />
                       مراجعة البلاغات
@@ -437,7 +437,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
 
                 {/* إعدادات الموقع */}
                 {currentRole === "site_admin" && (
-                  <Link to="/admin">
+                  <Link to="/admin?tab=seo">
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Settings className="h-4 w-4 mr-2" />
                       إعدادات الموقع
