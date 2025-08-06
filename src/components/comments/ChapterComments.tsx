@@ -100,7 +100,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chapter-comments", chapterId] });
       setNewComment("");
-      setReplyContent("");
+      setReplyContents({});
       setReplyingTo(null);
       toast({
         title: "تم النشر!",
