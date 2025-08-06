@@ -180,8 +180,10 @@ export const useReadingHistory = () => {
           chapter: item.chapters
         })) : []
       });
+      return true;
     } catch (error) {
       console.error('Error loading reading stats:', error);
+      return false;
     }
   };
 
@@ -267,7 +269,7 @@ export const useReadingHistory = () => {
       });
 
       toast({
-        title: 'تم مسح السجل',
+        title: '��م مسح السجل',
         description: 'تم مسح سجل القراءة بنجاح'
       });
     } catch (error) {
