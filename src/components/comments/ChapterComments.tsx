@@ -164,8 +164,9 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
   };
 
   const handleSubmitReply = (parentId: string) => {
-    if (!replyContent.trim()) return;
-    addCommentMutation.mutate({ content: replyContent, parentId });
+    const content = replyContents[parentId] || "";
+    if (!content.trim()) return;
+    addCommentMutation.mutate({ content, parentId });
   };
 
   const canModerateComments = hasPermission(userRole, "can_moderate_comments");
