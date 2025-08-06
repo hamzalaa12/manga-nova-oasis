@@ -197,6 +197,7 @@ const AdminDashboard = () => {
           <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
           <TabsTrigger value="reports">الإبلاغات</TabsTrigger>
           <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
+          <TabsTrigger value="seo">تحسين محركات البحث</TabsTrigger>
         </TabsList>
 
         {/* إدارة المستخدمين */}
@@ -409,7 +410,7 @@ const UserCard = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="user">مستخدم عادي</SelectItem>
+              <SelectItem value="user">��ستخدم عادي</SelectItem>
               <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
               <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
               <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
