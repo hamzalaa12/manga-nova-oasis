@@ -245,14 +245,14 @@ const ProfileDashboard = () => {
         id: 'streak_7',
         title: 'قارئ منتظم',
         description: 'قراءة لمدة 7 أيام متتالية',
-        icon: '⚡',
+        icon: '��',
         unlocked: userStats.streak >= 7,
         progress: Math.min(userStats.streak, 7),
         maxProgress: 7
       },
       {
         id: 'favorites_10',
-        title: 'جامع المفضلات',
+        title: 'جامع المف��لات',
         description: 'إضافة 10 مانجا للمفضلة',
         icon: '��️',
         unlocked: userStats.favorites >= 10,
@@ -478,7 +478,7 @@ const ProfileDashboard = () => {
             <div className="mt-6 pt-4 border-t">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {hasPermission(userRole, "can_submit_content") && (
-                  <a href="/admin" className="block">
+                  <a href="/admin?tab=content" className="block">
                     <div className="p-3 text-center bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer">
                       <Upload className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
                       <p className="text-sm font-medium">إضافة محتوى</p>
@@ -487,7 +487,7 @@ const ProfileDashboard = () => {
                 )}
 
                 {hasPermission(userRole, "can_moderate_comments") && (
-                  <a href="/admin" className="block">
+                  <a href="/admin?tab=reports" className="block">
                     <div className="p-3 text-center bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer">
                       <Eye className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
                       <p className="text-sm font-medium">مراجعة التعليقات</p>
@@ -496,7 +496,7 @@ const ProfileDashboard = () => {
                 )}
 
                 {hasPermission(userRole, "can_manage_users") && (
-                  <a href="/admin" className="block">
+                  <a href="/admin?tab=users" className="block">
                     <div className="p-3 text-center bg-muted/50 hover:bg-muted rounded-lg transition-colors cursor-pointer">
                       <Users className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
                       <p className="text-sm font-medium">إدارة المستخدمين</p>
