@@ -139,7 +139,7 @@ const ContentManagement = () => {
         </CardHeader>
         <CardContent>
           <Tabs value={activeContentTab} onValueChange={setActiveContentTab}>
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className={`grid w-full grid-cols-${getContentTabCount()}`}>
               <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
               {canSubmitContent && (
                 <TabsTrigger value="add-manga">إضافة مانجا</TabsTrigger>
@@ -164,7 +164,7 @@ const ContentManagement = () => {
                         أضف مانجا جديدة مع المعلومات والغلاف
                       </p>
                       <Badge variant={canPublishDirectly ? "default" : "secondary"}>
-                        {canPublishDirectly ? "نشر مباشر" : "يتطلب مراجعة"}
+                        {canPublishDirectly ? "نشر مباش��" : "يتطلب مراجعة"}
                       </Badge>
                     </CardContent>
                   </Card>
@@ -240,7 +240,7 @@ const ContentManagement = () => {
                     {canPublishDirectly && (
                       <Badge variant="default">
                         <CheckCircle className="h-3 w-3 mr-1" />
-                        نشر مباشر
+                        نشر مبا��ر
                       </Badge>
                     )}
                     {canManageUsers && (
