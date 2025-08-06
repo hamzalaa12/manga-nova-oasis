@@ -85,17 +85,14 @@ serve(async (req) => {
     // If view doesn't exist, add it
     if (!existingView) {
       try {
-        // Prepare insert data
-        const insertData: any = {
-          user_id: userId,
-          session_id: sessionId,
-        };
-        insertData[idField] = mangaId;
-
         // Insert new view record - let the trigger handle the counter update
         const { error: viewError } = await supabaseClient
-          .from(tableName)
-          .insert(insertData);
+          .from("manga_views")
+          .insert({
+            manga_id: mangaId,
+            user_id: userId,
+            session_id: sessionId,
+          });
 
         if (viewError) {
           console.error("Error inserting view:", viewError);
