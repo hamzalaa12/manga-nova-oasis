@@ -175,4 +175,73 @@
   .nav-link:hover::after {
     @apply w-full;
   }
+
+  /* Spoiler Comment Styles */
+  .spoiler-hidden {
+    background: linear-gradient(45deg, #1a1a1a 25%, #2a2a2a 25%, #2a2a2a 50%, #1a1a1a 50%, #1a1a1a 75%, #2a2a2a 75%, #2a2a2a);
+    background-size: 28px 28px;
+    animation: spoiler-animate 2s linear infinite;
+    color: transparent;
+    user-select: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .spoiler-hidden:hover {
+    background-color: #333;
+    transform: scale(1.02);
+  }
+
+  .spoiler-revealed {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    border: 2px solid #ff6b35;
+    animation: spoiler-reveal 0.5s ease-out;
+  }
+
+  @keyframes spoiler-animate {
+    0% { background-position: 0 0; }
+    100% { background-position: 28px 28px; }
+  }
+
+  @keyframes spoiler-reveal {
+    0% {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Comment edit animation */
+  .comment-edit-enter {
+    animation: comment-edit-in 0.3s ease-out;
+  }
+
+  @keyframes comment-edit-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Improved comment hover effects */
+  .comment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+  }
+
+  /* Reply depth indicator */
+  .reply-depth-1 { border-right: 3px solid #3b82f6; }
+  .reply-depth-2 { border-right: 3px solid #10b981; }
+  .reply-depth-3 { border-right: 3px solid #f59e0b; }
 }
