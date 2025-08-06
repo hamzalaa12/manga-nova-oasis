@@ -56,7 +56,7 @@ const AdminDashboard = () => {
   // حساب عدد التبويبات المرئية
   const getTabCount = () => {
     let count = 0;
-    if (canManageUsers) count++;
+    if (canViewUsers) count++;
     if (canModerateComments) count++;
     if (canSubmitContent) count++;
     if (isSiteAdmin) count++;
