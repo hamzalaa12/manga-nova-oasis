@@ -155,7 +155,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     onError: (error: any) => {
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحديث ا��تعليق",
+        description: error.message || "فشل في تحديث التعليق",
         variant: "destructive",
       });
     },
@@ -333,7 +333,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
   };
 
   const renderComment = (comment: Comment, isReply = false) => (
-    <Card key={comment.id} className={`bg-card border-border ${isReply ? 'ml-8' : ''}`}>
+    <Card key={comment.id} className={`comment-card bg-card border-border transition-all duration-200 ${isReply ? 'ml-8 reply-depth-1' : ''}`}>
       <CardContent className="p-4">
         {/* رأس التعليق */}
         <div className="flex items-center justify-between mb-3">
