@@ -67,8 +67,27 @@ export const useViewTracking = () => {
       });
 
       // Also increment chapter views count directly
+      // First get the current count, then increment it
+      const { data: currentChapter, error: fetchError } = await supabase
+        .from('chapters')
+        .select('views_count')
+        .eq('id', chapterId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching current chapter views:', fetchError);
+        return;
+      }
+
+      const newViewsCount = (currentChapter?.views_count || 0) + 1;
+
       const { error: chapterError } = await supabase
-        .rpc('increment_chapter_views', { chapter_id: chapterId });
+        .from('chapters')
+        .update({
+          views_count: newViewsCount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', chapterId);
 
       if (chapterError) {
         console.error('Error updating chapter views:', {
