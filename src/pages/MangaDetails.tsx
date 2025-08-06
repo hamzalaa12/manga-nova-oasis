@@ -97,6 +97,8 @@ const MangaDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
 
   useEffect(() => {
     if (slug) {
@@ -631,7 +633,7 @@ const MangaDetails = () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
-                              هل أ��ت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
+                              هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
                               الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
@@ -681,7 +683,7 @@ const MangaDetails = () => {
                     >
                       <Button>
                         <Play className="h-4 w-4 ml-2" />
-                        بدء القراءة
+                        بدء القر��ءة
                       </Button>
                     </Link>
                   )}
