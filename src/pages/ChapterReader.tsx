@@ -46,7 +46,6 @@ import ViewsCounter from "@/components/ViewsCounter";
 import AdvancedComments from "@/components/AdvancedComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
-import SEOLinks from "@/components/SEOLinks";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useViewTracking } from "@/hooks/useViewTracking";
@@ -308,7 +307,7 @@ const ChapterReader = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [chapter, manga, updateReadingProgress]);
 
-  // Keyboard navigation
+  // Keyboard navigation and click-to-scroll
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
@@ -327,11 +326,38 @@ const ChapterReader = () => {
             navigate(getChapterUrl(getMangaSlug(manga), prev.chapter_number));
           }
           break;
+        case " ": // Space key
+          event.preventDefault();
+          window.scrollBy({
+            top: window.innerHeight * 0.8,
+            behavior: 'smooth'
+          });
+          break;
+      }
+    };
+
+    const handleClick = (event: MouseEvent) => {
+      // Only handle clicks on the reading area (not on buttons or other interactive elements)
+      const target = event.target as HTMLElement;
+      const isInteractiveElement = target.closest('button, select, a, [role="button"], [tabindex]');
+      const isMainArea = target.closest('main');
+
+      if (isMainArea && !isInteractiveElement) {
+        event.preventDefault();
+        window.scrollBy({
+          top: window.innerHeight * 0.8,
+          behavior: 'smooth'
+        });
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("click", handleClick);
+    };
   }, [navigate, manga, chapter, allChapters]);
 
   if (loading) {
@@ -619,26 +645,28 @@ const ChapterReader = () => {
             </div>
           ) : readingMode === "single" ? (
             // Single Page Mode
-            <div className="relative">
+            <div className="relative cursor-pointer" data-reading-area="true">
               {chapter.pages[currentPage] && (
                 <img
                   src={chapter.pages[currentPage]?.url || "/placeholder.svg"}
                   alt={`صفحة ${currentPage + 1} من ${chapter.pages.length}`}
-                  className="w-full max-w-full object-contain mx-auto cursor-auto"
+                  className="w-full max-w-full object-contain mx-auto select-none"
                   loading="eager"
+                  draggable={false}
                 />
               )}
             </div>
           ) : (
             // Full Pages Mode
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 cursor-pointer" data-reading-area="true">
               {chapter.pages.map((page, index) => (
                 <div key={index} className="relative">
                   <img
                     src={page?.url || "/placeholder.svg"}
                     alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
-                    className="w-full max-w-full object-contain mx-auto"
+                    className="w-full max-w-full object-contain mx-auto select-none"
                     loading={index < 3 ? "eager" : "lazy"}
+                    draggable={false}
                   />
                 </div>
               ))}
@@ -793,14 +821,6 @@ const ChapterReader = () => {
         </div>
       )}
 
-      {/* SEO Links */}
-      {chapter && manga && (
-        <div className="bg-background py-8">
-          <div className="container mx-auto px-4">
-            <SEOLinks type="chapter" data={{ ...chapter, manga }} />
-          </div>
-        </div>
-      )}
 
       {/* ViewsCounter */}
       <ViewsCounter type="chapter" id={chapter.id} />
