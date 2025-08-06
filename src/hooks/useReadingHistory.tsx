@@ -214,6 +214,24 @@ export const useReadingHistory = () => {
         completed
       });
 
+      // First verify that the manga and chapter exist
+      const { data: chapterData, error: chapterCheckError } = await supabase
+        .from('chapters')
+        .select('id, manga_id')
+        .eq('id', chapterId)
+        .eq('manga_id', mangaId)
+        .single();
+
+      if (chapterCheckError) {
+        console.error('Chapter validation failed:', chapterCheckError);
+        return false;
+      }
+
+      if (!chapterData) {
+        console.error('Chapter not found or manga mismatch:', { chapterId, mangaId });
+        return false;
+      }
+
       const { error } = await supabase
         .from('reading_progress')
         .upsert({
