@@ -330,8 +330,12 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="اكتب تعليقك هنا... (Ctrl+Enter للإرسال)"
-              className="min-h-[100px] resize-none"
+              className="min-h-[100px] resize-none text-right"
               dir="rtl"
+              style={{
+                fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+                unicodeBidi: "embed"
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && e.ctrlKey) {
                   e.preventDefault();
