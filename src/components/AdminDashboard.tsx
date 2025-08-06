@@ -40,6 +40,7 @@ import ContentModeration from './ContentModeration';
 import RestrictionsMenu from './RestrictionsMenu';
 import SitemapManager from './admin/SitemapManager';
 import ContentManagement from './admin/ContentManagement';
+import LimitedUserManagement from './admin/LimitedUserManagement';
 
 const AdminDashboard = () => {
   const { user: currentUser, refreshProfile, userRole } = useAuth();
@@ -510,7 +511,7 @@ const UserCard = ({
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>حظر المستخدم</AlertDialogTitle>
+                    <AlertDialogTitle>ح��ر المستخدم</AlertDialogTitle>
                     <AlertDialogDescription>
                       هل أنت متأكد من رغبتك في حظر هذا المستخدم؟
                     </AlertDialogDescription>
