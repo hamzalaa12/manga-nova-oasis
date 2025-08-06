@@ -254,12 +254,12 @@ export const useReadingHistory = () => {
         updated_at: new Date().toISOString()
       };
 
-      console.log('���� Upsert data:', upsertData);
+      console.log('📝 Upsert data:', upsertData);
 
       const { error, data: upsertResult } = await supabase
         .from('reading_progress')
         .upsert(upsertData, {
-          onConflict: 'user_id,manga_id,chapter_id'
+          onConflict: 'user_id,chapter_id'
         });
 
       if (error) {
