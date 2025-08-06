@@ -65,8 +65,15 @@ export const useFavorites = () => {
       });
 
       fetchFavorites();
-    } catch (error) {
-      console.error('خطأ في إضافة للمفضلة:', error);
+    } catch (error: any) {
+      console.error('خطأ في إضافة للمفضلة:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        mangaId,
+        errorString: String(error)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في إضافة المانجا للمفضلة',
