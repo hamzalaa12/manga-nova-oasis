@@ -336,6 +336,50 @@ const MangaDetails = () => {
     }
   };
 
+  const handleRating = async (rating: number) => {
+    if (!user) {
+      toast({
+        title: "تسجيل الدخول مطلوب",
+        description: "يجب تسجيل الدخول لتقييم المانجا",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setUserRating(rating);
+
+      // حفظ التقييم في قاعدة البيانات
+      const { error } = await supabase
+        .from("manga_ratings")
+        .upsert({
+          user_id: user.id,
+          manga_id: manga?.id,
+          rating: rating,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,manga_id'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "تم التقييم!",
+        description: `تم تقييم المانجا بـ ${rating} نجوم`,
+      });
+
+      // إعادة تحميل بيانات المانجا لتحديث متوسط التقييم
+      fetchMangaDetails();
+    } catch (error: any) {
+      toast({
+        title: "خطأ",
+        description: "فشل في حفظ التقييم",
+        variant: "destructive",
+      });
+      setUserRating(0);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -634,7 +678,7 @@ const MangaDetails = () => {
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
-                              الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
+                              الفصول المرتبطة بها أ��ضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
@@ -683,7 +727,7 @@ const MangaDetails = () => {
                     >
                       <Button>
                         <Play className="h-4 w-4 ml-2" />
-                        بدء القر��ءة
+                        بدء القراءة
                       </Button>
                     </Link>
                   )}
