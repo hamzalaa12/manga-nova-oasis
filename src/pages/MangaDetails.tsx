@@ -349,7 +349,7 @@ const MangaDetails = () => {
     try {
       setUserRating(rating);
 
-      // حفظ التقييم في قاعدة البيانات
+      // حفظ التقييم في قاعدة الب��انات
       const { error } = await supabase
         .from("manga_ratings")
         .upsert({
@@ -505,7 +505,7 @@ const MangaDetails = () => {
         image: manga.cover_image_url,
         author: {
           "@type": "Person",
-          name: manga.author || "غير محدد",
+          name: manga.author || "غير ��حدد",
         },
         genre: manga.genre || [],
         inLanguage: "ar",
@@ -925,12 +925,6 @@ const MangaDetails = () => {
         />
       )}
 
-      {/* روابط SEO للتصفح */}
-      {manga && (
-        <section className="container mx-auto px-4 py-8">
-          <SEOLinks type="manga" data={manga} />
-        </section>
-      )}
 
       <Footer />
     </div>
