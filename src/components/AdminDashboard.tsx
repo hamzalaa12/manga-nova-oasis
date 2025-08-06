@@ -35,7 +35,7 @@ import { useReports } from '@/hooks/useReports';
 import { useRoleUpdate } from '@/hooks/useRoleUpdate';
 import { useUserRestrictions, RestrictionType } from '@/hooks/useUserRestrictions';
 import { useAuth } from '@/hooks/useAuth';
-import { UserRole, getRoleDisplayName, getRoleColor } from '@/types/user';
+import { UserRole, getRoleDisplayName, getRoleColor, hasPermission } from '@/types/user';
 import ContentModeration from './ContentModeration';
 import RestrictionsMenu from './RestrictionsMenu';
 import SitemapManager from './admin/SitemapManager';
