@@ -214,7 +214,34 @@ export const useReadingHistory = () => {
         completed
       });
 
-      // First verify that the manga and chapter exist
+      // First verify that the user has a profile
+      console.log('👤 Validating user profile...');
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('❌ User profile validation failed:', {
+          error: profileError,
+          message: profileError?.message,
+          code: profileError?.code,
+          details: profileError?.details,
+          hint: profileError?.hint,
+          user_id: user.id
+        });
+        return false;
+      }
+
+      if (!profileData) {
+        console.error('❌ User profile not found:', { user_id: user.id });
+        return false;
+      }
+
+      console.log('✅ User profile validation successful:', profileData);
+
+      // Then verify that the manga and chapter exist
       console.log('📋 Validating chapter and manga...');
       const { data: chapterData, error: chapterCheckError } = await supabase
         .from('chapters')
