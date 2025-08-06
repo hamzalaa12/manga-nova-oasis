@@ -116,7 +116,7 @@ const AdminDashboard = () => {
       if (success) {
         console.log('Role change succeeded, refreshing user data');
 
-        // إذا كان المستخدم المحدث هو المستخدم الحالي، حدث الملف الشخصي
+        // إ��ا كان المستخدم المحدث هو المستخدم الحالي، حدث الملف الشخصي
         if (userId === currentUser?.id) {
           console.log('Current user role changed, refreshing profile');
           setTimeout(() => {
@@ -198,7 +198,10 @@ const AdminDashboard = () => {
 
       <Tabs value={currentTab} onValueChange={(value) => setSearchParams({ tab: value })} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            إدارة المستخدمين
+          </TabsTrigger>
           <TabsTrigger value="reports">الإبلاغات</TabsTrigger>
           <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
           <TabsTrigger value="seo">تحسين محركات البحث</TabsTrigger>
