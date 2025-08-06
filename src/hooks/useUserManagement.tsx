@@ -89,8 +89,14 @@ export const useUserManagement = () => {
 
       console.log('Processed users with ban info:', usersWithBanInfo.length);
       setUsers(usersWithBanInfo);
-    } catch (error) {
-      console.error('Error loading users:', error);
+    } catch (error: any) {
+      console.error('Error loading users:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في تحميل قائمة المستخدمين',
