@@ -52,8 +52,8 @@ export const useReadingHistory = () => {
     }
   }, [user]);
 
-  const loadReadingHistory = async () => {
-    if (!user) return;
+  const loadReadingHistory = async (): Promise<boolean> => {
+    if (!user) return false;
 
     setLoading(true);
     try {
@@ -87,6 +87,7 @@ export const useReadingHistory = () => {
         }));
         setReadingHistory(formattedHistory);
       }
+      return true;
     } catch (error: any) {
       console.error('Error loading reading history:', {
         message: error?.message || 'Unknown error',
@@ -102,13 +103,14 @@ export const useReadingHistory = () => {
         description: `فشل في تحميل سجل القراءة: ${error?.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const loadReadingStats = async () => {
-    if (!user) return;
+  const loadReadingStats = async (): Promise<boolean> => {
+    if (!user) return false;
 
     try {
       // Get total manga read
@@ -178,8 +180,17 @@ export const useReadingHistory = () => {
           chapter: item.chapters
         })) : []
       });
-    } catch (error) {
-      console.error('Error loading reading stats:', error);
+      return true;
+    } catch (error: any) {
+      console.error('Error loading reading stats:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error),
+        errorObject: error
+      });
+      return false;
     }
   };
 
@@ -188,8 +199,11 @@ export const useReadingHistory = () => {
     chapterId: string,
     pageNumber: number,
     completed: boolean = false
-  ) => {
-    if (!user) return;
+  ): Promise<boolean> => {
+    if (!user) {
+      console.warn('Cannot update reading progress: user not logged in');
+      return false;
+    }
 
     try {
       console.log('Updating reading progress:', {
@@ -216,11 +230,31 @@ export const useReadingHistory = () => {
         throw error;
       }
 
-      // Reload data
-      loadReadingHistory();
-      loadReadingStats();
+      // Reload data in background
+      loadReadingHistory().catch(error => {
+        console.error('Error reloading reading history:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          errorString: String(error),
+          errorObject: error
+        });
+      });
+      loadReadingStats().catch(error => {
+        console.error('Error reloading reading stats:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          errorString: String(error),
+          errorObject: error
+        });
+      });
+
+      return true;
     } catch (error: any) {
-      console.error('Error updating reading progress:', {
+      const errorDetails = {
         message: error?.message || 'Unknown error',
         code: error?.code,
         details: error?.details,
@@ -228,11 +262,22 @@ export const useReadingHistory = () => {
         mangaId,
         chapterId,
         userId: user?.id,
-        error: error
-      });
+        errorType: typeof error,
+        errorString: String(error),
+        errorJSON: (() => {
+          try {
+            return JSON.stringify(error, null, 2);
+          } catch {
+            return 'Could not stringify error';
+          }
+        })()
+      };
 
-      // لا نعرض toast هنا لأن هذا يحدث في الخلفية
-      // فقط نسجل الخطأ
+      console.error('Error updating reading progress:', errorDetails);
+      console.error('Raw error object:', error);
+
+      // Return false to indicate failure
+      return false;
     }
   };
 
@@ -259,11 +304,18 @@ export const useReadingHistory = () => {
       });
 
       toast({
-        title: 'تم مسح السجل',
+        title: '��م مسح السجل',
         description: 'تم مسح سجل القراءة بنجاح'
       });
-    } catch (error) {
-      console.error('Error clearing reading history:', error);
+    } catch (error: any) {
+      console.error('Error clearing reading history:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error),
+        errorObject: error
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في مسح سجل القراءة',

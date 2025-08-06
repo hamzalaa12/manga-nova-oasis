@@ -46,8 +46,19 @@ const ReadingProgress = ({ mangaId, chapterId, pageNumber }: ReadingProgressProp
               last_read_at: new Date().toISOString()
             });
         }
-      } catch (error) {
-        console.error('خطأ في تحديث تقدم القراءة:', error);
+      } catch (error: any) {
+        console.error('خطأ في تحديث تقدم القراءة:', {
+          message: error?.message || 'Unknown error',
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          mangaId,
+          chapterId,
+          pageNumber,
+          userId: user?.id,
+          errorString: String(error),
+          errorObject: error
+        });
       }
     };
 

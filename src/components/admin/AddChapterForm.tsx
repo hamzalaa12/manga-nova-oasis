@@ -9,10 +9,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Upload, Link, FolderOpen } from "lucide-react";
+import { X, Plus, Upload, Link, FolderOpen, Check, ChevronsUpDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface AddChapterFormProps {
   onSuccess: () => void;
@@ -35,6 +49,8 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [mangaList, setMangaList] = useState<Manga[]>([]);
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
     mangaId: "",
     chapterNumber: "",
@@ -64,6 +80,18 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
       });
     }
   };
+
+  const filteredMangaList = mangaList.filter(manga => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+
+    const title = manga.title.toLowerCase();
+    const type = manga.manga_type.toLowerCase();
+
+    return title.includes(query) || type.includes(query);
+  });
+
+  const selectedManga = mangaList.find(manga => manga.id === formData.mangaId);
 
   const addPage = () => {
     setPages([...pages, { type: "url", url: "" }]);
@@ -195,28 +223,65 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium mb-2">اختر المانجا *</label>
-        <Select
-          value={formData.mangaId}
-          onValueChange={(value) =>
-            setFormData({ ...formData, mangaId: value })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="اختر مانجا/مانهوا/مانها" />
-          </SelectTrigger>
-          <SelectContent>
-            {mangaList.map((manga) => (
-              <SelectItem key={manga.id} value={manga.id}>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+            >
+              {selectedManga ? (
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-xs">
-                    {manga.manga_type}
+                    {selectedManga.manga_type}
                   </Badge>
-                  {manga.title}
+                  {selectedManga.title}
                 </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              ) : (
+                "اختر مانجا/مانهوا/مانها"
+              )}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className={cn("w-[400px] p-0")} align="start">
+            <Command shouldFilter={false}>
+              <CommandInput
+                placeholder="ابحث عن المانجا..."
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+              />
+              <CommandList>
+                <CommandEmpty>لا توجد نتائج</CommandEmpty>
+                <CommandGroup>
+                  {filteredMangaList.map((manga) => (
+                    <CommandItem
+                      key={manga.id}
+                      value={manga.title}
+                      onSelect={() => {
+                        setFormData({ ...formData, mangaId: manga.id });
+                        setOpen(false);
+                        setSearchQuery("");
+                      }}
+                    >
+                      <Check
+                        className={`ml-2 h-4 w-4 ${
+                          formData.mangaId === manga.id ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {manga.manga_type}
+                        </Badge>
+                        {manga.title}
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

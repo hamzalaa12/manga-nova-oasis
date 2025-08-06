@@ -144,28 +144,19 @@ const ChapterReader = () => {
     try {
       console.log("📖 Tracking chapter view for ID:", chapterId);
 
-      // Track chapter view using new system
-      await trackChapterView(chapterId);
-
-      // Track manga view as well
+      // Track chapter view using new system (includes manga view tracking)
       if (manga) {
-        await trackMangaView(manga.id);
+        await trackChapterView(chapterId, manga.id);
       }
 
       // Save reading progress for logged users
       const { data: sessionData } = await supabase.auth.getSession();
       if (sessionData.session?.user && manga && chapter) {
-        try {
-          await updateReadingProgress(manga.id, chapterId, 1, true);
+        const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
+        if (progressSaved) {
           console.log('✅ Reading progress saved via hook');
-        } catch (hookError: any) {
-          console.error('Hook failed, trying direct save:', {
-            message: hookError?.message || 'Unknown error',
-            code: hookError?.code,
-            details: hookError?.details,
-            hint: hookError?.hint,
-            error: hookError
-          });
+        } else {
+          console.warn('Hook failed, trying direct save');
 
           // نسخ احتياطي مباشر
           const { error: progressError } = await supabase
@@ -302,8 +293,26 @@ const ChapterReader = () => {
       const scrollPercentage = (scrollY + windowHeight) / documentHeight;
       if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga) {
         hasTrackedCompletion = true;
-        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true);
-        console.log('📖 Chapter marked as completed via scroll');
+        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
+          .then((success) => {
+            if (success) {
+              console.log('📖 Chapter marked as completed via scroll');
+            } else {
+              console.warn('Failed to update reading progress via scroll');
+            }
+          })
+          .catch((error) => {
+            console.error('Unexpected error in scroll reading progress update:', {
+              message: error?.message || 'Unknown error',
+              code: error?.code,
+              details: error?.details,
+              hint: error?.hint,
+              mangaId: manga.id,
+              chapterId: chapter.id,
+              errorString: String(error),
+              errorObject: error
+            });
+          });
       }
     };
 

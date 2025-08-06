@@ -33,8 +33,14 @@ export const useFavorites = () => {
 
       if (error) throw error;
       setFavorites(data || []);
-    } catch (error) {
-      console.error('خطأ في جلب المفضلة:', error);
+    } catch (error: any) {
+      console.error('خطأ في جلب المفضلة:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error)
+      });
     } finally {
       setLoading(false);
     }
@@ -59,8 +65,15 @@ export const useFavorites = () => {
       });
 
       fetchFavorites();
-    } catch (error) {
-      console.error('خطأ في إضافة للمفضلة:', error);
+    } catch (error: any) {
+      console.error('خطأ في إضافة للمفضلة:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        mangaId,
+        errorString: String(error)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في إضافة المانجا للمفضلة',
@@ -87,8 +100,15 @@ export const useFavorites = () => {
       });
 
       fetchFavorites();
-    } catch (error) {
-      console.error('خطأ في حذف من المفضلة:', error);
+    } catch (error: any) {
+      console.error('خطأ في حذف من المفضلة:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        mangaId,
+        errorString: String(error)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في حذف المانجا من المفضلة',
@@ -110,8 +130,15 @@ export const useFavorites = () => {
 
       if (error && error.code !== 'PGRST116') throw error;
       return !!data;
-    } catch (error) {
-      console.error('خطأ في فحص المفضلة:', error);
+    } catch (error: any) {
+      console.error('خطأ في فحص المفضلة:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        mangaId,
+        errorString: String(error)
+      });
       return false;
     }
   };
