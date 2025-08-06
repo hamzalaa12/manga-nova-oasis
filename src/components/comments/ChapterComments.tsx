@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Trash2, Reply, Flag, Pin } from "lucide-react";
+import { MessageCircle, Send, Trash2, Reply, Flag, Pin, Edit, Eye, EyeOff, Save, X } from "lucide-react";
 import { getRoleDisplayName, getRoleColor, hasPermission } from "@/types/user";
 
 interface Comment {
