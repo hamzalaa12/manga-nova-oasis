@@ -299,8 +299,21 @@ const ChapterReader = () => {
       const scrollPercentage = (scrollY + windowHeight) / documentHeight;
       if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga) {
         hasTrackedCompletion = true;
-        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true);
-        console.log('📖 Chapter marked as completed via scroll');
+        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
+          .then(() => {
+            console.log('📖 Chapter marked as completed via scroll');
+          })
+          .catch((error) => {
+            console.error('Error updating reading progress from scroll:', {
+              message: error?.message || 'Unknown error',
+              code: error?.code,
+              details: error?.details,
+              hint: error?.hint,
+              mangaId: manga.id,
+              chapterId: chapter.id,
+              error: error
+            });
+          });
       }
     };
 
@@ -416,7 +429,7 @@ const ChapterReader = () => {
         );
       })()}
 
-      {/* شريط التنقل العلوي - يظهر عند التمرير */}
+      {/* شريط التن��ل العلوي - يظهر عند التمرير */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
           showNavigation ? "translate-y-0" : "-translate-y-full"
