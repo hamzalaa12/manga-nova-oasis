@@ -642,6 +642,31 @@ const MangaDetails = () => {
                     </div>
                   )}
 
+                  {/* نظام التقييم */}
+                  <div className="mt-4">
+                    <p className="text-sm font-medium mb-2">التقييم:</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-5 w-5 cursor-pointer transition-colors ${
+                              star <= (hoverRating || userRating || manga.rating || 0)
+                                ? 'text-yellow-400 fill-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => handleRating(star)}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {manga.rating ? `${manga.rating.toFixed(1)}/5` : 'غير مقيّم'}
+                      </span>
+                    </div>
+                  </div>
+
                   {/* أزرار التف��عل */}
                   <div className="flex gap-2 mt-6">
                     <FavoriteButton
