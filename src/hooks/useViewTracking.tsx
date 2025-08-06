@@ -52,7 +52,15 @@ export const useViewTracking = () => {
   }, []);
 
   const trackChapterView = useCallback(async (chapterId: string, mangaId: string) => {
-    if (!chapterId || sessionViews.current.has(`chapter-${chapterId}`)) return;
+    if (!chapterId || !mangaId) {
+      console.warn('Cannot track chapter view: missing chapterId or mangaId', { chapterId, mangaId });
+      return;
+    }
+
+    if (sessionViews.current.has(`chapter-${chapterId}`)) {
+      console.log('Chapter view already tracked in this session:', chapterId);
+      return;
+    }
 
     sessionViews.current.add(`chapter-${chapterId}`);
 
@@ -61,29 +69,77 @@ export const useViewTracking = () => {
       const token = session?.access_token;
 
       // Track manga view (chapters contribute to manga views for now)
-      await supabase.functions.invoke('track-view', {
-        body: { mangaId: mangaId, type: 'manga' },
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      });
+      try {
+        await supabase.functions.invoke('track-view', {
+          body: { mangaId: mangaId, type: 'manga' },
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+      } catch (mangaViewError) {
+        console.error('Error tracking manga view via function:', {
+          message: mangaViewError?.message || 'Unknown error',
+          mangaId,
+          errorType: typeof mangaViewError,
+          errorString: String(mangaViewError),
+          errorJSON: JSON.stringify(mangaViewError, null, 2)
+        });
+      }
 
       // Also increment chapter views count directly
-      const { error: chapterError } = await supabase
-        .from('chapters')
-        .update({
-          views_count: supabase.sql`views_count + 1`,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', chapterId);
+      try {
+        // First get the current count, then increment it
+        const { data: currentChapter, error: fetchError } = await supabase
+          .from('chapters')
+          .select('views_count')
+          .eq('id', chapterId)
+          .single();
 
-      if (chapterError) {
-        console.error('Error updating chapter views:', {
-          message: chapterError?.message || 'Unknown error',
-          code: chapterError?.code,
-          details: chapterError?.details,
-          hint: chapterError?.hint,
+        if (fetchError) {
+          console.error('Error fetching current chapter views:', {
+            message: fetchError?.message || 'Unknown error',
+            code: fetchError?.code,
+            details: fetchError?.details,
+            hint: fetchError?.hint,
+            chapterId,
+            errorType: typeof fetchError,
+            errorString: String(fetchError),
+            errorJSON: JSON.stringify(fetchError, null, 2)
+          });
+          return;
+        }
+
+        const newViewsCount = (currentChapter?.views_count || 0) + 1;
+
+        const { error: chapterError } = await supabase
+          .from('chapters')
+          .update({
+            views_count: newViewsCount,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', chapterId);
+
+        if (chapterError) {
+          console.error('Error updating chapter views:', {
+            message: chapterError?.message || 'Unknown error',
+            code: chapterError?.code,
+            details: chapterError?.details,
+            hint: chapterError?.hint,
+            chapterId,
+            currentViews: currentChapter?.views_count,
+            newViews: newViewsCount,
+            errorType: typeof chapterError,
+            errorString: String(chapterError),
+            errorJSON: JSON.stringify(chapterError, null, 2)
+          });
+        } else {
+          console.log('✅ Chapter views updated successfully:', { chapterId, newViewsCount });
+        }
+      } catch (updateError) {
+        console.error('Unexpected error updating chapter views:', {
+          message: updateError?.message || 'Unknown error',
           chapterId,
-          errorString: String(chapterError),
-          errorObject: chapterError
+          errorType: typeof updateError,
+          errorString: String(updateError),
+          errorJSON: JSON.stringify(updateError, null, 2)
         });
       }
     } catch (error: any) {
@@ -94,8 +150,10 @@ export const useViewTracking = () => {
         hint: error?.hint,
         chapterId,
         mangaId,
+        errorType: typeof error,
         errorString: String(error),
-        errorObject: error
+        errorJSON: JSON.stringify(error, null, 2),
+        stack: error?.stack
       });
     }
   }, []);

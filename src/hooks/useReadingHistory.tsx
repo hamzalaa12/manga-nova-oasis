@@ -206,7 +206,7 @@ export const useReadingHistory = () => {
     }
 
     try {
-      console.log('Updating reading progress:', {
+      console.log('🔄 Starting reading progress update:', {
         user_id: user.id,
         manga_id: mangaId,
         chapter_id: chapterId,
@@ -214,21 +214,68 @@ export const useReadingHistory = () => {
         completed
       });
 
-      const { error } = await supabase
+      // First verify that the manga and chapter exist
+      console.log('📋 Validating chapter and manga...');
+      const { data: chapterData, error: chapterCheckError } = await supabase
+        .from('chapters')
+        .select('id, manga_id')
+        .eq('id', chapterId)
+        .eq('manga_id', mangaId)
+        .single();
+
+      if (chapterCheckError) {
+        console.error('❌ Chapter validation failed:', {
+          error: chapterCheckError,
+          message: chapterCheckError?.message,
+          code: chapterCheckError?.code,
+          details: chapterCheckError?.details,
+          hint: chapterCheckError?.hint,
+          errorString: String(chapterCheckError),
+          errorJSON: JSON.stringify(chapterCheckError, null, 2)
+        });
+        return false;
+      }
+
+      if (!chapterData) {
+        console.error('❌ Chapter not found or manga mismatch:', { chapterId, mangaId });
+        return false;
+      }
+
+      console.log('✅ Chapter validation successful:', chapterData);
+
+      console.log('💾 Attempting to upsert reading progress...');
+      const upsertData = {
+        user_id: user.id,
+        manga_id: mangaId,
+        chapter_id: chapterId,
+        page_number: pageNumber,
+        completed,
+        last_read_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('📝 Upsert data:', upsertData);
+
+      const { error, data: upsertResult } = await supabase
         .from('reading_progress')
-        .upsert({
-          user_id: user.id,
-          manga_id: mangaId,
-          chapter_id: chapterId,
-          page_number: pageNumber,
-          completed,
-          last_read_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+        .upsert(upsertData, {
+          onConflict: 'user_id,chapter_id'
         });
 
       if (error) {
+        console.error('❌ Upsert failed with error:', {
+          error,
+          message: error?.message,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          errorString: String(error),
+          errorJSON: JSON.stringify(error, null, 2)
+        });
         throw error;
       }
+
+      console.log('✅ Upsert successful:', upsertResult);
 
       // Reload data in background
       loadReadingHistory().catch(error => {

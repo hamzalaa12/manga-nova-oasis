@@ -46,7 +46,6 @@ import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
-import SEOLinks from "@/components/SEOLinks";
 import ViewsCounter from "@/components/ViewsCounter";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReportDialog from "@/components/ReportDialog";
@@ -333,6 +332,7 @@ const MangaDetails = () => {
     }
   };
 
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -578,13 +578,18 @@ const MangaDetails = () => {
                       <p className="text-sm font-medium mb-2">التصنيفات:</p>
                       <div className="flex flex-wrap gap-1 justify-center">
                         {manga.genre.map((genre, index) => (
-                          <Badge
+                          <Link
                             key={index}
-                            variant="outline"
-                            className="text-xs"
+                            to={`/genre/${encodeURIComponent(genre.toLowerCase())}`}
+                            className="hover:scale-105 transition-transform"
                           >
-                            {genre}
-                          </Badge>
+                            <Badge
+                              variant="outline"
+                              className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                            >
+                              {genre}
+                            </Badge>
+                          </Link>
                         ))}
                       </div>
                     </div>
@@ -782,7 +787,7 @@ const MangaDetails = () => {
                                   >
                                     <Lock className="h-4 w-4 ml-2" />
                                     {chapter.is_private
-                                      ? "نشر الفصل"
+                                      ? "نش�� الفصل"
                                       : "جعله خاص"}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
@@ -848,12 +853,6 @@ const MangaDetails = () => {
         />
       )}
 
-      {/* روابط SEO للتصفح */}
-      {manga && (
-        <section className="container mx-auto px-4 py-8">
-          <SEOLinks type="manga" data={manga} />
-        </section>
-      )}
 
       <Footer />
     </div>
