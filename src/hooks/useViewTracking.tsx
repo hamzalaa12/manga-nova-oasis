@@ -38,8 +38,16 @@ export const useViewTracking = () => {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
       }
-    } catch (error) {
-      console.error('Error tracking manga view:', error);
+    } catch (error: any) {
+      console.error('Error tracking manga view:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        mangaId,
+        errorString: String(error),
+        errorObject: error
+      });
     }
   }, []);
 
