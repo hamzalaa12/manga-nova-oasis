@@ -240,7 +240,7 @@ export const useReadingHistory = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Error updating reading progress:', {
+      const errorDetails = {
         message: error?.message || 'Unknown error',
         code: error?.code,
         details: error?.details,
@@ -248,9 +248,19 @@ export const useReadingHistory = () => {
         mangaId,
         chapterId,
         userId: user?.id,
+        errorType: typeof error,
         errorString: String(error),
-        errorObject: error
-      });
+        errorJSON: (() => {
+          try {
+            return JSON.stringify(error, null, 2);
+          } catch {
+            return 'Could not stringify error';
+          }
+        })()
+      };
+
+      console.error('Error updating reading progress:', errorDetails);
+      console.error('Raw error object:', error);
 
       // Return false to indicate failure
       return false;
