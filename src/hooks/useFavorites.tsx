@@ -130,8 +130,15 @@ export const useFavorites = () => {
 
       if (error && error.code !== 'PGRST116') throw error;
       return !!data;
-    } catch (error) {
-      console.error('خطأ في فحص المفضلة:', error);
+    } catch (error: any) {
+      console.error('خطأ في فحص المفضلة:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        mangaId,
+        errorString: String(error)
+      });
       return false;
     }
   };
