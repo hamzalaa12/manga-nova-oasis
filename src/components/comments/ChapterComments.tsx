@@ -41,8 +41,14 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
+  const [newCommentSpoiler, setNewCommentSpoiler] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContents, setReplyContents] = useState<Record<string, string>>({});
+  const [replySpoilers, setReplySpoilers] = useState<Record<string, boolean>>({});
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState<Record<string, string>>({});
+  const [editSpoiler, setEditSpoiler] = useState<Record<string, boolean>>({});
+  const [revealedSpoilers, setRevealedSpoilers] = useState<Set<string>>(new Set());
 
   // جلب التعليقات
   const { data: comments = [], isLoading } = useQuery({
