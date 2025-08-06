@@ -82,9 +82,15 @@ export const useReports = () => {
       if (error) throw error;
       setReports(data || []);
     } catch (error) {
-      console.error('Error loading reports:', error);
+      console.error('Error loading reports:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       toast({
-        title: '��طأ',
+        title: 'خطأ',
         description: 'فشل في تحميل الإبلاغات',
         variant: 'destructive'
       });
@@ -121,7 +127,13 @@ export const useReports = () => {
         resolved: resolved || 0
       });
     } catch (error) {
-      console.error('Error loading stats:', error);
+      console.error('Error loading stats:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
     }
   };
 
@@ -175,7 +187,13 @@ export const useReports = () => {
 
       return true;
     } catch (error) {
-      console.error('Error submitting report:', error);
+      console.error('Error submitting report:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في إرسال الإبلاغ',
@@ -214,7 +232,13 @@ export const useReports = () => {
 
       return true;
     } catch (error) {
-      console.error('Error updating report status:', error);
+      console.error('Error updating report status:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في تحديث حالة الإبلاغ',
@@ -245,7 +269,13 @@ export const useReports = () => {
 
       return true;
     } catch (error) {
-      console.error('Error deleting report:', error);
+      console.error('Error deleting report:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في حذف الإبلاغ',
