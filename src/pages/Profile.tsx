@@ -185,7 +185,7 @@ const Profile = () => {
 
                       {/* إدارة المحتوى */}
                       {hasPermission(userRole, "can_moderate_comments") && (
-                        <Link to="/admin" className="block">
+                        <Link to="/admin?tab=reports" className="block">
                           <Button size="sm" variant="outline" className="w-full text-xs h-8">
                             <MessageSquare className="h-3 w-3 mr-1" />
                             إدارة التعليقات
@@ -540,7 +540,7 @@ const AvatarUploadButton = () => {
       if (!file.type.startsWith('image/')) {
         toast({
           title: 'خطأ',
-          description: 'يجب اخ��يار ملف صورة فقط',
+          description: 'يجب اخ��يار ملف صورة فق��',
           variant: 'destructive'
         });
         return;
@@ -625,7 +625,7 @@ const AvatarUploadButton = () => {
   );
 };
 
-// مكون سجل القراءة المحسن
+// مكون سجل ��لقراءة المحسن
 const ReadingHistoryComponent = () => {
   const { readingHistory, stats, loading, clearReadingHistory } = useReadingHistory();
 
