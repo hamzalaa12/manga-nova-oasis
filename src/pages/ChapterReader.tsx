@@ -150,21 +150,36 @@ const ChapterReader = () => {
   };
 
   const trackChapterViewOld = async (chapterId: string) => {
+    if (!chapterId) {
+      console.warn('Cannot track chapter view: chapterId is null or empty');
+      return;
+    }
+
     try {
       console.log("📖 Tracking chapter view for ID:", chapterId);
 
-      if (manga) {
+      if (manga && manga.id) {
         await trackChapterView(chapterId, manga.id);
+      } else {
+        console.warn('Cannot track chapter view: manga data not available');
       }
 
       const { data: sessionData } = await supabase.auth.getSession();
-      if (sessionData.session?.user && manga && chapter) {
+      if (sessionData.session?.user && manga && chapter && manga.id && chapter.id) {
         const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
         if (progressSaved) {
           console.log('✅ Reading progress saved via hook');
         } else {
           console.warn('❌ Failed to save reading progress via hook');
         }
+      } else {
+        console.log('Skipping reading progress update:', {
+          hasUser: !!sessionData.session?.user,
+          hasManga: !!manga,
+          hasChapter: !!chapter,
+          mangaId: manga?.id,
+          chapterId: chapter?.id
+        });
       }
     } catch (error: any) {
       console.error("❌ Error tracking chapter view:", {
