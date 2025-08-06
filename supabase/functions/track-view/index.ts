@@ -65,17 +65,17 @@ serve(async (req) => {
     try {
       if (userId) {
         const { data } = await supabaseClient
-          .from("manga_views")
+          .from(tableName)
           .select("id")
-          .eq("manga_id", mangaId)
+          .eq(idField, mangaId)
           .eq("user_id", userId)
           .maybeSingle();
         existingView = data;
       } else if (sessionId) {
         const { data } = await supabaseClient
-          .from("manga_views")
+          .from(tableName)
           .select("id")
-          .eq("manga_id", mangaId)
+          .eq(idField, mangaId)
           .eq("session_id", sessionId)
           .maybeSingle();
         existingView = data;
