@@ -160,7 +160,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Upload className="h-4 w-4" />,
               title: "رفع ونشر مباشر",
-              description: "رفع مانجا أو فصل بدون الحاجة لموافقة",
+              description: "��فع مانجا أو فصل بدون الحاجة لموافقة",
               available: true
             },
             {
@@ -194,7 +194,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             {
               icon: <Upload className="h-4 w-4" />,
               title: "رفع ونشر مباشر",
-              description: "رفع وإدارة أي محتوى",
+              description: "رفع وإدارة أ�� محتوى",
               available: true
             },
             {
@@ -338,7 +338,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
             ))}
           </div>
 
-          {/* م��احظات حسب الرتبة */}
+          {/* ملاحظات حسب الرتبة */}
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
               <Eye className="h-4 w-4" />
@@ -357,7 +357,7 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
               {currentRole === "site_admin" && (
                 <p>• تملك جميع الصلاحيات، استخدمها بحكمة</p>
               )}
-              <p>• جميع الأعمال الإدارية مسجلة ومراقبة</p>
+              <p>• جميع الأعمال الإدارية مسجلة ومرا��بة</p>
             </div>
           </div>
 
@@ -390,13 +390,13 @@ const UserPermissions: React.FC<UserPermissionsProps> = ({ userRole, className =
                 {/* رفع المحتوى */}
                 {(currentRole === "beginner_fighter" || currentRole === "elite_fighter" || currentRole === "tribe_leader" || currentRole === "admin" || currentRole === "site_admin") && (
                   <>
-                    <Link to="/admin">
+                    <Link to="/admin?tab=content">
                       <Button variant="outline" size="sm" className="w-full justify-start">
                         <Plus className="h-4 w-4 mr-2" />
                         إضافة مانجا جديدة
                       </Button>
                     </Link>
-                    <Link to="/admin">
+                    <Link to="/admin?tab=content">
                       <Button variant="outline" size="sm" className="w-full justify-start">
                         <FileText className="h-4 w-4 mr-2" />
                         إضافة فصل جديد
