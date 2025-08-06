@@ -165,11 +165,32 @@ const ChapterReader = () => {
 
       const { data: sessionData } = await supabase.auth.getSession();
       if (sessionData.session?.user && manga && chapter && manga.id && chapter.id) {
-        const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
-        if (progressSaved) {
-          console.log('✅ Reading progress saved via hook');
-        } else {
-          console.warn('❌ Failed to save reading progress via hook');
+        try {
+          const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
+          if (progressSaved) {
+            console.log('✅ Reading progress saved via hook');
+          } else {
+            console.error('❌ Failed to save reading progress via hook - updateReadingProgress returned false');
+          }
+        } catch (progressError) {
+          console.error('❌ Error updating reading progress:', progressError);
+          console.error('❌ Reading progress error details:', {
+            message: progressError?.message || 'Unknown error',
+            code: progressError?.code,
+            details: progressError?.details,
+            hint: progressError?.hint,
+            mangaId: manga.id,
+            chapterId: chapterId,
+            errorType: typeof progressError,
+            errorString: String(progressError),
+            errorJSON: (() => {
+              try {
+                return JSON.stringify(progressError, null, 2);
+              } catch (e) {
+                return 'Could not stringify error: ' + String(e);
+              }
+            })()
+          });
         }
       } else {
         console.log('Skipping reading progress update:', {
