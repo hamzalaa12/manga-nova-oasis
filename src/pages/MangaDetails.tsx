@@ -157,10 +157,11 @@ const MangaDetails = () => {
 
       setManga(data);
 
-      // جلب الفصول والتتبع في نفس الوقت
+      // جلب الفصول والتتبع وتقييم المستخدم في نفس الوقت
       await Promise.all([
         fetchChaptersForManga(data.id),
         trackMangaView(data.id),
+        loadUserRating(data.id),
       ]);
     } catch (error: any) {
       const errorMessage = error.message || "فشل في تحميل تفاصيل المانجا";
@@ -349,7 +350,7 @@ const MangaDetails = () => {
     try {
       setUserRating(rating);
 
-      // حفظ التقييم في قاعدة الب��انات
+      // حفظ التقييم في قاعدة البيانات
       const { error } = await supabase
         .from("manga_ratings")
         .upsert({
@@ -505,7 +506,7 @@ const MangaDetails = () => {
         image: manga.cover_image_url,
         author: {
           "@type": "Person",
-          name: manga.author || "غير ��حدد",
+          name: manga.author || "غير محدد",
         },
         genre: manga.genre || [],
         inLanguage: "ar",
