@@ -14,7 +14,7 @@ import {
   Upload
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { hasPermission } from '@/types/user';
+import { hasPermission, getRoleDisplayName, getRoleColor } from '@/types/user';
 import AddMangaForm from './AddMangaForm';
 import AddChapterForm from './AddChapterForm';
 import ContentModeration from '../ContentModeration';
@@ -137,7 +137,7 @@ const ContentManagement = () => {
                   <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setActiveContentTab('add-manga')}>
                     <CardContent className="p-6 text-center">
                       <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary" />
-                      <h3 className="font-semibold mb-2">إضافة م��نجا جديدة</h3>
+                      <h3 className="font-semibold mb-2">إضافة مانجا جديدة</h3>
                       <p className="text-sm text-muted-foreground mb-3">
                         أضف مانجا جديدة مع المعلومات والغلاف
                       </p>
@@ -154,7 +154,7 @@ const ContentManagement = () => {
                       <FileText className="h-12 w-12 mx-auto mb-3 text-primary" />
                       <h3 className="font-semibold mb-2">إضافة فصل جديد</h3>
                       <p className="text-sm text-muted-foreground mb-3">
-                        أضف فصل جديد لمانجا موجودة
+                        أضف فصل ج��يد لمانجا موجودة
                       </p>
                       <Badge variant={canPublishDirectly ? "default" : "secondary"}>
                         {canPublishDirectly ? "نشر مباشر" : "يتطلب مراجعة"}
