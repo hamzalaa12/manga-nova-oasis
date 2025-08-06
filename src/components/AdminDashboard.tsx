@@ -246,7 +246,6 @@ const AdminDashboard = () => {
               الإبلاغات
             </TabsTrigger>
           )}
-          <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
           {canSubmitContent && (
             <TabsTrigger value="content" className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -581,7 +580,7 @@ const UserCard = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
-                    هل أنت مت��ك�� من رغبتك في حذف هذا المستخدم نهائياً؟ 
+                    هل أنت مت��ك�� من رغبتك في حذف هذا ال��ستخدم نهائياً؟ 
                     سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع ��ن ه��ا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
