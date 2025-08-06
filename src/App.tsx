@@ -12,6 +12,7 @@ import ChapterReader from "./pages/ChapterReader";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
