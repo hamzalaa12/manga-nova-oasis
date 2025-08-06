@@ -181,8 +181,15 @@ export const useReadingHistory = () => {
         })) : []
       });
       return true;
-    } catch (error) {
-      console.error('Error loading reading stats:', error);
+    } catch (error: any) {
+      console.error('Error loading reading stats:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error),
+        errorObject: error
+      });
       return false;
     }
   };
