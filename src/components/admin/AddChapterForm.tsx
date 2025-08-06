@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Plus, Upload, Link, FolderOpen, Check, ChevronsUpDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface AddChapterFormProps {
   onSuccess: () => void;
