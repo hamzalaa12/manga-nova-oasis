@@ -62,7 +62,7 @@ const ContentManagement = () => {
             <div>
               <h2 className="text-xl font-semibold">مرحباً في قسم إدارة المحتوى</h2>
               <p className="text-sm text-muted-foreground">
-                يمكنك هنا إضافة المانج�� والفصول الجديدة
+                يمكنك هنا إضافة المانجا والفصول الجديدة
               </p>
             </div>
             <div className="text-left">
@@ -289,7 +289,7 @@ const ContentManagement = () => {
                   <CardContent>
                     <AddMangaForm onSuccess={() => {
                       setActiveContentTab('overview');
-                      // يمكن إضافة تحديث ل��إحصائيات هنا
+                      // يمكن إضافة تحديث للإحصائيات ��نا
                     }} />
                   </CardContent>
                 </Card>
@@ -338,6 +338,13 @@ const ContentManagement = () => {
                 </Card>
               </TabsContent>
             )}
+
+            {/* إدارة المستخدمين المحدودة لقائد القبيلة */}
+            {userRole === 'tribe_leader' && (
+              <TabsContent value="users" className="space-y-4">
+                <LimitedUserManagement />
+              </TabsContent>
+            )}
           </Tabs>
         </CardContent>
       </Card>
@@ -350,7 +357,7 @@ const ContentManagement = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium mb-2">✅ نصائح لإضافة مانجا جيدة:</h4>
+              <h4 className="font-medium mb-2">✅ نصائح لإضافة مانجا ج��دة:</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
                 <li>• استخدم عنوان واضح ومفهوم</li>
                 <li>• أضف وصف شامل للقصة</li>
