@@ -45,6 +45,28 @@ const ContentManagement = () => {
 
   return (
     <div className="space-y-6">
+      {/* ترحيب ومعلومات الرتبة */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">مرحباً في قسم إدارة المحتوى</h2>
+              <p className="text-sm text-muted-foreground">
+                يمكنك هنا إضافة المانجا والفصول الجديدة
+              </p>
+            </div>
+            <div className="text-left">
+              <Badge className={getRoleColor(userRole)} variant="secondary">
+                {getRoleDisplayName(userRole)}
+              </Badge>
+              <p className="text-xs text-muted-foreground mt-1">
+                {canPublishDirectly ? "نشر مباشر" : "يتطلب مراجعة"}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* لوحة معلومات المحتوى */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -154,7 +176,7 @@ const ContentManagement = () => {
                       <FileText className="h-12 w-12 mx-auto mb-3 text-primary" />
                       <h3 className="font-semibold mb-2">إضافة فصل جديد</h3>
                       <p className="text-sm text-muted-foreground mb-3">
-                        أضف فصل ج��يد لمانجا موجودة
+                        أضف فصل جديد لمانجا موجودة
                       </p>
                       <Badge variant={canPublishDirectly ? "default" : "secondary"}>
                         {canPublishDirectly ? "نشر مباشر" : "يتطلب مراجعة"}
