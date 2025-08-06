@@ -8,9 +8,9 @@ import SEO from '@/components/SEO';
 
 const AdminPanel = () => {
   const { userRole } = useAuth();
-  const isAdmin = ['tribe_leader', 'admin', 'site_admin'].includes(userRole as string);
+  const hasAdminAccess = ['beginner_fighter', 'elite_fighter', 'tribe_leader', 'admin', 'site_admin'].includes(userRole as string);
 
-  if (!isAdmin) {
+  if (!hasAdminAccess) {
     return (
       <div className="min-h-screen bg-background">
         <SEO
