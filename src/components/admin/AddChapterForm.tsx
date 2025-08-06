@@ -257,9 +257,9 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                   {filteredMangaList.map((manga) => (
                     <CommandItem
                       key={manga.id}
-                      value={manga.id}
-                      onSelect={(currentValue) => {
-                        setFormData({ ...formData, mangaId: currentValue });
+                      value={manga.title}
+                      onSelect={() => {
+                        setFormData({ ...formData, mangaId: manga.id });
                         setOpen(false);
                         setSearchQuery("");
                       }}
@@ -401,7 +401,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                 <Input
                   value={page.url || ""}
                   onChange={(e) => updatePageUrl(index, e.target.value)}
-                  placeholder={`راب�� الصفحة ${index + 1}`}
+                  placeholder={`رابط الصفحة ${index + 1}`}
                   className="w-full"
                 />
               ) : (
@@ -438,7 +438,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
         className="w-full"
         disabled={isLoading || !formData.mangaId || !formData.chapterNumber}
       >
-        {isLoading ? "جاري ال��ضافة..." : "إضافة الفصل"}
+        {isLoading ? "جاري الإضافة..." : "إضافة الفصل"}
       </Button>
     </form>
   );
