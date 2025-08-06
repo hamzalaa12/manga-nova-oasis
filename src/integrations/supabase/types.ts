@@ -660,11 +660,56 @@ export type Database = {
         }
         Relationships: []
       }
+      user_restrictions: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          reason: string
+          restriction_type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          reason: string
+          restriction_type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          reason?: string
+          restriction_type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      add_user_restriction: {
+        Args: {
+          target_user_id: string
+          restriction_type_param: string
+          reason_param: string
+          expires_at_param?: string
+        }
+        Returns: boolean
+      }
       change_user_role: {
         Args: {
           role_name: Database["public"]["Enums"]["user_role"]
@@ -692,6 +737,10 @@ export type Database = {
         }
         Returns: string
       }
+      delete_user_completely: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
       get_user_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
@@ -703,6 +752,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_user_restriction: {
+        Args: { user_uuid: string; restriction_type_param: string }
+        Returns: boolean
+      }
       notify_owner: {
         Args: {
           notification_type: Database["public"]["Enums"]["notification_type"]
@@ -710,6 +763,18 @@ export type Database = {
           notification_message: string
           notification_data?: Json
         }
+        Returns: undefined
+      }
+      remove_user_restriction: {
+        Args: { target_user_id: string; restriction_type_param: string }
+        Returns: boolean
+      }
+      track_chapter_view: {
+        Args: { chapter_uuid: string }
+        Returns: undefined
+      }
+      track_manga_view: {
+        Args: { manga_uuid: string }
         Returns: undefined
       }
     }
