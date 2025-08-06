@@ -33,11 +33,32 @@ const SEO = ({
       document.title = title;
     }
 
+    // إضافة viewport meta tag
+    const updateViewportTag = () => {
+      let viewport = document.querySelector('meta[name="viewport"]') as HTMLMetaElement;
+      if (!viewport) {
+        viewport = document.createElement("meta");
+        viewport.name = "viewport";
+        document.head.appendChild(viewport);
+      }
+      viewport.content = "width=device-width, initial-scale=1.0, maximum-scale=5.0";
+    };
+    updateViewportTag();
+
+    // إضافة charset meta tag
+    const updateCharsetTag = () => {
+      let charset = document.querySelector('meta[charset]') as HTMLMetaElement;
+      if (!charset) {
+        charset = document.createElement("meta");
+        charset.setAttribute("charset", "UTF-8");
+        document.head.insertBefore(charset, document.head.firstChild);
+      }
+    };
+    updateCharsetTag();
+
     // تحديث meta tags
     const updateMetaTag = (name: string, content: string) => {
-      let meta = document.querySelector(
-        `meta[name="${name}"]`,
-      ) as HTMLMetaElement;
+      let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
       if (!meta) {
         meta = document.createElement("meta");
         meta.name = name;
@@ -47,9 +68,7 @@ const SEO = ({
     };
 
     const updatePropertyTag = (property: string, content: string) => {
-      let meta = document.querySelector(
-        `meta[property="${property}"]`,
-      ) as HTMLMetaElement;
+      let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
       if (!meta) {
         meta = document.createElement("meta");
         meta.setAttribute("property", property);
@@ -58,10 +77,20 @@ const SEO = ({
       meta.content = content;
     };
 
-    // Meta tags أساسية
+    // Meta tags أساسية لتحسين الفهرسة
     updateMetaTag("robots", robots);
-    updateMetaTag("googlebot", "index, follow");
+    updateMetaTag("googlebot", "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1");
     updateMetaTag("bingbot", "index, follow");
+    updateMetaTag("format-detection", "telephone=no");
+    
+    // Language tags محسنة
+    updateMetaTag("language", "ar");
+    updateMetaTag("content-language", "ar");
+    let htmlLang = document.documentElement.getAttribute('lang');
+    if (!htmlLang) {
+      document.documentElement.setAttribute('lang', 'ar');
+      document.documentElement.setAttribute('dir', 'rtl');
+    }
 
     if (description) {
       updateMetaTag("description", description);
@@ -76,12 +105,12 @@ const SEO = ({
       updateMetaTag("publisher", author);
     }
 
-    // Language and geo tags
-    updateMetaTag("language", "Arabic");
+    // Geo tags محسنة
     updateMetaTag("geo.region", "SA");
     updateMetaTag("geo.country", "SA");
+    updateMetaTag("geo.placename", "Saudi Arabia");
 
-    // Canonical URL
+    // Canonical URL محسن
     if (canonical || url) {
       let linkCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
       if (!linkCanonical) {
@@ -89,10 +118,15 @@ const SEO = ({
         linkCanonical.rel = "canonical";
         document.head.appendChild(linkCanonical);
       }
-      linkCanonical.href = canonical || url || "";
+      const canonicalUrl = canonical || url || "";
+      linkCanonical.href = canonicalUrl.startsWith('http') ? canonicalUrl : `https://sanime.site${canonicalUrl}`;
     }
 
-    // Open Graph tags
+    // تحسين Open Graph tags
+    updatePropertyTag("og:site_name", siteName);
+    updatePropertyTag("og:locale", "ar_SA");
+    updatePropertyTag("og:type", type);
+    
     if (title) {
       updatePropertyTag("og:title", title);
     }
@@ -100,20 +134,23 @@ const SEO = ({
       updatePropertyTag("og:description", description);
     }
     if (image) {
-      updatePropertyTag("og:image", image);
+      const fullImageUrl = image.startsWith('http') ? image : `https://sanime.site${image}`;
+      updatePropertyTag("og:image", fullImageUrl);
       updatePropertyTag("og:image:width", "1200");
       updatePropertyTag("og:image:height", "630");
-      updatePropertyTag("og:image:type", "image/png");
+      updatePropertyTag("og:image:type", "image/jpeg");
+      updatePropertyTag("og:image:alt", title || "مانجا العرب");
     }
     if (url) {
-      updatePropertyTag("og:url", url);
+      const fullUrl = url.startsWith('http') ? url : `https://sanime.site${url}`;
+      updatePropertyTag("og:url", fullUrl);
     }
-    updatePropertyTag("og:type", type);
-    updatePropertyTag("og:site_name", siteName);
-    updatePropertyTag("og:locale", "ar_SA");
 
-    // Twitter Card tags
+    // تحسين Twitter Card tags
     updateMetaTag("twitter:card", "summary_large_image");
+    updateMetaTag("twitter:site", "@manga_arab");
+    updateMetaTag("twitter:creator", "@manga_arab");
+    
     if (title) {
       updateMetaTag("twitter:title", title);
     }
@@ -121,18 +158,21 @@ const SEO = ({
       updateMetaTag("twitter:description", description);
     }
     if (image) {
-      updateMetaTag("twitter:image", image);
+      const fullImageUrl = image.startsWith('http') ? image : `https://sanime.site${image}`;
+      updateMetaTag("twitter:image", fullImageUrl);
+      updateMetaTag("twitter:image:alt", title || "مانجا العرب");
     }
 
-    // Structured Data (JSON-LD)
+    // إضافة theme-color
+    updateMetaTag("theme-color", "#1a1a1a");
+    updateMetaTag("msapplication-navbutton-color", "#1a1a1a");
+    updateMetaTag("apple-mobile-web-app-status-bar-style", "black-translucent");
+
+    // Structured Data محسن (JSON-LD)
     if (structuredData) {
-      // إزالة الـ structured data السابق إن وجد
-      const existingScript = document.querySelector(
-        'script[type="application/ld+json"]',
-      );
-      if (existingScript) {
-        existingScript.remove();
-      }
+      // إزالة الـ structured data السابق
+      const existingScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      existingScripts.forEach(script => script.remove());
 
       // إضافة الـ structured data الجديد
       const script = document.createElement("script");
@@ -141,11 +181,7 @@ const SEO = ({
       document.head.appendChild(script);
     }
 
-    // Cleanup function لإزالة meta tags عند unmount
-    return () => {
-      // لا نحتاج cleanup في هذه الحالة لأن meta tags يجب أن تبقى
-    };
-  }, [title, description, image, url, type, siteName, structuredData]);
+  }, [title, description, image, url, type, siteName, structuredData, keywords, author, robots, canonical]);
 
   return null; // هذا المكون لا يرنتج أي JSX
 };

@@ -1,19 +1,23 @@
 User-agent: *
 Allow: /
 
+# السماح بفهرسة المحتوى الرئيسي
+Allow: /manga/*
+Allow: /read/*
+Allow: /genre/*
+Allow: /type/*
+
 # منع الوصول للملفات الحساسة
 Disallow: /api/
-Disallow: /admin/
+Disallow: /admin*
+Disallow: /auth*
+Disallow: /profile*
 Disallow: /_next/
 Disallow: *.json$
+Disallow: /src/
+Disallow: /node_modules/
 
-# السماح بفهرسة المحتوى الرئيسي
-Allow: /manga/
-Allow: /read/
-Allow: /genre/
-Allow: /type/
-
-# تحديد معدل الزحف
+# تحديد معدل الزحف المحسن
 Crawl-delay: 1
 
 # ملف الخريطة
