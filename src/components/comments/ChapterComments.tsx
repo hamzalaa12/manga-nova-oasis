@@ -69,7 +69,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
 
       if (error) throw error;
 
-      // ��نظيم التعليقات والردود
+      // تنظيم التعليقات والردود
       const topLevelComments = data?.filter(c => !c.parent_id) || [];
       const replies = data?.filter(c => c.parent_id) || [];
 
@@ -155,7 +155,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     onError: (error: any) => {
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحديث التعليق",
+        description: error.message || "فشل في تحديث ا��تعليق",
         variant: "destructive",
       });
     },
@@ -273,18 +273,16 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
 
   const renderCommentContent = (comment: Comment) => {
     const isEditing = editingComment === comment.id;
-    const isRevealed = revealedSpoilers.has(comment.id);
-    const isSpoiler = comment.is_spoiler;
 
     if (isEditing) {
       return (
-        <div className="space-y-3">
+        <div className="space-y-3 comment-edit-enter">
           <Textarea
             value={editContent[comment.id] || ""}
             onChange={(e) => setEditContent(prev => ({ ...prev, [comment.id]: e.target.value }))}
             className="min-h-[80px] resize-none text-right"
             dir="rtl"
-            style={{ 
+            style={{
               fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
               unicodeBidi: "embed"
             }}
@@ -294,7 +292,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
               <Checkbox
                 id={`edit-spoiler-${comment.id}`}
                 checked={editSpoiler[comment.id] || false}
-                onCheckedChange={(checked) => 
+                onCheckedChange={(checked) =>
                   setEditSpoiler(prev => ({ ...prev, [comment.id]: !!checked }))
                 }
               />
@@ -325,46 +323,12 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
       );
     }
 
-    if (isSpoiler && !isRevealed) {
-      return (
-        <div 
-          className="bg-gray-800 text-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
-          onClick={() => toggleSpoilerReveal(comment.id)}
-        >
-          <AlertTriangle className="h-4 w-4 text-orange-500" />
-          <span className="font-medium text-orange-500">انقر لإظهار المحتوى المحرق</span>
-          <EyeOff className="h-4 w-4 text-orange-500" />
-        </div>
-      );
-    }
-
     return (
-      <div className="space-y-2">
-        {isSpoiler && (
-          <div className="flex items-center gap-2 text-orange-500 text-sm">
-            <AlertTriangle className="h-4 w-4" />
-            <span>تحذير: محتوى محرق</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 text-orange-500"
-              onClick={() => toggleSpoilerReveal(comment.id)}
-            >
-              <Eye className="h-3 w-3" />
-            </Button>
-          </div>
-        )}
-        <div 
-          className="text-foreground leading-relaxed whitespace-pre-wrap text-right"
-          dir="rtl"
-          style={{ 
-            fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
-            unicodeBidi: "embed"
-          }}
-        >
-          {comment.content}
-        </div>
-      </div>
+      <SpoilerContent
+        content={comment.content}
+        isSpoiler={comment.is_spoiler || false}
+        onReveal={() => console.log(`Revealed spoiler for comment ${comment.id}`)}
+      />
     );
   };
 
@@ -461,7 +425,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
           {renderCommentContent(comment)}
         </div>
 
-        {/* منطق�� الرد */}
+        {/* منطقة الرد */}
         {replyingTo === comment.id && (
           <div className="border-t pt-3 space-y-3">
             <Textarea
