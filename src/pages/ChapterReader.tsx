@@ -152,17 +152,11 @@ const ChapterReader = () => {
       // Save reading progress for logged users
       const { data: sessionData } = await supabase.auth.getSession();
       if (sessionData.session?.user && manga && chapter) {
-        try {
-          await updateReadingProgress(manga.id, chapterId, 1, true);
+        const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
+        if (progressSaved) {
           console.log('✅ Reading progress saved via hook');
-        } catch (hookError: any) {
-          console.error('Hook failed, trying direct save:', {
-            message: hookError?.message || 'Unknown error',
-            code: hookError?.code,
-            details: hookError?.details,
-            hint: hookError?.hint,
-            error: hookError
-          });
+        } else {
+          console.warn('Hook failed, trying direct save');
 
           // نسخ احتياطي مباشر
           const { error: progressError } = await supabase
@@ -429,7 +423,7 @@ const ChapterReader = () => {
         );
       })()}
 
-      {/* شريط التن��ل العلوي - يظهر عند التمرير */}
+      {/* شريط التنقل العلوي - يظهر عند التمرير */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md shadow-lg transition-transform duration-300 ${
           showNavigation ? "translate-y-0" : "-translate-y-full"
@@ -604,7 +598,7 @@ const ChapterReader = () => {
         </div>
       )}
 
-      {/* روابط SEO للتصفح */}
+      {/* رواب�� SEO للتصفح */}
       {chapter && manga && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
