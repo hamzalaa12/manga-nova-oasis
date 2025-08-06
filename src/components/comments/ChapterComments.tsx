@@ -76,7 +76,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
   const addCommentMutation = useMutation({
     mutationFn: async ({ content, parentId }: { content: string; parentId?: string }) => {
       if (!user) {
-        throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
+        throw new Error("يج�� تسجيل الدخول لكتابة التعليقات");
       }
 
       const { data, error } = await supabase
@@ -260,7 +260,14 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
         </div>
 
         {/* محتوى التعليق */}
-        <div className="text-foreground leading-relaxed whitespace-pre-wrap mb-3">
+        <div
+          className="text-foreground leading-relaxed whitespace-pre-wrap mb-3 text-right"
+          dir="rtl"
+          style={{
+            fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+            unicodeBidi: "embed"
+          }}
+        >
           {comment.content}
         </div>
 
