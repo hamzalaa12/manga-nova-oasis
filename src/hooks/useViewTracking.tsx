@@ -52,7 +52,15 @@ export const useViewTracking = () => {
   }, []);
 
   const trackChapterView = useCallback(async (chapterId: string, mangaId: string) => {
-    if (!chapterId || sessionViews.current.has(`chapter-${chapterId}`)) return;
+    if (!chapterId || !mangaId) {
+      console.warn('Cannot track chapter view: missing chapterId or mangaId', { chapterId, mangaId });
+      return;
+    }
+
+    if (sessionViews.current.has(`chapter-${chapterId}`)) {
+      console.log('Chapter view already tracked in this session:', chapterId);
+      return;
+    }
 
     sessionViews.current.add(`chapter-${chapterId}`);
 
