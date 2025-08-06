@@ -48,7 +48,6 @@ import Footer from "@/components/Footer";
 import EditMangaDialog from "@/components/admin/EditMangaDialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEO from "@/components/SEO";
-import SEOLinks from "@/components/SEOLinks";
 import ViewsCounter from "@/components/ViewsCounter";
 import FavoriteButton from "@/components/FavoriteButton";
 import ReportDialog from "@/components/ReportDialog";
@@ -592,7 +591,7 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-                  {/* أ��رار التف��عل */}
+                  {/* أزرار التف��عل */}
                   <div className="flex gap-2 mt-6">
                     <FavoriteButton
                       mangaId={manga.id}
@@ -632,7 +631,7 @@ const MangaDetails = () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
-                              هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
+                              هل أ��ت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
                               الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
