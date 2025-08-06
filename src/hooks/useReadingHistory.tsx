@@ -87,6 +87,7 @@ export const useReadingHistory = () => {
         }));
         setReadingHistory(formattedHistory);
       }
+      return true;
     } catch (error: any) {
       console.error('Error loading reading history:', {
         message: error?.message || 'Unknown error',
