@@ -103,6 +103,7 @@ export const useReadingHistory = () => {
         description: `فشل في تحميل سجل القراءة: ${error?.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
+      return false;
     } finally {
       setLoading(false);
     }
