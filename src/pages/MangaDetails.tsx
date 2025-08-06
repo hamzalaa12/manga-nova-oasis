@@ -14,8 +14,6 @@ import {
   MoreHorizontal,
   Flag,
   Heart,
-  Star,
-  StarHalf,
 } from "lucide-react";
 import { parseMangaIdentifier, getChapterUrl, getMangaSlug } from "@/lib/slug";
 import { ensureMangaHasSlugs } from "@/utils/ensureSlugs";
@@ -732,7 +730,7 @@ const MangaDetails = () => {
                           <AlertDialogHeader>
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
-                              هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جم��ع
+                              هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
                               الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
