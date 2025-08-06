@@ -172,7 +172,7 @@ const AdminDashboard = () => {
         }, 1500);
       } else {
         console.error('Role change failed - reverting UI change');
-        // إذا ف��ل�� أرجع التغيير في الواجهة
+        // إذا فشل�� أرجع التغيير في الواجهة
         setLocalUsers(users);
       }
     } catch (error) {
@@ -240,10 +240,10 @@ const AdminDashboard = () => {
 
       <Tabs value={currentTab} onValueChange={(value) => setSearchParams({ tab: value })} className="w-full">
         <TabsList className={`grid w-full grid-cols-${getTabCount()}`}>
-          {canManageUsers && (
+          {canViewUsers && (
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              إدارة المستخدمين
+              {isTribeLeader ? "إدارة المستخدمين (محدود)" : "إدارة المستخدمين"}
             </TabsTrigger>
           )}
           {canModerateComments && (
