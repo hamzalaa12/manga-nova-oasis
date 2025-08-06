@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertTriangle, MessageCircle, Send, Trash2, Reply, Flag, Pin, Edit, Eye, EyeOff, Save, X } from "lucide-react";
+import SpoilerContent from "@/components/ui/spoiler-content";
 import { getRoleDisplayName, getRoleColor, hasPermission } from "@/types/user";
 
 interface Comment {
@@ -68,7 +69,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
 
       if (error) throw error;
 
-      // تنظيم التعليقات والردود
+      // ��نظيم التعليقات والردود
       const topLevelComments = data?.filter(c => !c.parent_id) || [];
       const replies = data?.filter(c => c.parent_id) || [];
 
@@ -460,7 +461,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
           {renderCommentContent(comment)}
         </div>
 
-        {/* منطقة الرد */}
+        {/* منطق�� الرد */}
         {replyingTo === comment.id && (
           <div className="border-t pt-3 space-y-3">
             <Textarea
