@@ -119,7 +119,7 @@ const AdminDashboard = () => {
   const [banDuration, setBanDuration] = useState('7'); // days
   const [localUsers, setLocalUsers] = useState(users);
 
-  // ت��ديث المستخدمين ��لمحليين عند تغيير البيانات الأصلية
+  // ت��ديث المستخدمين ��لمح��يين عند تغيير البيانات الأصلية
   useEffect(() => {
     setLocalUsers(users);
   }, [users]);
@@ -240,10 +240,12 @@ const AdminDashboard = () => {
               إدارة المستخدمين
             </TabsTrigger>
           )}
-          <TabsTrigger value="reports" className="flex items-center gap-2">
-            <Flag className="h-4 w-4" />
-            الإبلاغات
-          </TabsTrigger>
+          {canModerateComments && (
+            <TabsTrigger value="reports" className="flex items-center gap-2">
+              <Flag className="h-4 w-4" />
+              الإبلاغات
+            </TabsTrigger>
+          )}
           <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
           <TabsTrigger value="seo">تحسين محركات البحث</TabsTrigger>
         </TabsList>
@@ -569,7 +571,7 @@ const UserCard = ({
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
                     هل أنت مت��ك�� من رغبتك في حذف هذا المستخدم نهائياً؟ 
-                    سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع عن ه��ا الإجراء.
+                    سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع ��ن ه��ا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
