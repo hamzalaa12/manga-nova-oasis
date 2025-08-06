@@ -28,6 +28,14 @@ const ContentManagement = () => {
   const canPublishDirectly = hasPermission(userRole, "can_publish_directly");
   const canManageUsers = hasPermission(userRole, "can_manage_users");
 
+  // حساب عدد التبويبات في ContentManagement
+  const getContentTabCount = () => {
+    let count = 1; // overview tab is always visible
+    if (canSubmitContent) count += 2; // add-manga, add-chapter
+    if (canManageUsers) count++; // review
+    return count;
+  };
+
   // إذا لم يكن لديه صلاحية رفع المحتوى أو إدارة المستخدمين، عرض رسالة
   if (!canSubmitContent && !canManageUsers) {
     return (
@@ -164,7 +172,7 @@ const ContentManagement = () => {
                         أضف مانجا جديدة مع المعلومات والغلاف
                       </p>
                       <Badge variant={canPublishDirectly ? "default" : "secondary"}>
-                        {canPublishDirectly ? "نشر مباش��" : "يتطلب مراجعة"}
+                        {canPublishDirectly ? "نشر مباشر" : "يتطلب مراجعة"}
                       </Badge>
                     </CardContent>
                   </Card>
@@ -240,7 +248,7 @@ const ContentManagement = () => {
                     {canPublishDirectly && (
                       <Badge variant="default">
                         <CheckCircle className="h-3 w-3 mr-1" />
-                        نشر مبا��ر
+                        نشر مباشر
                       </Badge>
                     )}
                     {canManageUsers && (
