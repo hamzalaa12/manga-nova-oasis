@@ -151,7 +151,7 @@ const Profile = () => {
                     <div className="text-center">
                       <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium ${getRoleColor(userRole)} text-white`}>
                         <Shield className="h-3 w-3" />
-                        <span>عضو في فريق الإدارة</span>
+                        <span>��ضو في فريق الإدارة</span>
                       </div>
                     </div>
                   </div>
@@ -168,13 +168,13 @@ const Profile = () => {
                       {/* رفع محتوى */}
                       {hasPermission(userRole, "can_submit_content") && (
                         <div className="grid grid-cols-2 gap-2">
-                          <Link to="/admin" className="block">
+                          <Link to="/admin?tab=content" className="block">
                             <Button size="sm" variant="outline" className="w-full text-xs h-8">
                               <Plus className="h-3 w-3 mr-1" />
                               إضافة مانجا
                             </Button>
                           </Link>
-                          <Link to="/admin" className="block">
+                          <Link to="/admin?tab=content" className="block">
                             <Button size="sm" variant="outline" className="w-full text-xs h-8">
                               <FileText className="h-3 w-3 mr-1" />
                               إضافة فصل
@@ -354,7 +354,7 @@ const ProfileSettings = () => {
         }, 500);
 
         toast({
-          title: 'تم الحفظ',
+          title: 'تم الحف��',
           description: 'تم تحديث ملف�� الشخصي بنجاح'
         });
       }
@@ -540,7 +540,7 @@ const AvatarUploadButton = () => {
       if (!file.type.startsWith('image/')) {
         toast({
           title: 'خطأ',
-          description: 'يجب اختيار ملف صورة فقط',
+          description: 'يجب اخ��يار ملف صورة فقط',
           variant: 'destructive'
         });
         return;
@@ -716,8 +716,8 @@ const ReadingHistoryComponent = () => {
           {readingHistory.filter((item) => item.manga && item.chapter).length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>لا يوجد سجل قراءة بعد</p>
-              <p className="text-sm">ابدأ بقراءة بعض الفص��ل!</p>
+              <p>لا يوجد سجل ق��اءة بعد</p>
+              <p className="text-sm">ابدأ بقراءة بعض الفص����ل!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -874,7 +874,7 @@ const AccountSettings = () => {
     if (newPassword.length < 6) {
       toast({
         title: 'خطأ',
-        description: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+        description: 'كلم�� المرور يجب أن تكون 6 أحرف على الأقل',
         variant: 'destructive'
       });
       return;
@@ -1060,7 +1060,7 @@ const AdminPanelQuick = () => {
             <div className="text-sm text-muted-foreground space-y-1">
               {userRole === 'site_admin' && (
                 <>
-                  <p>��� إدارة شاملة للموقع والمستخدمين</p>
+                  <p>��� إدارة شاملة للموقع والم��تخدمين</p>
                   <p>• تغيير رتب المستخدمين</p>
                   <p>• حذف وحظر الحسابات</p>
                   <p>• إدارة المحتوى والإبلاغات</p>
