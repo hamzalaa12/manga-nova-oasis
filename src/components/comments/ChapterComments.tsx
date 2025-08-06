@@ -268,11 +268,20 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
         {replyingTo === comment.id && (
           <div className="border-t pt-3 space-y-3">
             <Textarea
-              value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
+              value={replyContents[comment.id] || ""}
+              onChange={(e) => {
+                setReplyContents(prev => ({
+                  ...prev,
+                  [comment.id]: e.target.value
+                }));
+              }}
               placeholder="اكتب ردك هنا..."
-              className="min-h-[80px] resize-none"
+              className="min-h-[80px] resize-none text-right"
               dir="rtl"
+              style={{
+                fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+                unicodeBidi: "embed"
+              }}
             />
             <div className="flex justify-end gap-2">
               <Button
@@ -280,7 +289,11 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
                 size="sm"
                 onClick={() => {
                   setReplyingTo(null);
-                  setReplyContent("");
+                  setReplyContents(prev => {
+                    const newContents = { ...prev };
+                    delete newContents[comment.id];
+                    return newContents;
+                  });
                 }}
               >
                 إلغاء
@@ -288,7 +301,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
               <Button
                 size="sm"
                 onClick={() => handleSubmitReply(comment.id)}
-                disabled={!replyContent.trim() || addCommentMutation.isPending}
+                disabled={!(replyContents[comment.id] || "").trim() || addCommentMutation.isPending}
               >
                 رد
               </Button>
