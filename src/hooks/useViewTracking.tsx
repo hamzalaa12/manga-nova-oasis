@@ -68,12 +68,7 @@ export const useViewTracking = () => {
 
       // Also increment chapter views count directly
       const { error: chapterError } = await supabase
-        .from('chapters')
-        .update({
-          views_count: supabase.sql`views_count + 1`,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', chapterId);
+        .rpc('increment_chapter_views', { chapter_id: chapterId });
 
       if (chapterError) {
         console.error('Error updating chapter views:', {
