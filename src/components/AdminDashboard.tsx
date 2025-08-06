@@ -152,7 +152,7 @@ const AdminDashboard = () => {
       if (success) {
         console.log('Role change succeeded, refreshing user data');
 
-        // إذا كان المستخدم المحدث هو المست��دم الحالي، حدث الملف الشخصي
+        // إذا كان المستخدم المحدث هو المستخدم الحالي، حدث الملف الشخصي
         if (userId === currentUser?.id) {
           console.log('Current user role changed, refreshing profile');
           setTimeout(() => {
@@ -374,9 +374,11 @@ const AdminDashboard = () => {
         )}
 
         {/* تحسين محركات البحث */}
-        <TabsContent value="seo" className="space-y-4">
-          <SitemapManager />
-        </TabsContent>
+        {isSiteAdmin && (
+          <TabsContent value="seo" className="space-y-4">
+            <SitemapManager />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
