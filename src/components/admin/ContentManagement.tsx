@@ -29,11 +29,12 @@ const ContentManagement = () => {
   const canPublishDirectly = hasPermission(userRole, "can_publish_directly");
   const canManageUsers = hasPermission(userRole, "can_manage_users");
 
-  // حساب عدد التبويبات في ContentManagement
+  // حساب عدد ا��تبويبات في ContentManagement
   const getContentTabCount = () => {
     let count = 1; // overview tab is always visible
     if (canSubmitContent) count += 2; // add-manga, add-chapter
     if (canManageUsers) count++; // review
+    if (userRole === 'tribe_leader') count++; // limited user management
     return count;
   };
 
@@ -59,7 +60,7 @@ const ContentManagement = () => {
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">مرحباً في قسم إدارة المحتوى</h2>
+              <h2 className="text-xl font-semibold">مرحباً في قسم إدارة ��لمحتوى</h2>
               <p className="text-sm text-muted-foreground">
                 يمكنك هنا إضافة المانجا والفصول الجديدة
               </p>
@@ -325,7 +326,7 @@ const ContentManagement = () => {
                       مراجعة المحتوى
                     </CardTitle>
                     <CardDescription>
-                      مراجعة المحتوى المنتظر للموافقة من ال��ساهمين
+                      مراجعة المحتوى المنتظر للموافقة من المساهمين
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
