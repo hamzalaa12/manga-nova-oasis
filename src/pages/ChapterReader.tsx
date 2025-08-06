@@ -302,7 +302,16 @@ const ChapterReader = () => {
             }
           })
           .catch((error) => {
-            console.error('Unexpected error in scroll reading progress update:', error);
+            console.error('Unexpected error in scroll reading progress update:', {
+              message: error?.message || 'Unknown error',
+              code: error?.code,
+              details: error?.details,
+              hint: error?.hint,
+              mangaId: manga.id,
+              chapterId: chapter.id,
+              errorString: String(error),
+              errorObject: error
+            });
           });
       }
     };
