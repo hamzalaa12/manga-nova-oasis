@@ -22,6 +22,10 @@ serve(async (req) => {
 
     console.log(`Processing ${type} view for ID: ${mangaId}`);
 
+    // Determine table based on type
+    const tableName = type === "chapter" ? "chapter_views" : "manga_views";
+    const idField = type === "chapter" ? "chapter_id" : "manga_id";
+
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
