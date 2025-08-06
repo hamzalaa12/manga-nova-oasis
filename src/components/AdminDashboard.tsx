@@ -247,7 +247,18 @@ const AdminDashboard = () => {
             </TabsTrigger>
           )}
           <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
-          <TabsTrigger value="seo">تحسين محركات البحث</TabsTrigger>
+          {canSubmitContent && (
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              إدارة المحتوى
+            </TabsTrigger>
+          )}
+          {isSiteAdmin && (
+            <TabsTrigger value="seo" className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              تحسين محركات البحث
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* إدارة المستخدمين */}
