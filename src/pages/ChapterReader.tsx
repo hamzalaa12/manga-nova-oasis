@@ -159,10 +159,22 @@ const ChapterReader = () => {
         const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
         if (progressSaved) {
           console.log('✅ Reading progress saved via hook');
+        } else {
+          console.warn('❌ Failed to save reading progress via hook');
         }
       }
     } catch (error: any) {
-      console.error("❌ Error tracking chapter view:", error);
+      console.error("❌ Error tracking chapter view:", {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        chapterId,
+        mangaId: manga?.id,
+        errorType: typeof error,
+        errorString: String(error),
+        errorJSON: JSON.stringify(error, null, 2)
+      });
     }
   };
 
@@ -209,7 +221,7 @@ const ChapterReader = () => {
       await trackChapterViewOld(chapterData.id);
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
-      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
+      setError('فشل في تحميل الفصل. تحقق من راب�� الصفحة.');
       setChapter(null);
       setManga(null);
     } finally {
