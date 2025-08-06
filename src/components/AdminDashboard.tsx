@@ -50,6 +50,8 @@ const AdminDashboard = () => {
   const canSubmitContent = hasPermission(userRole, "can_submit_content");
   const canModerateComments = hasPermission(userRole, "can_moderate_comments");
   const isSiteAdmin = userRole === "site_admin";
+  const isTribeLeader = userRole === "tribe_leader";
+  const canViewUsers = canManageUsers || isTribeLeader;
 
   // حساب عدد التبويبات المرئية
   const getTabCount = () => {
@@ -511,7 +513,7 @@ const UserCard = ({
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>ح��ر المستخدم</AlertDialogTitle>
+                    <AlertDialogTitle>حظر المستخدم</AlertDialogTitle>
                     <AlertDialogDescription>
                       هل أنت متأكد من رغبتك في حظر هذا المستخدم؟
                     </AlertDialogDescription>
