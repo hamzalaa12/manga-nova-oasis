@@ -243,23 +243,39 @@ export const useReadingHistory = () => {
 
       console.log('✅ Chapter validation successful:', chapterData);
 
-      const { error } = await supabase
+      console.log('💾 Attempting to upsert reading progress...');
+      const upsertData = {
+        user_id: user.id,
+        manga_id: mangaId,
+        chapter_id: chapterId,
+        page_number: pageNumber,
+        completed,
+        last_read_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('���� Upsert data:', upsertData);
+
+      const { error, data: upsertResult } = await supabase
         .from('reading_progress')
-        .upsert({
-          user_id: user.id,
-          manga_id: mangaId,
-          chapter_id: chapterId,
-          page_number: pageNumber,
-          completed,
-          last_read_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }, {
+        .upsert(upsertData, {
           onConflict: 'user_id,manga_id,chapter_id'
         });
 
       if (error) {
+        console.error('❌ Upsert failed with error:', {
+          error,
+          message: error?.message,
+          code: error?.code,
+          details: error?.details,
+          hint: error?.hint,
+          errorString: String(error),
+          errorJSON: JSON.stringify(error, null, 2)
+        });
         throw error;
       }
+
+      console.log('✅ Upsert successful:', upsertResult);
 
       // Reload data in background
       loadReadingHistory().catch(error => {
