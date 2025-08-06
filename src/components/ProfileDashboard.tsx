@@ -183,8 +183,15 @@ const ProfileDashboard = () => {
       }
 
       return streak;
-    } catch (error) {
-      console.error('Error calculating reading streak:', error);
+    } catch (error: any) {
+      console.error('Error calculating reading streak:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error),
+        errorObject: error
+      });
       return 0;
     }
   };
