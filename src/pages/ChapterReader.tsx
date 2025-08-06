@@ -294,19 +294,15 @@ const ChapterReader = () => {
       if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga) {
         hasTrackedCompletion = true;
         updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
-          .then(() => {
-            console.log('📖 Chapter marked as completed via scroll');
+          .then((success) => {
+            if (success) {
+              console.log('📖 Chapter marked as completed via scroll');
+            } else {
+              console.warn('Failed to update reading progress via scroll');
+            }
           })
           .catch((error) => {
-            console.error('Error updating reading progress from scroll:', {
-              message: error?.message || 'Unknown error',
-              code: error?.code,
-              details: error?.details,
-              hint: error?.hint,
-              mangaId: manga.id,
-              chapterId: chapter.id,
-              error: error
-            });
+            console.error('Unexpected error in scroll reading progress update:', error);
           });
       }
     };
@@ -598,7 +594,7 @@ const ChapterReader = () => {
         </div>
       )}
 
-      {/* رواب�� SEO للتصفح */}
+      {/* روابط SEO للتصفح */}
       {chapter && manga && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
