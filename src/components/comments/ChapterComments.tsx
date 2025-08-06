@@ -149,7 +149,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
       setEditSpoiler({});
       toast({
         title: "تم التحديث!",
-        description: "تم تحديث تعليقك ��نجاح",
+        description: "تم تحديث تعليقك بنجاح",
       });
     },
     onError: (error: any) => {
@@ -197,7 +197,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chapter-comments", chapterId] });
       toast({
-        title: "تم تحديث التعليق",
+        title: "تم تحد��ث التعليق",
         description: "تم تحديث حالة التثبيت للتعليق",
       });
     },
@@ -496,13 +496,31 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     <div className="bg-background rounded-lg border">
       {/* منطقة كتابة التعليق */}
       <div className="p-6 border-b">
-        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <MessageCircle className="h-5 w-5" />
-          التعليقات
-          <Badge variant="secondary">
-            {comments.length}
-          </Badge>
-        </h3>
+        <div className="space-y-3">
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            التعليقات
+            <Badge variant="secondary">
+              {comments.length}
+            </Badge>
+            {comments.some(c => c.is_spoiler || c.replies?.some(r => r.is_spoiler)) && (
+              <Badge variant="destructive" className="flex items-center gap-1">
+                <AlertTriangle className="h-3 w-3" />
+                يحتوي على محتوى محرق
+              </Badge>
+            )}
+          </h3>
+
+          {comments.some(c => c.is_spoiler || c.replies?.some(r => r.is_spoiler)) && (
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3 flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-orange-200">
+                <p className="font-medium">تحذير من المحتوى المحرق</p>
+                <p className="text-orange-300">تحتوي بعض التعليقات على معلومات قد تكشف أحداث القصة. انقر على التعليقات المخفية لإظهارها.</p>
+              </div>
+            </div>
+          )}
+        </div>
 
         {user ? (
           <div className="space-y-4">
