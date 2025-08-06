@@ -14,6 +14,8 @@ import {
   MoreHorizontal,
   Flag,
   Heart,
+  Star,
+  StarHalf,
 } from "lucide-react";
 import { parseMangaIdentifier, getChapterUrl, getMangaSlug } from "@/lib/slug";
 import { ensureMangaHasSlugs } from "@/utils/ensureSlugs";
@@ -590,7 +592,7 @@ const MangaDetails = () => {
                     </div>
                   )}
 
-                  {/* أزرار التف��عل */}
+                  {/* أ��رار التف��عل */}
                   <div className="flex gap-2 mt-6">
                     <FavoriteButton
                       mangaId={manga.id}
