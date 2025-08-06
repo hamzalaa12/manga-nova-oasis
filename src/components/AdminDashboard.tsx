@@ -43,6 +43,22 @@ import ContentManagement from './admin/ContentManagement';
 
 const AdminDashboard = () => {
   const { user: currentUser, refreshProfile, userRole } = useAuth();
+
+  // فحص الصلاحيات
+  const canManageUsers = hasPermission(userRole, "can_manage_users");
+  const canSubmitContent = hasPermission(userRole, "can_submit_content");
+  const canModerateComments = hasPermission(userRole, "can_moderate_comments");
+  const isSiteAdmin = userRole === "site_admin";
+
+  // حساب عدد التبوي��ات المرئية
+  const getTabCount = () => {
+    let count = 0;
+    if (canManageUsers) count++;
+    if (canModerateComments) count++;
+    if (canSubmitContent) count++;
+    if (isSiteAdmin) count++;
+    return Math.max(count, 1);
+  };
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     users,
