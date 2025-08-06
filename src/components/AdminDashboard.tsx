@@ -11,13 +11,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { 
-  Users, 
-  Shield, 
-  AlertTriangle, 
-  Trash2, 
-  Ban, 
-  UserCheck, 
+import {
+  Users,
+  Shield,
+  AlertTriangle,
+  Trash2,
+  Ban,
+  UserCheck,
   Calendar,
   MessageSquare,
   Heart,
@@ -25,7 +25,10 @@ import {
   Eye,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Flag,
+  Plus,
+  Globe
 } from 'lucide-react';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { useReports } from '@/hooks/useReports';
@@ -226,7 +229,7 @@ const AdminDashboard = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">جميع الرتب</SelectItem>
-                    <SelectItem value="user">مستخدم عادي</SelectItem>
+                    <SelectItem value="user">م��تخدم عادي</SelectItem>
                     <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
                     <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
                     <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
@@ -401,7 +404,7 @@ const UserCard = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          {/* تغيير الرت��ة */}
+          {/* تغ��ير الرت��ة */}
           <Select
             key={`${user.user_id}-${user.role}-${user.updated_at}`}
             value={user.role}
