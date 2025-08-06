@@ -263,9 +263,29 @@ const ChapterReader = () => {
       setShowNavigation(scrollY > 100);
 
       const scrollPercentage = (scrollY + windowHeight) / documentHeight;
-      if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga) {
+      if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga && chapter.pages.length > 0) {
         hasTrackedCompletion = true;
-        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true);
+        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
+          .then((success) => {
+            if (success) {
+              console.log('📖 Chapter marked as completed via scroll');
+            } else {
+              console.warn('❌ Failed to mark chapter as completed via scroll');
+            }
+          })
+          .catch((error) => {
+            console.error('❌ Error in scroll completion tracking:', {
+              message: error?.message || 'Unknown error',
+              code: error?.code,
+              details: error?.details,
+              hint: error?.hint,
+              mangaId: manga.id,
+              chapterId: chapter.id,
+              errorType: typeof error,
+              errorString: String(error),
+              errorJSON: JSON.stringify(error, null, 2)
+            });
+          });
       }
     };
 
