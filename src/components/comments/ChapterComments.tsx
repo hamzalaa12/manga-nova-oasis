@@ -41,7 +41,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
   const queryClient = useQueryClient();
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState("");
+  const [replyContents, setReplyContents] = useState<Record<string, string>>({});
 
   // جلب التعليقات
   const { data: comments = [], isLoading } = useQuery({
