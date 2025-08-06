@@ -224,6 +224,8 @@ export const useReadingHistory = () => {
           completed,
           last_read_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,manga_id,chapter_id'
         });
 
       if (error) {
