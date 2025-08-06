@@ -144,12 +144,9 @@ const ChapterReader = () => {
     try {
       console.log("📖 Tracking chapter view for ID:", chapterId);
 
-      // Track chapter view using new system
-      await trackChapterView(chapterId);
-
-      // Track manga view as well
+      // Track chapter view using new system (includes manga view tracking)
       if (manga) {
-        await trackMangaView(manga.id);
+        await trackChapterView(chapterId, manga.id);
       }
 
       // Save reading progress for logged users
