@@ -192,7 +192,7 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="users" className="w-full">
+      <Tabs value={currentTab} onValueChange={(value) => setSearchParams({ tab: value })} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="users">إدارة المستخدمين</TabsTrigger>
           <TabsTrigger value="reports">الإبلاغات</TabsTrigger>
