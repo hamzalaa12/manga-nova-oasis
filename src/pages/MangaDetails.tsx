@@ -332,73 +332,6 @@ const MangaDetails = () => {
     }
   };
 
-  const loadUserRating = async (mangaId: string) => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("manga_ratings")
-        .select("rating")
-        .eq("user_id", user.id)
-        .eq("manga_id", mangaId)
-        .single();
-
-      if (error && error.code !== "PGRST116") {
-        console.error("Error loading user rating:", error);
-        return;
-      }
-
-      if (data) {
-        setUserRating(data.rating);
-      }
-    } catch (error: any) {
-      console.error("Error loading user rating:", error);
-    }
-  };
-
-  const handleRating = async (rating: number) => {
-    if (!user) {
-      toast({
-        title: "تسجيل الدخول مطلوب",
-        description: "يجب تسجيل الدخول لتقييم المانجا",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setUserRating(rating);
-
-      // حفظ التقييم في قاعدة البيانات
-      const { error } = await supabase
-        .from("manga_ratings")
-        .upsert({
-          user_id: user.id,
-          manga_id: manga?.id,
-          rating: rating,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,manga_id'
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "تم التقييم!",
-        description: `تم تقييم المانجا بـ ${rating} نجوم`,
-      });
-
-      // إعادة تحميل بيانات المانجا لتحديث متوسط التقييم
-      fetchMangaDetails();
-    } catch (error: any) {
-      toast({
-        title: "خطأ",
-        description: "فشل في حفظ التقييم",
-        variant: "destructive",
-      });
-      setUserRating(0);
-    }
-  };
 
   if (loading) {
     return (
@@ -497,7 +430,7 @@ const MangaDetails = () => {
                 <div className="text-muted-foreground text-6xl">📚</div>
                 <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
                 <p className="text-muted-foreground">
-                  ل�� يتم العثور على المانجا المطلوبة
+                  لم يتم العثور على المانجا المطلوبة
                 </p>
                 <Button onClick={() => navigate("/")} variant="outline">
                   العودة للرئيسية
@@ -513,7 +446,7 @@ const MangaDetails = () => {
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
-  // إنشاء structured data للمانجا
+  // إن��اء structured data للمانجا
   const structuredData = manga
     ? {
         "@context": "https://schema.org",
@@ -617,7 +550,7 @@ const MangaDetails = () => {
                     {manga.author && (
                       <div className="flex items-center justify-center gap-2">
                         <User className="h-4 w-4" />
-                        الم��لف: {manga.author}
+                        المؤلف: {manga.author}
                       </div>
                     )}
                     {manga.artist && manga.artist !== manga.author && (
