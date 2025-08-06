@@ -135,7 +135,10 @@ const ChapterReader = () => {
       if (chaptersError) throw chaptersError;
       setAllChapters(chaptersData || []);
 
-      await trackChapterViewOld(id);
+      // Track chapter view after we have all the data
+      setTimeout(() => {
+        trackChapterViewOld(id);
+      }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter details:", error);
       setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
