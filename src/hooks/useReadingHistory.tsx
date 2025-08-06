@@ -206,7 +206,7 @@ export const useReadingHistory = () => {
     }
 
     try {
-      console.log('Updating reading progress:', {
+      console.log('🔄 Starting reading progress update:', {
         user_id: user.id,
         manga_id: mangaId,
         chapter_id: chapterId,
@@ -215,6 +215,7 @@ export const useReadingHistory = () => {
       });
 
       // First verify that the manga and chapter exist
+      console.log('📋 Validating chapter and manga...');
       const { data: chapterData, error: chapterCheckError } = await supabase
         .from('chapters')
         .select('id, manga_id')
@@ -223,14 +224,24 @@ export const useReadingHistory = () => {
         .single();
 
       if (chapterCheckError) {
-        console.error('Chapter validation failed:', chapterCheckError);
+        console.error('❌ Chapter validation failed:', {
+          error: chapterCheckError,
+          message: chapterCheckError?.message,
+          code: chapterCheckError?.code,
+          details: chapterCheckError?.details,
+          hint: chapterCheckError?.hint,
+          errorString: String(chapterCheckError),
+          errorJSON: JSON.stringify(chapterCheckError, null, 2)
+        });
         return false;
       }
 
       if (!chapterData) {
-        console.error('Chapter not found or manga mismatch:', { chapterId, mangaId });
+        console.error('❌ Chapter not found or manga mismatch:', { chapterId, mangaId });
         return false;
       }
+
+      console.log('✅ Chapter validation successful:', chapterData);
 
       const { error } = await supabase
         .from('reading_progress')
