@@ -78,8 +78,17 @@ export const useViewTracking = () => {
       if (chapterError) {
         console.error('Error updating chapter views:', chapterError);
       }
-    } catch (error) {
-      console.error('Error tracking chapter view:', error);
+    } catch (error: any) {
+      console.error('Error tracking chapter view:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        chapterId,
+        mangaId,
+        errorString: String(error),
+        errorObject: error
+      });
     }
   }, []);
 
