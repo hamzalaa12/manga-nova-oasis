@@ -149,8 +149,15 @@ const ProfileDashboard = () => {
         achievements,
         readingStreak
       });
-    } catch (error) {
-      console.error('Error loading advanced stats:', error);
+    } catch (error: any) {
+      console.error('Error loading advanced stats:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error),
+        errorObject: error
+      });
     } finally {
       setLoading(false);
     }
