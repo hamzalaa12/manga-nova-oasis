@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Trash2, Reply, Flag, Pin, Edit, Eye, EyeOff, Save, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertTriangle, MessageCircle, Send, Trash2, Reply, Flag, Pin, Edit, Eye, EyeOff, Save, X } from "lucide-react";
 import { getRoleDisplayName, getRoleColor, hasPermission } from "@/types/user";
 
 interface Comment {
@@ -81,9 +82,9 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
 
   // نشر تعليق جديد
   const addCommentMutation = useMutation({
-    mutationFn: async ({ content, parentId }: { content: string; parentId?: string }) => {
+    mutationFn: async ({ content, parentId, isSpoiler }: { content: string; parentId?: string; isSpoiler?: boolean }) => {
       if (!user) {
-        throw new Error("يج�� تسجيل الدخول لكتابة التعليقات");
+        throw new Error("يجب تسجيل الدخول لكتابة التعليقات");
       }
 
       const { data, error } = await supabase
@@ -94,6 +95,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
           user_id: user.id,
           content: content.trim(),
           parent_id: parentId || null,
+          is_spoiler: isSpoiler || false,
         })
         .select(`
           *,
@@ -107,7 +109,9 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chapter-comments", chapterId] });
       setNewComment("");
+      setNewCommentSpoiler(false);
       setReplyContents({});
+      setReplySpoilers({});
       setReplyingTo(null);
       toast({
         title: "تم النشر!",
@@ -118,6 +122,39 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
       toast({
         title: "خطأ",
         description: error.message || "فشل في نشر التعليق",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // تعديل تعليق
+  const editCommentMutation = useMutation({
+    mutationFn: async ({ commentId, content, isSpoiler }: { commentId: string; content: string; isSpoiler?: boolean }) => {
+      const { error } = await supabase
+        .from("comments")
+        .update({ 
+          content: content.trim(),
+          is_spoiler: isSpoiler || false,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", commentId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["chapter-comments", chapterId] });
+      setEditingComment(null);
+      setEditContent({});
+      setEditSpoiler({});
+      toast({
+        title: "تم التحديث!",
+        description: "تم تحديث تعليقك بنجاح",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "خطأ",
+        description: error.message || "فشل في تحديث التعليق",
         variant: "destructive",
       });
     },
@@ -167,13 +204,53 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
 
   const handleSubmitComment = () => {
     if (!newComment.trim()) return;
-    addCommentMutation.mutate({ content: newComment });
+    addCommentMutation.mutate({ content: newComment, isSpoiler: newCommentSpoiler });
   };
 
   const handleSubmitReply = (parentId: string) => {
     const content = replyContents[parentId] || "";
     if (!content.trim()) return;
-    addCommentMutation.mutate({ content, parentId });
+    const isSpoiler = replySpoilers[parentId] || false;
+    addCommentMutation.mutate({ content, parentId, isSpoiler });
+  };
+
+  const handleStartEdit = (comment: Comment) => {
+    setEditingComment(comment.id);
+    setEditContent({ [comment.id]: comment.content });
+    setEditSpoiler({ [comment.id]: comment.is_spoiler || false });
+  };
+
+  const handleSaveEdit = (commentId: string) => {
+    const content = editContent[commentId];
+    const isSpoiler = editSpoiler[commentId];
+    if (!content?.trim()) return;
+    editCommentMutation.mutate({ commentId, content, isSpoiler });
+  };
+
+  const handleCancelEdit = (commentId: string) => {
+    setEditingComment(null);
+    setEditContent(prev => {
+      const newState = { ...prev };
+      delete newState[commentId];
+      return newState;
+    });
+    setEditSpoiler(prev => {
+      const newState = { ...prev };
+      delete newState[commentId];
+      return newState;
+    });
+  };
+
+  const toggleSpoilerReveal = (commentId: string) => {
+    setRevealedSpoilers(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
   };
 
   const canModerateComments = hasPermission(userRole, "can_moderate_comments");
@@ -191,6 +268,103 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
     if (diffHours > 0) return `منذ ${diffHours} ساعة`;
     if (diffMinutes > 0) return `منذ ${diffMinutes} دقيقة`;
     return "الآن";
+  };
+
+  const renderCommentContent = (comment: Comment) => {
+    const isEditing = editingComment === comment.id;
+    const isRevealed = revealedSpoilers.has(comment.id);
+    const isSpoiler = comment.is_spoiler;
+
+    if (isEditing) {
+      return (
+        <div className="space-y-3">
+          <Textarea
+            value={editContent[comment.id] || ""}
+            onChange={(e) => setEditContent(prev => ({ ...prev, [comment.id]: e.target.value }))}
+            className="min-h-[80px] resize-none text-right"
+            dir="rtl"
+            style={{ 
+              fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+              unicodeBidi: "embed"
+            }}
+          />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id={`edit-spoiler-${comment.id}`}
+                checked={editSpoiler[comment.id] || false}
+                onCheckedChange={(checked) => 
+                  setEditSpoiler(prev => ({ ...prev, [comment.id]: !!checked }))
+                }
+              />
+              <label htmlFor={`edit-spoiler-${comment.id}`} className="text-sm cursor-pointer">
+                تحذير من المحتوى المحرق (Spoiler)
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleCancelEdit(comment.id)}
+              >
+                <X className="h-4 w-4 ml-1" />
+                إلغاء
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleSaveEdit(comment.id)}
+                disabled={editCommentMutation.isPending}
+              >
+                <Save className="h-4 w-4 ml-1" />
+                حفظ
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (isSpoiler && !isRevealed) {
+      return (
+        <div 
+          className="bg-gray-800 text-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+          onClick={() => toggleSpoilerReveal(comment.id)}
+        >
+          <AlertTriangle className="h-4 w-4 text-orange-500" />
+          <span className="font-medium text-orange-500">انقر لإظهار المحتوى المحرق</span>
+          <EyeOff className="h-4 w-4 text-orange-500" />
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {isSpoiler && (
+          <div className="flex items-center gap-2 text-orange-500 text-sm">
+            <AlertTriangle className="h-4 w-4" />
+            <span>تحذير: محتوى محرق</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-orange-500"
+              onClick={() => toggleSpoilerReveal(comment.id)}
+            >
+              <Eye className="h-3 w-3" />
+            </Button>
+          </div>
+        )}
+        <div 
+          className="text-foreground leading-relaxed whitespace-pre-wrap text-right"
+          dir="rtl"
+          style={{ 
+            fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+            unicodeBidi: "embed"
+          }}
+        >
+          {comment.content}
+        </div>
+      </div>
+    );
   };
 
   const renderComment = (comment: Comment, isReply = false) => (
@@ -211,6 +385,9 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
             <span className="text-xs text-muted-foreground">
               {formatDate(comment.created_at)}
             </span>
+            {comment.updated_at !== comment.created_at && (
+              <span className="text-xs text-muted-foreground">(محرر)</span>
+            )}
           </div>
 
           <div className="flex items-center gap-1">
@@ -226,6 +403,18 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
                 })}
               >
                 <Pin className={`h-4 w-4 ${comment.is_pinned ? 'text-yellow-500' : 'text-muted-foreground'}`} />
+              </Button>
+            )}
+
+            {/* تعديل التعليق */}
+            {user && user.id === comment.user_id && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => handleStartEdit(comment)}
+              >
+                <Edit className="h-4 w-4" />
               </Button>
             )}
 
@@ -267,15 +456,8 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
         </div>
 
         {/* محتوى التعليق */}
-        <div
-          className="text-foreground leading-relaxed whitespace-pre-wrap mb-3 text-right"
-          dir="rtl"
-          style={{
-            fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
-            unicodeBidi: "embed"
-          }}
-        >
-          {comment.content}
+        <div className="mb-3">
+          {renderCommentContent(comment)}
         </div>
 
         {/* منطقة الرد */}
@@ -292,33 +474,52 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
               placeholder="اكتب ردك هنا..."
               className="min-h-[80px] resize-none text-right"
               dir="rtl"
-              style={{
+              style={{ 
                 fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                 unicodeBidi: "embed"
               }}
             />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setReplyingTo(null);
-                  setReplyContents(prev => {
-                    const newContents = { ...prev };
-                    delete newContents[comment.id];
-                    return newContents;
-                  });
-                }}
-              >
-                إلغاء
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => handleSubmitReply(comment.id)}
-                disabled={!(replyContents[comment.id] || "").trim() || addCommentMutation.isPending}
-              >
-                رد
-              </Button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id={`reply-spoiler-${comment.id}`}
+                  checked={replySpoilers[comment.id] || false}
+                  onCheckedChange={(checked) => 
+                    setReplySpoilers(prev => ({ ...prev, [comment.id]: !!checked }))
+                  }
+                />
+                <label htmlFor={`reply-spoiler-${comment.id}`} className="text-sm cursor-pointer">
+                  تحذير من المحتوى المحرق (Spoiler)
+                </label>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setReplyingTo(null);
+                    setReplyContents(prev => {
+                      const newContents = { ...prev };
+                      delete newContents[comment.id];
+                      return newContents;
+                    });
+                    setReplySpoilers(prev => {
+                      const newSpoilers = { ...prev };
+                      delete newSpoilers[comment.id];
+                      return newSpoilers;
+                    });
+                  }}
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleSubmitReply(comment.id)}
+                  disabled={!(replyContents[comment.id] || "").trim() || addCommentMutation.isPending}
+                >
+                  رد
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -346,7 +547,7 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
               placeholder="اكتب تعليقك هنا... (Ctrl+Enter للإرسال)"
               className="min-h-[100px] resize-none text-right"
               dir="rtl"
-              style={{
+              style={{ 
                 fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                 unicodeBidi: "embed"
               }}
@@ -358,7 +559,17 @@ const ChapterComments = ({ chapterId, mangaId }: ChapterCommentsProps) => {
               }}
             />
 
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="new-comment-spoiler"
+                  checked={newCommentSpoiler}
+                  onCheckedChange={(checked) => setNewCommentSpoiler(!!checked)}
+                />
+                <label htmlFor="new-comment-spoiler" className="text-sm cursor-pointer">
+                  تحذير من المحتوى المحرق (Spoiler)
+                </label>
+              </div>
               <Button
                 onClick={handleSubmitComment}
                 disabled={!newComment.trim() || addCommentMutation.isPending}
