@@ -283,8 +283,15 @@ export const useReadingHistory = () => {
         title: '��م مسح السجل',
         description: 'تم مسح سجل القراءة بنجاح'
       });
-    } catch (error) {
-      console.error('Error clearing reading history:', error);
+    } catch (error: any) {
+      console.error('Error clearing reading history:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error),
+        errorObject: error
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في مسح سجل القراءة',
