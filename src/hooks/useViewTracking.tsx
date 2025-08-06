@@ -96,8 +96,11 @@ export const useViewTracking = () => {
           details: chapterError?.details,
           hint: chapterError?.hint,
           chapterId,
+          currentViews: currentChapter?.views_count,
+          newViews: newViewsCount,
+          errorType: typeof chapterError,
           errorString: String(chapterError),
-          errorObject: chapterError
+          errorJSON: JSON.stringify(chapterError, null, 2)
         });
       }
     } catch (error: any) {
