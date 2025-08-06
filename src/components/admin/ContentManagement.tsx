@@ -18,6 +18,7 @@ import { hasPermission, getRoleDisplayName, getRoleColor } from '@/types/user';
 import AddMangaForm from './AddMangaForm';
 import AddChapterForm from './AddChapterForm';
 import ContentModeration from '../ContentModeration';
+import LimitedUserManagement from './LimitedUserManagement';
 
 const ContentManagement = () => {
   const { userRole } = useAuth();
@@ -324,7 +325,7 @@ const ContentManagement = () => {
                       مراجعة المحتوى
                     </CardTitle>
                     <CardDescription>
-                      مراجعة المحتوى المنتظر للموافقة من المساهمين
+                      مراجعة المحتوى المنتظر للموافقة من ال��ساهمين
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
