@@ -170,7 +170,7 @@ const ChapterReader = () => {
           if (progressSaved) {
             console.log('✅ Reading progress saved via hook');
           } else {
-            console.error('❌ Failed to save reading progress via hook - updateReadingProgress returned false');
+            console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
           }
         } catch (progressError) {
           console.error('❌ Error updating reading progress:', progressError);
@@ -202,7 +202,7 @@ const ChapterReader = () => {
         });
       }
     } catch (error: any) {
-      console.error("❌ Error tracking chapter view:", {
+      console.error("�� Error tracking chapter view:", {
         message: error?.message || 'Unknown error',
         code: error?.code,
         details: error?.details,
@@ -262,7 +262,7 @@ const ChapterReader = () => {
       }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
-      setError('فشل في تحميل الف��ل. تحقق من رابط الصفحة.');
+      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
       setChapter(null);
       setManga(null);
     } finally {
@@ -303,7 +303,7 @@ const ChapterReader = () => {
         updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
           .then((success) => {
             if (success) {
-              console.log('��� Chapter marked as completed via scroll');
+              console.log('📖 Chapter marked as completed via scroll');
             } else {
               console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
             }
