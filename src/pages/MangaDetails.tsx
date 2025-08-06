@@ -95,8 +95,6 @@ const MangaDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [userRating, setUserRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
 
   useEffect(() => {
     if (slug) {
@@ -731,7 +729,7 @@ const MangaDetails = () => {
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
-                              الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
+                              الفصول ال��رتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
