@@ -154,9 +154,7 @@ const SEOLinks = ({ type, data }: SEOLinksProps) => {
               <div className="flex flex-wrap gap-2">
                 {data.manga.genre.slice(0, 4).map((genre: string) => (
                   <Link key={genre} to={`/genre/${encodeURIComponent(genre)}`}>
-                    <Badge variant="secondary" size="sm">
-                      {genre}
-                    </Badge>
+                    <Badge variant="secondary">{genre}</Badge>
                   </Link>
                 ))}
               </div>

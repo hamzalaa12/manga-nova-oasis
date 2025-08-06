@@ -88,7 +88,10 @@ export const useUserManagement = () => {
       })) || [];
 
       console.log('Processed users with ban info:', usersWithBanInfo.length);
-      setUsers(usersWithBanInfo);
+      const filteredUsers = usersWithBanInfo.filter(user => 
+        user.role && ['user', 'beginner_fighter', 'elite_fighter', 'tribe_leader', 'admin', 'site_admin'].includes(user.role)
+      ) as UserProfile[];
+      setUsers(filteredUsers);
     } catch (error: any) {
       console.error('Error loading users:', {
         message: error?.message || 'Unknown error',

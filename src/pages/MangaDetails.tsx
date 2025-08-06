@@ -594,7 +594,6 @@ const MangaDetails = () => {
                   <div className="flex gap-2 mt-6">
                     <FavoriteButton
                       mangaId={manga.id}
-                      className="flex-1"
                     />
                     <ReportDialog
                       type="manga"

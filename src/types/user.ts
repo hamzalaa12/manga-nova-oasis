@@ -40,18 +40,70 @@ export interface ContentSubmission {
   reviewed_at?: string;
 }
 
+export interface UserProfile {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  email: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
+  banned_until?: string | null;
+  // Extended properties for admin management
+  is_banned?: boolean;
+  ban_reason?: string;
+  ban_expires_at?: string;
+}
+
 export interface Report {
   id: string;
   reporter_id?: string;
   reported_user_id: string;
-  target_type: "comment" | "manga" | "user";
-  target_id: string;
+  comment_id?: string;
+  manga_id?: string;
   reason: string;
   description?: string;
-  status: "pending" | "resolved" | "dismissed";
-  resolved_by?: string;
-  resolved_at?: string;
+  status: "pending" | "resolved" | "dismissed" | "reviewed";
+  reviewed_by?: string;
+  reviewed_at?: string;
   created_at: string;
+}
+
+export interface ReadingProgressItem {
+  id: string;
+  user_id: string;
+  manga_id: string;
+  chapter_id: string;
+  page_number: number;
+  completed: boolean;
+  last_read_at: string;
+  created_at: string;
+  updated_at: string;
+  manga: {
+    title: string;
+    slug: string;
+    cover_image_url: string;
+    author: string;
+  };
+  chapter: {
+    chapter_number: number;
+    title: string;
+  };
+}
+
+export type RestrictionType = 'ban' | 'comment_ban' | 'upload_ban' | 'temporary_restriction';
+
+export interface UserRestriction {
+  id: string;
+  user_id: string;
+  restriction_type: RestrictionType;
+  reason: string;
+  created_by: string;
+  created_at: string;
+  expires_at?: string | null;
+  is_active: boolean;
 }
 
 // دوال مساعدة للأدوار

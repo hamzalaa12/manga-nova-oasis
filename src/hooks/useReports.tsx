@@ -80,7 +80,13 @@ export const useReports = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setReports(data || []);
+      if (data) {
+        const formattedReports = data.map(report => ({
+          ...report,
+          status: report.status as "pending" | "resolved" | "dismissed" | "reviewed"
+        }));
+        setReports(formattedReports);
+      }
     } catch (error) {
       console.error('Error loading reports:', {
         message: error?.message || 'Unknown error',

@@ -120,7 +120,7 @@ const LimitedUserManagement = () => {
                         <Badge className={getRoleColor(user.role as UserRole)} variant="secondary">
                           {getRoleDisplayName(user.role as UserRole)}
                         </Badge>
-                        {user.banned_until && (
+                        {(user.is_banned) && (
                           <Badge variant="destructive">محظور</Badge>
                         )}
                       </div>
@@ -135,13 +135,14 @@ const LimitedUserManagement = () => {
                     {/* قائمة القيود */}
                     <RestrictionsMenu
                       userId={user.user_id}
-                      userRestrictions={getUserRestrictions(user.user_id)}
+                      userName={user.display_name || user.email || 'مستخدم'}
                       addRestriction={addRestriction}
                       removeRestriction={removeRestriction}
+                      getUserRestrictions={getUserRestrictions}
                     />
 
                     {/* أزرار الحظر */}
-                    {user.banned_until ? (
+                    {user.is_banned ? (
                       <Button
                         size="sm"
                         variant="outline"

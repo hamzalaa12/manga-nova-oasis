@@ -80,7 +80,13 @@ export const useReadingHistory = () => {
         throw error;
       }
 
-      setReadingHistory(data || []);
+      if (data) {
+        const formattedHistory = data.map(item => ({
+          ...item,
+          chapter: item.chapters
+        }));
+        setReadingHistory(formattedHistory);
+      }
     } catch (error: any) {
       console.error('Error loading reading history:', {
         message: error?.message || 'Unknown error',
@@ -167,7 +173,10 @@ export const useReadingHistory = () => {
         totalChaptersRead: chaptersCount || 0,
         totalReadingTime: 0, // Will be implemented later
         favoriteGenres,
-        recentActivity: recentData || []
+        recentActivity: recentData ? recentData.map(item => ({
+          ...item,
+          chapter: item.chapters
+        })) : []
       });
     } catch (error) {
       console.error('Error loading reading stats:', error);

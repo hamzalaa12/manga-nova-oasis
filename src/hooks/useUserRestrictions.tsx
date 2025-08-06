@@ -46,7 +46,13 @@ export const useUserRestrictions = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setRestrictions(data || []);
+      if (data) {
+        const formattedRestrictions = data.map(restriction => ({
+          ...restriction,
+          restriction_type: restriction.restriction_type as RestrictionType
+        }));
+        setRestrictions(formattedRestrictions);
+      }
     } catch (error: any) {
       console.error('Error loading restrictions:', {
         message: error?.message || 'Unknown error',
