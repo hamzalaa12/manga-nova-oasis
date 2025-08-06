@@ -52,53 +52,24 @@ export const useViewTracking = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      // Track both chapter and manga views
-      const requests = [
-        fetch('/api/track-view', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            mangaId: chapterId,
-            type: 'chapter'
-          })
-        }),
-        fetch('/api/track-view', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            mangaId: mangaId,
-            type: 'manga'
-          })
-        })
-      ];
-
-      const responses = await Promise.allSettled(requests);
-
-      // If fetch fails, try supabase functions as fallback
-      responses.forEach(async (response, index) => {
-        if (response.status === 'rejected' || !response.value.ok) {
-          try {
-            const body = index === 0
-              ? { mangaId: chapterId, type: 'chapter' }
-              : { mangaId: mangaId, type: 'manga' };
-
-            await supabase.functions.invoke('track-view', {
-              body,
-              headers: token ? { Authorization: `Bearer ${token}` } : {}
-            });
-          } catch (fallbackError) {
-            console.error('Fallback view tracking failed:', fallbackError);
-          }
-        }
+      // Track manga view (chapters contribute to manga views for now)
+      await supabase.functions.invoke('track-view', {
+        body: { mangaId: mangaId, type: 'manga' },
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
+
+      // Also increment chapter views count directly
+      const { error: chapterError } = await supabase
+        .from('chapters')
+        .update({
+          views_count: supabase.sql`views_count + 1`,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', chapterId);
+
+      if (chapterError) {
+        console.error('Error updating chapter views:', chapterError);
+      }
     } catch (error) {
       console.error('Error tracking chapter view:', error);
     }
