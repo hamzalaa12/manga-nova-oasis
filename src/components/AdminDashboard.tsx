@@ -234,10 +234,12 @@ const AdminDashboard = () => {
 
       <Tabs value={currentTab} onValueChange={(value) => setSearchParams({ tab: value })} className="w-full">
         <TabsList className={`grid w-full grid-cols-${getTabCount()}`}>
-          <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            إدارة المستخدمين
-          </TabsTrigger>
+          {canManageUsers && (
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              إدارة المستخدمين
+            </TabsTrigger>
+          )}
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <Flag className="h-4 w-4" />
             الإبلاغات
@@ -252,7 +254,7 @@ const AdminDashboard = () => {
             <CardHeader>
               <CardTitle>إدارة المستخدمين</CardTitle>
               <CardDescription>
-                إدارة حسابات المست��دمين ورتبهم وحالة الحظر
+                إدارة حسابات المستخدمين ورتبهم وحالة الحظر
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -653,7 +655,7 @@ const ReportCard = ({
 
         {report.manga && (
           <div className="text-sm">
-            <strong>المانجا المبل�� ع��ها:</strong> {report.manga.title}
+            <strong>المانجا المبل�� عنها:</strong> {report.manga.title}
           </div>
         )}
 
