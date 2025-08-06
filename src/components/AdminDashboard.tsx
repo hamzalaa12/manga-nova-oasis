@@ -50,7 +50,7 @@ const AdminDashboard = () => {
   const canModerateComments = hasPermission(userRole, "can_moderate_comments");
   const isSiteAdmin = userRole === "site_admin";
 
-  // حساب عدد التبوي��ات المرئية
+  // حساب عدد التبويبات المرئية
   const getTabCount = () => {
     let count = 0;
     if (canManageUsers) count++;
@@ -72,25 +72,28 @@ const AdminDashboard = () => {
 
   const { updateUserRole } = useRoleUpdate();
 
-  // التبويب الحالي من URL أو افتراضي
-  const currentTab = searchParams.get('tab') || getDefaultTab(userRole);
-
-  // فحص الصلاحيات
-  const canManageUsers = hasPermission(userRole, "can_manage_users");
-  const canSubmitContent = hasPermission(userRole, "can_submit_content");
-  const canModerateComments = hasPermission(userRole, "can_moderate_comments");
-  const isSiteAdmin = userRole === "site_admin";
-
   // دالة لتحديد التبويب الافتراضي حسب الرتبة
-  function getDefaultTab(role: UserRole): string {
-    if (role === 'beginner_fighter' || role === 'elite_fighter') {
+  const getDefaultTab = (): string => {
+    if (userRole === 'beginner_fighter' || userRole === 'elite_fighter') {
       return 'content';
     }
-    if (role === 'tribe_leader') {
+    if (userRole === 'tribe_leader') {
+      return 'content';
+    }
+    if (canManageUsers) {
+      return 'users';
+    }
+    if (canModerateComments) {
+      return 'reports';
+    }
+    if (canSubmitContent) {
       return 'content';
     }
     return 'users';
-  }
+  };
+
+  // التبويب الحالي من URL أو افتراضي
+  const currentTab = searchParams.get('tab') || getDefaultTab();
 
   const {
     reports,
@@ -453,7 +456,7 @@ const UserCard = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="user">��ستخدم عادي</SelectItem>
+              <SelectItem value="user">��ستخدم عا��ي</SelectItem>
               <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
               <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
               <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
