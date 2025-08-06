@@ -57,7 +57,24 @@ const AdminDashboard = () => {
   const { updateUserRole } = useRoleUpdate();
 
   // التبويب الحالي من URL أو افتراضي
-  const currentTab = searchParams.get('tab') || 'users';
+  const currentTab = searchParams.get('tab') || getDefaultTab(userRole);
+
+  // فحص الصلاحيات
+  const canManageUsers = hasPermission(userRole, "can_manage_users");
+  const canSubmitContent = hasPermission(userRole, "can_submit_content");
+  const canModerateComments = hasPermission(userRole, "can_moderate_comments");
+  const isSiteAdmin = userRole === "site_admin";
+
+  // دالة لتحديد التبويب الافتراضي حسب الرتبة
+  function getDefaultTab(role: UserRole): string {
+    if (role === 'beginner_fighter' || role === 'elite_fighter') {
+      return 'content';
+    }
+    if (role === 'tribe_leader') {
+      return 'content';
+    }
+    return 'users';
+  }
 
   const {
     reports,
@@ -207,7 +224,7 @@ const AdminDashboard = () => {
             الإبلاغات
           </TabsTrigger>
           <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
-          <TabsTrigger value="seo">ت��سين محركات البحث</TabsTrigger>
+          <TabsTrigger value="seo">تحسين محركات البحث</TabsTrigger>
         </TabsList>
 
         {/* إدارة المستخدمين */}
@@ -234,7 +251,7 @@ const AdminDashboard = () => {
                     <SelectValue placeholder="فلترة حسب الرتبة" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">جميع ا��رتب</SelectItem>
+                    <SelectItem value="all">جميع الرتب</SelectItem>
                     <SelectItem value="user">م��تخدم عادي</SelectItem>
                     <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
                     <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
@@ -530,7 +547,7 @@ const UserCard = ({
                 <AlertDialogHeader>
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
-                    هل أنت مت��ك�� من رغبتك في حذف هذا المستخدم نهائيا��؟ 
+                    هل أنت مت��ك�� من رغبتك في حذف هذا المستخدم نهائياً؟ 
                     سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع عن ه��ا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
