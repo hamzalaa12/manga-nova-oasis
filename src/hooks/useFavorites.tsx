@@ -33,8 +33,14 @@ export const useFavorites = () => {
 
       if (error) throw error;
       setFavorites(data || []);
-    } catch (error) {
-      console.error('خطأ في جلب المفضلة:', error);
+    } catch (error: any) {
+      console.error('خطأ في جلب المفضلة:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        errorString: String(error)
+      });
     } finally {
       setLoading(false);
     }
