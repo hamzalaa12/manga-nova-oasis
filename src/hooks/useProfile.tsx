@@ -73,7 +73,13 @@ export const useProfile = () => {
         .single();
 
       if (verifyError) {
-        console.error('Verification error:', verifyError);
+        console.error('Verification error:', {
+        message: verifyError?.message || 'Unknown error',
+        code: verifyError?.code,
+        details: verifyError?.details,
+        hint: verifyError?.hint,
+        error: JSON.stringify(verifyError, null, 2)
+      });
       } else {
         console.log('Updated profile verified:', verifyData);
       }
@@ -88,7 +94,13 @@ export const useProfile = () => {
 
       return true;
     } catch (error: any) {
-      console.error('خطأ في تحد��ث الملف الشخصي:', error);
+      console.error('خطأ في تحديث الملف الشخصي:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       toast({
         title: 'خطأ',
         description: `فشل في تحديث الملف الشخصي: ${error.message || 'خطأ غير معروف'}`,
@@ -116,7 +128,13 @@ export const useProfile = () => {
 
       return true;
     } catch (error) {
-      console.error('خطأ في تغيير كلمة المرور:', error);
+      console.error('خطأ في تغيير كلمة المرور:', {
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        error: JSON.stringify(error, null, 2)
+      });
       toast({
         title: 'خطأ',
         description: 'فشل في تغيير كلمة المرور',
