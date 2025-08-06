@@ -83,7 +83,7 @@ const AdminDashboard = () => {
   const [banDuration, setBanDuration] = useState('7'); // days
   const [localUsers, setLocalUsers] = useState(users);
 
-  // ت��ديث المستخدمين المحليين عند تغيير البيانات الأصلية
+  // ت��ديث المستخدمين ��لمحليين عند تغيير البيانات الأصلية
   useEffect(() => {
     setLocalUsers(users);
   }, [users]);
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
       if (success) {
         console.log('Role change succeeded, refreshing user data');
 
-        // إ��ا كان المستخدم المحدث هو المستخدم الحالي، حدث الملف الشخصي
+        // إذا كان المستخدم المحدث هو المستخدم الحالي، حدث الملف الشخصي
         if (userId === currentUser?.id) {
           console.log('Current user role changed, refreshing profile');
           setTimeout(() => {
@@ -202,7 +202,10 @@ const AdminDashboard = () => {
             <Users className="h-4 w-4" />
             إدارة المستخدمين
           </TabsTrigger>
-          <TabsTrigger value="reports">الإبلاغات</TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <Flag className="h-4 w-4" />
+            الإبلاغات
+          </TabsTrigger>
           <TabsTrigger value="content">إدارة ��لمحتوى</TabsTrigger>
           <TabsTrigger value="seo">تحسين محركات البحث</TabsTrigger>
         </TabsList>
