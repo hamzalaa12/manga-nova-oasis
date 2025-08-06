@@ -153,11 +153,10 @@ const MangaDetails = () => {
 
       setManga(data);
 
-      // جلب الفصول والتتبع وتقييم المستخدم في نفس الوقت
+      // جلب الفصول والتتبع في نفس الوقت
       await Promise.all([
         fetchChaptersForManga(data.id),
         trackMangaView(data.id),
-        loadUserRating(data.id),
       ]);
     } catch (error: any) {
       const errorMessage = error.message || "فشل في تحميل تفاصيل المانجا";
@@ -498,7 +497,7 @@ const MangaDetails = () => {
                 <div className="text-muted-foreground text-6xl">📚</div>
                 <h1 className="text-2xl font-bold">المانجا غير موجودة</h1>
                 <p className="text-muted-foreground">
-                  لم يتم العثور على المانجا المطلوبة
+                  ل�� يتم العثور على المانجا المطلوبة
                 </p>
                 <Button onClick={() => navigate("/")} variant="outline">
                   العودة للرئيسية
@@ -618,7 +617,7 @@ const MangaDetails = () => {
                     {manga.author && (
                       <div className="flex items-center justify-center gap-2">
                         <User className="h-4 w-4" />
-                        المؤلف: {manga.author}
+                        الم��لف: {manga.author}
                       </div>
                     )}
                     {manga.artist && manga.artist !== manga.author && (
@@ -729,7 +728,7 @@ const MangaDetails = () => {
                             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                             <AlertDialogDescription>
                               هل أنت متأكد من حذف "{manga.title}"؟ سيتم حذف جميع
-                              الفصول ال��رتبطة بها أيضاً. ��ذا الإجراء لا يمكن
+                              الفصول المرتبطة بها أيضاً. ��ذا الإجراء لا يمكن
                               التراجع عنه.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
