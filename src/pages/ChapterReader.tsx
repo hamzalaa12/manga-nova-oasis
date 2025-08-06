@@ -218,10 +218,13 @@ const ChapterReader = () => {
       if (chaptersError) throw chaptersError;
       setAllChapters(chaptersData || []);
 
-      await trackChapterViewOld(chapterData.id);
+      // Track chapter view after we have all the data
+      setTimeout(() => {
+        trackChapterViewOld(chapterData.id);
+      }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
-      setError('فشل في تحميل الفصل. تحقق من راب�� الصفحة.');
+      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
       setChapter(null);
       setManga(null);
     } finally {
