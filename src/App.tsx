@@ -21,6 +21,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
+          <ScrollToTop />
           <Sonner />
           <Routes>
             <Route path="/" element={<Index />} />
