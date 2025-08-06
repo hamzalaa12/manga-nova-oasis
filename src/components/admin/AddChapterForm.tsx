@@ -81,10 +81,15 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
     }
   };
 
-  const filteredMangaList = mangaList.filter(manga =>
-    manga.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    manga.manga_type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMangaList = mangaList.filter(manga => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+
+    const title = manga.title.toLowerCase();
+    const type = manga.manga_type.toLowerCase();
+
+    return title.includes(query) || type.includes(query);
+  });
 
   const selectedManga = mangaList.find(manga => manga.id === formData.mangaId);
 
