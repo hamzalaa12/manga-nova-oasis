@@ -23,7 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Upload, Link, FolderOpen } from "lucide-react";
+import { X, Plus, Upload, Link, FolderOpen, Check, ChevronsUpDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -267,7 +267,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
             setFormData({ ...formData, description: e.target.value })
           }
           rows={3}
-          placeholder="وصف مختصر للفصل (اخ��ياري)"
+          placeholder="وصف مختصر للفصل (اختياري)"
         />
       </div>
 
@@ -330,7 +330,7 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
                     ) : (
                       <Link className="h-4 w-4" />
                     )}
-                    {page.type === "url" ? "رفع م��ف" : "رابط"}
+                    {page.type === "url" ? "رفع ملف" : "رابط"}
                   </Button>
                   {pages.length > 1 && (
                     <Button
