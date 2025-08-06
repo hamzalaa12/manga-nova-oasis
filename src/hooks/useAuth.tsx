@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
-          error: error
+          error: JSON.stringify(error, null, 2)
         });
 
         // If profile doesn't exist, create it
@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         code: error?.code,
         details: error?.details,
         hint: error?.hint,
-        error: error
+        error: JSON.stringify(error, null, 2)
       });
     }
   };
