@@ -195,7 +195,7 @@ const Profile = () => {
 
                       {/* إدارة المستخدمين */}
                       {hasPermission(userRole, "can_manage_users") && (
-                        <Link to="/admin" className="block">
+                        <Link to="/admin?tab=users" className="block">
                           <Button size="sm" variant="outline" className="w-full text-xs h-8">
                             <Users className="h-3 w-3 mr-1" />
                             إدارة المستخدمين
@@ -408,7 +408,7 @@ const ProfileSettings = () => {
             </div>
 
             <Button type="submit" disabled={isSubmitting || loading}>
-              {(isSubmitting || loading) ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+              {(isSubmitting || loading) ? 'جاري الح��ظ...' : 'حفظ التغييرات'}
             </Button>
           </form>
         </CardContent>
@@ -540,7 +540,7 @@ const AvatarUploadButton = () => {
       if (!file.type.startsWith('image/')) {
         toast({
           title: 'خطأ',
-          description: 'يجب اخ��يار ملف صورة فق��',
+          description: 'يجب اخ��يار ملف صورة فقط',
           variant: 'destructive'
         });
         return;
@@ -625,7 +625,7 @@ const AvatarUploadButton = () => {
   );
 };
 
-// مكون سجل ��لقراءة المحسن
+// مكون سجل القراءة المحسن
 const ReadingHistoryComponent = () => {
   const { readingHistory, stats, loading, clearReadingHistory } = useReadingHistory();
 
@@ -785,7 +785,7 @@ const NotificationsList = () => {
       <Card>
         <CardHeader>
           <CardTitle>الإشعارات</CardTitle>
-          <CardDescription>آخر الإشعارات والتحديثات</CardDescription>
+          <CardDescription>آخر ال��شعارات والتحديثات</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
@@ -1023,7 +1023,7 @@ const AdminPanelQuick = () => {
               <CardContent className="p-4 text-center">
                 <Link to="/admin" className="block">
                   <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-medium mb-1">إدارة المستخدمين</h3>
+                  <h3 className="font-medium mb-1">إ��ارة المستخدمين</h3>
                   <p className="text-xs text-muted-foreground">إدارة الحسابات والصلاحيات</p>
                 </Link>
               </CardContent>
