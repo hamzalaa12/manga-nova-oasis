@@ -53,7 +53,7 @@ export const useUserRestrictions = () => {
         code: error?.code,
         details: error?.details,
         hint: error?.hint,
-        error: error
+        error: JSON.stringify(error, null, 2)
       });
       toast({
         title: 'خطأ',
@@ -79,7 +79,7 @@ export const useUserRestrictions = () => {
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
-          error: error
+          error: JSON.stringify(error, null, 2)
         });
         return false;
       }
@@ -91,7 +91,7 @@ export const useUserRestrictions = () => {
         code: error?.code,
         details: error?.details,
         hint: error?.hint,
-        error: error
+        error: JSON.stringify(error, null, 2)
       });
       return false;
     }
@@ -122,7 +122,7 @@ export const useUserRestrictions = () => {
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
-          error: error
+          error: JSON.stringify(error, null, 2)
         });
         throw error;
       }
@@ -148,7 +148,7 @@ export const useUserRestrictions = () => {
         code: error?.code,
         details: error?.details,
         hint: error?.hint,
-        error: error
+        error: JSON.stringify(error, null, 2)
       });
       toast({
         title: 'خطأ',
@@ -192,7 +192,7 @@ export const useUserRestrictions = () => {
         code: error?.code,
         details: error?.details,
         hint: error?.hint,
-        error: error
+        error: JSON.stringify(error, null, 2)
       });
       toast({
         title: 'خطأ',
@@ -219,7 +219,7 @@ export const useUserRestrictions = () => {
           code: error?.code,
           details: error?.details,
           hint: error?.hint,
-          error: error
+          error: JSON.stringify(error, null, 2)
         });
         return [];
       }
@@ -231,7 +231,7 @@ export const useUserRestrictions = () => {
         code: error?.code,
         details: error?.details,
         hint: error?.hint,
-        error: error
+        error: JSON.stringify(error, null, 2)
       });
       return [];
     }
