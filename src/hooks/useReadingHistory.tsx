@@ -52,8 +52,8 @@ export const useReadingHistory = () => {
     }
   }, [user]);
 
-  const loadReadingHistory = async () => {
-    if (!user) return;
+  const loadReadingHistory = async (): Promise<boolean> => {
+    if (!user) return false;
 
     setLoading(true);
     try {
