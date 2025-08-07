@@ -218,7 +218,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
     },
   });
 
-  // تعديل ت��ليق
+  // تعديل تعليق
   const editCommentMutation = useMutation({
     mutationFn: async ({ commentId, content, isSpoiler }: { commentId: string; content: string; isSpoiler: boolean }) => {
       const { error } = await supabase
@@ -427,7 +427,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
     if (!reportReason.trim()) {
       toast({
         title: "خطأ",
-        description: "يرجى إدخال سب�� البلاغ",
+        description: "يرجى إدخال سبب البلاغ",
         variant: "destructive"
       });
       return;
@@ -632,7 +632,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                           className="text-red-600 focus:text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          حذف التعليق
+                          حذف ��لتعليق
                         </DropdownMenuItem>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -666,12 +666,13 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                 <Textarea
                   value={editContent[comment.id] || ""}
                   onChange={(e) => setEditContent(prev => ({ ...prev, [comment.id]: e.target.value }))}
-                  className="min-h-[100px] resize-none text-right"
+                  className="min-h-[100px] resize-none text-right comment-textarea"
                   dir="rtl"
                   style={{
                     fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                     unicodeBidi: "plaintext",
-                    whiteSpace: "pre-wrap"
+                    whiteSpace: "pre-wrap",
+                    wordSpacing: "normal"
                   }}
                 />
                 <div className="flex items-center justify-between">
@@ -919,7 +920,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
               <Textarea
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                placeholder="اذكر سبب الإبلاغ بالتف��يل..."
+                placeholder="اذكر سبب الإبلاغ بالتفصيل..."
                 className="text-right"
                 dir="rtl"
                 rows={4}
