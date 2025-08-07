@@ -364,4 +364,32 @@
   .reply-depth-1 { border-right: 3px solid #3b82f6; }
   .reply-depth-2 { border-right: 3px solid #10b981; }
   .reply-depth-3 { border-right: 3px solid #f59e0b; }
+
+  /* إص��اح مشكلة المسافة في التعليقات */
+  textarea[dir="rtl"],
+  .comment-textarea {
+    unicode-bidi: plaintext !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-spacing: normal !important;
+  }
+
+  /* تحسين الخط العربي في التعليقات */
+  .comment-content,
+  .comment-textarea,
+  textarea[dir="rtl"] {
+    font-family: 'Noto Sans Arabic', 'Cairo', 'Amiri', 'Segoe UI', 'Tahoma', sans-serif !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0.02em !important;
+    text-align: right !important;
+  }
+
+  /* ضمان عمل المسافة في جميع المتصفحات */
+  textarea {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+  }
 }

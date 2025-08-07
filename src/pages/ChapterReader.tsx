@@ -43,7 +43,7 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import AdvancedChapterComments from "@/components/comments/AdvancedChapterComments";
+import ImprovedChapterComments from "@/components/comments/ImprovedChapterComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
@@ -346,6 +346,18 @@ const ChapterReader = () => {
   // Keyboard navigation and click-to-scroll
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // التحقق من أن المستخدم ليس يكتب في input أو textarea
+      const target = event.target as HTMLElement;
+      const isTyping = target.tagName === 'INPUT' ||
+                      target.tagName === 'TEXTAREA' ||
+                      target.isContentEditable ||
+                      target.closest('input, textarea, [contenteditable="true"]');
+
+      // إذا كان المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
+      if (isTyping) {
+        return;
+      }
+
       switch (event.key) {
         case "Escape":
           navigate(-1);
@@ -375,10 +387,12 @@ const ChapterReader = () => {
     const handleClick = (event: MouseEvent) => {
       // Only handle clicks on the reading area (not on buttons or other interactive elements)
       const target = event.target as HTMLElement;
-      const isInteractiveElement = target.closest('button, select, a, [role="button"], [tabindex]');
+      const isInteractiveElement = target.closest('button, select, a, [role="button"], [tabindex], input, textarea, [contenteditable="true"]');
+      const isCommentsArea = target.closest('.comment-card, .comment-textarea, [data-comments-area="true"]');
       const isMainArea = target.closest('main');
 
-      if (isMainArea && !isInteractiveElement) {
+      // لا نتدخل إذا كان النقر في منطقة التعليقات أو على عناصر تفاعلية
+      if (isMainArea && !isInteractiveElement && !isCommentsArea) {
         event.preventDefault();
         window.scrollBy({
           top: window.innerHeight * 0.8,
@@ -863,7 +877,7 @@ const ChapterReader = () => {
       {chapter && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
-            <AdvancedChapterComments chapterId={chapter.id} mangaId={manga.id} />
+            <ImprovedChapterComments chapterId={chapter.id} mangaId={manga.id} />
           </div>
         </div>
       )}
