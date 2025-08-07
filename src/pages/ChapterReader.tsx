@@ -353,7 +353,7 @@ const ChapterReader = () => {
                       target.isContentEditable ||
                       target.closest('input, textarea, [contenteditable="true"]');
 
-      // إذ�� كان المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
+      // إذا كان المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
       if (isTyping) {
         return;
       }
@@ -387,10 +387,12 @@ const ChapterReader = () => {
     const handleClick = (event: MouseEvent) => {
       // Only handle clicks on the reading area (not on buttons or other interactive elements)
       const target = event.target as HTMLElement;
-      const isInteractiveElement = target.closest('button, select, a, [role="button"], [tabindex]');
+      const isInteractiveElement = target.closest('button, select, a, [role="button"], [tabindex], input, textarea, [contenteditable="true"]');
+      const isCommentsArea = target.closest('.comment-card, .comment-textarea, [data-comments-area="true"]');
       const isMainArea = target.closest('main');
 
-      if (isMainArea && !isInteractiveElement) {
+      // لا نتدخل إذا كان النقر في منطقة التعليقات أو على عناصر تفاعلية
+      if (isMainArea && !isInteractiveElement && !isCommentsArea) {
         event.preventDefault();
         window.scrollBy({
           top: window.innerHeight * 0.8,
