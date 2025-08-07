@@ -346,6 +346,18 @@ const ChapterReader = () => {
   // Keyboard navigation and click-to-scroll
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // التحقق من أن المستخدم ليس يكتب في input أو textarea
+      const target = event.target as HTMLElement;
+      const isTyping = target.tagName === 'INPUT' ||
+                      target.tagName === 'TEXTAREA' ||
+                      target.isContentEditable ||
+                      target.closest('input, textarea, [contenteditable="true"]');
+
+      // إذ�� كان المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
+      if (isTyping) {
+        return;
+      }
+
       switch (event.key) {
         case "Escape":
           navigate(-1);
