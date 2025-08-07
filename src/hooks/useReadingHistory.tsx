@@ -175,14 +175,7 @@ export const useReadingHistory = () => {
       });
       return true;
     } catch (error: any) {
-      console.error('Error loading reading stats:', {
-        message: error?.message || 'Unknown error',
-        code: error?.code,
-        details: error?.details,
-        hint: error?.hint,
-        errorString: String(error),
-        errorObject: error
-      });
+      // Silent error handling for stats
       return false;
     }
   };
@@ -325,7 +318,7 @@ export const useReadingHistory = () => {
       });
       toast({
         title: 'خطأ',
-        description: 'فشل في مسح سجل القراءة',
+        description: 'فشل في مسح سجل القرا��ة',
         variant: 'destructive'
       });
     }
