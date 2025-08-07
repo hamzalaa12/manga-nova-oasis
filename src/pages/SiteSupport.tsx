@@ -122,7 +122,7 @@ const SiteSupport = () => {
                       <Star className="h-4 w-4 text-yellow-500" />
                     </li>
                     <li className="flex items-center gap-2 justify-end">
-                      <span>شارة مميزة للمتبرعين</span>
+                      <span>شارة مميزة للمت��رعين</span>
                       <Star className="h-4 w-4 text-yellow-500" />
                     </li>
                   </ul>
@@ -235,7 +235,7 @@ const SiteSupport = () => {
         </div>
       )}
       
-      <style jsx>{`
+      <style>{`
         @keyframes progress {
           from { width: 0%; }
           to { width: 100%; }
