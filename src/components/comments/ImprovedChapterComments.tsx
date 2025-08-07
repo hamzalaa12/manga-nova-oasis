@@ -828,12 +828,13 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="شارك رأيك حول هذا الفصل..."
-                    className="min-h-[120px] resize-none text-right text-base"
+                    className="min-h-[120px] resize-none text-right text-base comment-textarea"
                     dir="rtl"
                     style={{
                       fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                       unicodeBidi: "plaintext",
-                      whiteSpace: "pre-wrap"
+                      whiteSpace: "pre-wrap",
+                      wordSpacing: "normal"
                     }}
                   />
                   
