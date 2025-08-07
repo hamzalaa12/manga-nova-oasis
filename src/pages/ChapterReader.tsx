@@ -419,7 +419,7 @@ const ChapterReader = () => {
           <p className="text-gray-400 mb-6">تأكد من صحة الرابط</p>
           <Link to="/">
             <Button className="bg-red-600 hover:bg-red-700 text-white rounded-[20px] border-b-2 border-red-800">
-              العودة للرئيسية
+              ال��ودة للرئيسية
             </Button>
           </Link>
         </div>
@@ -674,7 +674,16 @@ const ChapterReader = () => {
                   alt={`صفحة ${currentPage + 1} من ${chapter.pages.length}`}
                   className="w-full max-w-full object-contain mx-auto select-none"
                   loading="eager"
+                  fetchPriority="high"
+                  decoding="sync"
                   draggable={false}
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  style={{
+                    opacity: '0',
+                    transition: 'opacity 0.3s ease-in-out'
+                  }}
                 />
               )}
             </div>
