@@ -54,6 +54,7 @@ import PreloadContent from "@/components/PreloadContent";
 import ServerSideContent from "@/components/ServerSideContent";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useViewTracking } from "@/hooks/useViewTracking";
+import MangaDetailsSkeleton from "@/components/MangaDetailsSkeleton";
 
 interface Manga {
   id: string;
