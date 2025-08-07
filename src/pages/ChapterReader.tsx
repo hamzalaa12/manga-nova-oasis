@@ -148,7 +148,7 @@ const ChapterReader = () => {
       }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter details:", error);
-      setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
+      setError('فشل في تحميل الفصل. يرجى المحاو��ة مرة أخرى.');
       setChapter(null);
       setManga(null);
     } finally {
@@ -228,6 +228,8 @@ const ChapterReader = () => {
     if (!slug || !chapterParam) return;
 
     setError(null);
+    setChapter(null);
+    setManga(null);
     try {
       const chapterNumber = parseFloat(chapterParam);
       const identifier = parseMangaIdentifier(slug);
@@ -571,7 +573,7 @@ const ChapterReader = () => {
               }}
             >
               <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[140px]">
-                <SelectValue placeholder="ا��تيار الفصل" />
+                <SelectValue placeholder="اختيار الفصل" />
               </SelectTrigger>
               <SelectContent className="bg-[#161d1d] border-gray-700 max-h-72">
                 {allChapters.map((chapterItem) => (
@@ -688,7 +690,7 @@ const ChapterReader = () => {
             <div className="flex items-center justify-center min-h-[70vh]">
               <div className="text-center">
                 <p className="text-gray-400 text-xl mb-4">
-                  لا توجد صفحات في هذا ال��صل
+                  لا توجد صفحات في هذا الفصل
                 </p>
                 <p className="text-gray-500">يرجى المحاولة لاحقاً</p>
               </div>
