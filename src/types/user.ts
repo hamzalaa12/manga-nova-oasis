@@ -182,6 +182,14 @@ export const hasPermission = (role: UserRole, permission: string): boolean => {
       return ["tribe_leader", "admin", "site_admin"].includes(role);
     case "can_delete_any_comment":
       return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
+    case "can_delete_comments":
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
+    case "can_edit_any_comment":
+      return ["tribe_leader", "admin", "site_admin"].includes(role);
+    case "can_view_reports":
+      return ["elite_fighter", "tribe_leader", "admin", "site_admin"].includes(role);
+    case "can_resolve_reports":
+      return ["tribe_leader", "admin", "site_admin"].includes(role);
     default:
       return false;
   }
