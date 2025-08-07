@@ -206,7 +206,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
       setReplyingTo(null);
       toast({
         title: "تم النشر!",
-        description: "تم نشر تعليقك بنجاح",
+        description: "تم نشر تعليقك بن��اح",
       });
     },
     onError: (error: any) => {
@@ -668,6 +668,14 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                   onChange={(e) => setEditContent(prev => ({ ...prev, [comment.id]: e.target.value }))}
                   className="min-h-[100px] resize-none text-right comment-textarea"
                   dir="rtl"
+                  onKeyDown={(e) => {
+                    // منع التداخل مع اختصارات لوحة المفاتيح للصفحة
+                    e.stopPropagation();
+                  }}
+                  onKeyUp={(e) => {
+                    // منع التداخل مع اختصارات لوحة المفاتيح للصفحة
+                    e.stopPropagation();
+                  }}
                   style={{
                     fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                     unicodeBidi: "plaintext",
