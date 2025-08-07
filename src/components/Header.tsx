@@ -48,7 +48,13 @@ const Header = () => {
             >
               مانها
             </Link>
-            <SiteSupport />
+            <Link
+              to="/support"
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <Heart className="h-4 w-4" />
+              دعم الموقع
+            </Link>
           </nav>
         </div>
 
