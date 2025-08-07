@@ -29,6 +29,7 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/support" element={<SiteSupport />} />
             <Route path="/manga/:slug" element={<MangaDetails />} />
             <Route path="/type/:type" element={<MangaByType />} />
             <Route path="/genre/:genre" element={<MangaByGenre />} />
