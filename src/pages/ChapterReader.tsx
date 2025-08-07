@@ -687,8 +687,19 @@ const ChapterReader = () => {
                     src={page?.url || "/placeholder.svg"}
                     alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
                     className="w-full max-w-full object-contain mx-auto select-none"
-                    loading={index < 3 ? "eager" : "lazy"}
+                    loading={index < 2 ? "eager" : "lazy"}
+                    fetchPriority={index < 2 ? "high" : "low"}
+                    decoding={index < 2 ? "sync" : "async"}
                     draggable={false}
+                    onLoad={(e) => {
+                      if (index < 2) {
+                        e.currentTarget.style.opacity = '1';
+                      }
+                    }}
+                    style={{
+                      opacity: index < 2 ? '0' : '1',
+                      transition: 'opacity 0.3s ease-in-out'
+                    }}
                   />
                 </div>
               ))}
