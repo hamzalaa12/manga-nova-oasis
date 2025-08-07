@@ -1,32 +1,10 @@
-import { useState } from "react";
-import { Heart, Play, X, ArrowRight, Gift, Star } from "lucide-react";
+import { Heart, ArrowRight, Gift, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import Header from "@/components/Header";
 
 const SiteSupport = () => {
-  const [isAdVisible, setIsAdVisible] = useState(false);
-  const [adWatched, setAdWatched] = useState(false);
-
-  const handleWatchAd = () => {
-    setIsAdVisible(true);
-    // Simulate ad completion after 5 seconds
-    setTimeout(() => {
-      setAdWatched(true);
-      toast.success("شكراً لدعمك للموقع! تمت مشاهدة الإعلان بنجاح");
-    }, 5000);
-  };
-
-  const closeAd = () => {
-    if (adWatched) {
-      setIsAdVisible(false);
-      setAdWatched(false);
-    } else {
-      toast.error("يرجى مشاهدة الإعلان كاملاً لدعم الموقع");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
