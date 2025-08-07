@@ -14,30 +14,12 @@ export const useViewTracking = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await fetch('/api/track-view', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          mangaId,
-          type: 'manga'
-        })
+      // Use Supabase functions directly
+      await supabase.functions.invoke('track-view', {
+        body: { mangaId, type: 'manga' },
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
 
-      if (!response.ok) {
-        // Try using supabase functions as fallback
-        await supabase.functions.invoke('track-view', {
-          body: { mangaId, type: 'manga' },
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
-        });
-      }
     } catch (error: any) {
       console.error('Error tracking manga view:', {
         message: error?.message || 'Unknown error',
