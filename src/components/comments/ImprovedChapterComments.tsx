@@ -218,7 +218,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
     },
   });
 
-  // تعديل تعليق
+  // تعديل ت��ليق
   const editCommentMutation = useMutation({
     mutationFn: async ({ commentId, content, isSpoiler }: { commentId: string; content: string; isSpoiler: boolean }) => {
       const { error } = await supabase
@@ -427,7 +427,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
     if (!reportReason.trim()) {
       toast({
         title: "خطأ",
-        description: "يرجى إدخال سبب البلاغ",
+        description: "يرجى إدخال سب�� البلاغ",
         variant: "destructive"
       });
       return;
@@ -738,12 +738,13 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                       }));
                     }}
                     placeholder="اكتب ردك هنا..."
-                    className="min-h-[80px] resize-none text-right"
+                    className="min-h-[80px] resize-none text-right comment-textarea"
                     dir="rtl"
                     style={{
                       fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                       unicodeBidi: "plaintext",
-                      whiteSpace: "pre-wrap"
+                      whiteSpace: "pre-wrap",
+                      wordSpacing: "normal"
                     }}
                   />
                   
@@ -918,7 +919,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
               <Textarea
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                placeholder="اذكر سبب الإبلاغ بالتفصيل..."
+                placeholder="اذكر سبب الإبلاغ بالتف��يل..."
                 className="text-right"
                 dir="rtl"
                 rows={4}
