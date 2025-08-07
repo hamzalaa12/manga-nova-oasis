@@ -45,6 +45,7 @@ import {
 import ViewsCounter from "@/components/ViewsCounter";
 import ImprovedChapterComments from "@/components/comments/ImprovedChapterComments";
 import ReportDialog from "@/components/ReportDialog";
+import OptimizedImage from "@/components/OptimizedImage";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
@@ -698,20 +699,10 @@ const ChapterReader = () => {
             // Single Page Mode
             <div className="relative cursor-pointer" data-reading-area="true">
               {chapter.pages[currentPage] && (
-                <img
-                  src={chapter.pages[currentPage]?.url || "/placeholder.svg"}
+                <OptimizedImage
+                  src={chapter.pages[currentPage]?.url}
                   alt={`صفحة ${currentPage + 1} من ${chapter.pages.length}`}
-                  className="w-full max-w-full object-contain mx-auto select-none"
-                  loading="eager"
-                  decoding="async"
-                  draggable={false}
-                  onLoad={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                  }}
-                  style={{
-                    opacity: '0',
-                    transition: 'opacity 0.2s ease-in-out'
-                  }}
+                  priority={true}
                 />
               )}
             </div>
@@ -719,23 +710,12 @@ const ChapterReader = () => {
             // Full Pages Mode
             <div className="space-y-2.5 cursor-pointer" data-reading-area="true">
               {chapter.pages.map((page, index) => (
-                <div key={index} className="relative">
-                  <img
-                    src={page?.url || "/placeholder.svg"}
-                    alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
-                    className="w-full max-w-full object-contain mx-auto select-none"
-                    loading={index < 3 ? "eager" : "lazy"}
-                    decoding="async"
-                    draggable={false}
-                    onLoad={(e) => {
-                      e.currentTarget.style.opacity = '1';
-                    }}
-                    style={{
-                      opacity: '0',
-                      transition: 'opacity 0.2s ease-in-out'
-                    }}
-                  />
-                </div>
+                <OptimizedImage
+                  key={index}
+                  src={page?.url}
+                  alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
+                  priority={index < 2}
+                />
               ))}
             </div>
           )}
