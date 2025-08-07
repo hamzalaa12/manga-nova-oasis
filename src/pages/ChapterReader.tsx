@@ -148,7 +148,7 @@ const ChapterReader = () => {
       }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter details:", error);
-      setError('فشل في تحميل الفصل. يرجى المحاو��ة مرة أخرى.');
+      setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
       setChapter(null);
       setManga(null);
     } finally {
@@ -686,7 +686,14 @@ const ChapterReader = () => {
       {/* Chapter Content */}
       <div itemProp="description" className="mx-auto mr-[1%]">
         <main className="max-w-[1142px] mx-auto px-2.5 mb-2.5 text-center relative">
-          {chapter.pages.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center min-h-[70vh]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
+                <p className="text-gray-400 text-xl">جاري تحميل الفصل...</p>
+              </div>
+            </div>
+          ) : chapter.pages.length === 0 ? (
             <div className="flex items-center justify-center min-h-[70vh]">
               <div className="text-center">
                 <p className="text-gray-400 text-xl mb-4">
