@@ -863,7 +863,7 @@ const ChapterReader = () => {
       {chapter && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
-            <AdvancedChapterComments chapterId={chapter.id} mangaId={manga.id} />
+            <ImprovedChapterComments chapterId={chapter.id} mangaId={manga.id} />
           </div>
         </div>
       )}
