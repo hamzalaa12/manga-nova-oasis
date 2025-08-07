@@ -270,7 +270,7 @@ const ChapterReader = () => {
 
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
-      setError('فشل في تحميل الفصل. تحقق من را��ط الصفحة.');
+      setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
       setChapter(null);
       setManga(null);
     } finally {
@@ -703,7 +703,6 @@ const ChapterReader = () => {
                     alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
                     className="w-full max-w-full object-contain mx-auto select-none"
                     loading={index < 2 ? "eager" : "lazy"}
-                    fetchPriority={index < 2 ? "high" : "low"}
                     decoding={index < 2 ? "sync" : "async"}
                     draggable={false}
                     onLoad={(e) => {
