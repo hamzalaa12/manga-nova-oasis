@@ -20,7 +20,7 @@ const SiteSupport = () => {
             ادعم موقع مانجا لو
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            ساعدنا في الحفاظ على الموقع وتطويره من خلال مشاهدة الإعلانات أو التبرع
+            ساعدنا في الحفاظ على الموقع وتطويره من خلال التبرع
           </p>
         </div>
 
@@ -195,7 +195,7 @@ const SiteSupport = () => {
                   {adWatched && (
                     <div className="mt-6">
                       <p className="text-green-600 font-semibold">
-                        ✓ تم إكمال الإعلان - شكراً لدعمك!
+                        ✓ تم إكمال الإعلان - شكراً لد��مك!
                       </p>
                     </div>
                   )}
