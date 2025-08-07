@@ -1,9 +1,8 @@
-import { Search, User, Menu, LogOut } from "lucide-react";
+import { Search, User, Menu, LogOut, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
-import SiteSupport from "./SiteSupport";
 import {
   DropdownMenu,
   DropdownMenuContent,
