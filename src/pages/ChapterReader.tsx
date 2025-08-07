@@ -112,6 +112,8 @@ const ChapterReader = () => {
 
   const fetchChapterDetails = async () => {
     setError(null);
+    setChapter(null);
+    setManga(null);
     try {
       const { data: chapterData, error: chapterError } = await supabase
         .from("chapters")
@@ -358,7 +360,7 @@ const ChapterReader = () => {
                       target.isContentEditable ||
                       target.closest('input, textarea, [contenteditable="true"]');
 
-      // إذا كا�� المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
+      // إذا كان المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
       if (isTyping) {
         return;
       }
@@ -569,7 +571,7 @@ const ChapterReader = () => {
               }}
             >
               <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[140px]">
-                <SelectValue placeholder="اختيار الفصل" />
+                <SelectValue placeholder="ا��تيار الفصل" />
               </SelectTrigger>
               <SelectContent className="bg-[#161d1d] border-gray-700 max-h-72">
                 {allChapters.map((chapterItem) => (
@@ -686,7 +688,7 @@ const ChapterReader = () => {
             <div className="flex items-center justify-center min-h-[70vh]">
               <div className="text-center">
                 <p className="text-gray-400 text-xl mb-4">
-                  لا توجد صفحات في هذا الفصل
+                  لا توجد صفحات في هذا ال��صل
                 </p>
                 <p className="text-gray-500">يرجى المحاولة لاحقاً</p>
               </div>
