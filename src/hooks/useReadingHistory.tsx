@@ -281,7 +281,7 @@ export const useReadingHistory = () => {
         updated_at: new Date().toISOString()
       };
 
-      console.log('��� Upsert data:', upsertData);
+      console.log('📝 Upsert data:', upsertData);
 
       const { error, data: upsertResult } = await supabase
         .from('reading_progress')
@@ -304,27 +304,9 @@ export const useReadingHistory = () => {
 
       console.log('✅ Upsert successful:', upsertResult);
 
-      // Reload data in background
-      loadReadingHistory().catch(error => {
-        console.error('Error reloading reading history:', {
-          message: error?.message || 'Unknown error',
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-          errorString: String(error),
-          errorObject: error
-        });
-      });
-      loadReadingStats().catch(error => {
-        console.error('Error reloading reading stats:', {
-          message: error?.message || 'Unknown error',
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-          errorString: String(error),
-          errorObject: error
-        });
-      });
+      // Reload data in background (silently)
+      loadReadingHistory().catch(() => {});
+      loadReadingStats().catch(() => {});
 
       return true;
     } catch (error: any) {
