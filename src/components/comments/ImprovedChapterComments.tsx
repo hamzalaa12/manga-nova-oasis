@@ -668,6 +668,11 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                   onChange={(e) => setEditContent(prev => ({ ...prev, [comment.id]: e.target.value }))}
                   className="min-h-[100px] resize-none text-right"
                   dir="rtl"
+                  style={{
+                    fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+                    unicodeBidi: "plaintext",
+                    whiteSpace: "pre-wrap"
+                  }}
                 />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
