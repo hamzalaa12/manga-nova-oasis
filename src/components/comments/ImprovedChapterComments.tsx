@@ -441,7 +441,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
     }
   };
 
-  // مكون التفاعلات المحسن
+  // مكون التف��علات المحسن
   const ReactionButtons = ({ comment }: { comment: Comment }) => {
     const reactions = [
       { type: 'like', icon: ThumbsUp, label: 'إعجاب', count: comment.reactions?.like || 0, color: 'text-blue-600' },
@@ -820,6 +820,11 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                     placeholder="شارك رأيك حول هذا الفصل..."
                     className="min-h-[120px] resize-none text-right text-base"
                     dir="rtl"
+                    style={{
+                      fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+                      unicodeBidi: "plaintext",
+                      whiteSpace: "pre-wrap"
+                    }}
                   />
                   
                   <div className="flex items-center justify-between">
@@ -862,7 +867,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
         {isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">جاري تحميل التعليقات...</p>
+            <p className="text-muted-foreground">جاري تحميل التعليق��ت...</p>
           </div>
         ) : comments.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
