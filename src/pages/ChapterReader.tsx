@@ -43,7 +43,7 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import AdvancedChapterComments from "@/components/comments/AdvancedChapterComments";
+import ImprovedChapterComments from "@/components/comments/ImprovedChapterComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
