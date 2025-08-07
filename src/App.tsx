@@ -10,6 +10,7 @@ import MangaByType from "./pages/MangaByType";
 import MangaByGenre from "./pages/MangaByGenre";
 import ChapterReader from "./pages/ChapterReader";
 import Profile from "./pages/Profile";
+import SiteSupport from "./pages/SiteSupport";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
 import ScrollToTop from "./components/ScrollToTop";
@@ -28,6 +29,7 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/support" element={<SiteSupport />} />
             <Route path="/manga/:slug" element={<MangaDetails />} />
             <Route path="/type/:type" element={<MangaByType />} />
             <Route path="/genre/:genre" element={<MangaByGenre />} />

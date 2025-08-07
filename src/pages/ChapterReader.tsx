@@ -98,6 +98,11 @@ const ChapterReader = () => {
   const { trackChapterView, trackMangaView } = useViewTracking();
 
   useEffect(() => {
+    // Reset data immediately when route parameters change
+    setLoading(true);
+    setChapter(null);
+    setCurrentPage(0);
+
     if (slug && chapterParam) {
       fetchChapterBySlugAndNumber();
     } else if (id) {
@@ -107,6 +112,8 @@ const ChapterReader = () => {
 
   const fetchChapterDetails = async () => {
     setError(null);
+    setChapter(null);
+    setManga(null);
     try {
       const { data: chapterData, error: chapterError } = await supabase
         .from("chapters")
@@ -221,6 +228,8 @@ const ChapterReader = () => {
     if (!slug || !chapterParam) return;
 
     setError(null);
+    setChapter(null);
+    setManga(null);
     try {
       const chapterNumber = parseFloat(chapterParam);
       const identifier = parseMangaIdentifier(slug);
@@ -677,7 +686,14 @@ const ChapterReader = () => {
       {/* Chapter Content */}
       <div itemProp="description" className="mx-auto mr-[1%]">
         <main className="max-w-[1142px] mx-auto px-2.5 mb-2.5 text-center relative">
-          {chapter.pages.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center min-h-[70vh]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
+                <p className="text-gray-400 text-xl">جاري تحميل الفصل...</p>
+              </div>
+            </div>
+          ) : chapter.pages.length === 0 ? (
             <div className="flex items-center justify-center min-h-[70vh]">
               <div className="text-center">
                 <p className="text-gray-400 text-xl mb-4">

@@ -1,4 +1,4 @@
-import { Search, User, Menu, LogOut } from "lucide-react";
+import { Search, User, Menu, LogOut, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +47,13 @@ const Header = () => {
               className="text-foreground hover:text-primary transition-colors"
             >
               مانها
+            </Link>
+            <Link
+              to="/support"
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <Heart className="h-4 w-4" />
+              دعم الموقع
             </Link>
           </nav>
         </div>
