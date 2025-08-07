@@ -43,7 +43,7 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import AdvancedComments from "@/components/AdvancedComments";
+import AdvancedChapterComments from "@/components/comments/AdvancedChapterComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
@@ -257,7 +257,7 @@ const ChapterReader = () => {
         throw new Error('الفصل غير موجود');
       }
 
-      setChapter(chapterData);
+      setChapter({ ...chapterData, manga_id: mangaData.id });
 
       // Set all chapters sorted by chapter number
       const sortedChapters = allChaptersData
@@ -863,14 +863,14 @@ const ChapterReader = () => {
       {chapter && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
-            <AdvancedComments chapterId={chapter.id} mangaId={manga.id} />
+            <AdvancedChapterComments chapterId={chapter.id} mangaId={manga.id} />
           </div>
         </div>
       )}
 
 
       {/* ViewsCounter */}
-      <ViewsCounter type="chapter" id={chapter.id} />
+      {chapter && <ViewsCounter viewsCount={chapter.views_count} type="chapter" />}
     </article>
   );
 };

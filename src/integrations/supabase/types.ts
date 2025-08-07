@@ -77,6 +77,44 @@ export type Database = {
           },
         ]
       }
+      comment_reactions: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          reaction_type: string
+          session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          reaction_type: string
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_reactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           chapter_id: string | null
@@ -84,11 +122,14 @@ export type Database = {
           created_at: string
           deleted_by: string | null
           deleted_reason: string | null
+          formatting_style: Json | null
           id: string
           is_deleted: boolean
           is_pinned: boolean
+          is_spoiler: boolean | null
           manga_id: string
           parent_id: string | null
+          rich_content: Json | null
           updated_at: string
           user_id: string
         }
@@ -98,11 +139,14 @@ export type Database = {
           created_at?: string
           deleted_by?: string | null
           deleted_reason?: string | null
+          formatting_style?: Json | null
           id?: string
           is_deleted?: boolean
           is_pinned?: boolean
+          is_spoiler?: boolean | null
           manga_id: string
           parent_id?: string | null
+          rich_content?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -112,11 +156,14 @@ export type Database = {
           created_at?: string
           deleted_by?: string | null
           deleted_reason?: string | null
+          formatting_style?: Json | null
           id?: string
           is_deleted?: boolean
           is_pinned?: boolean
+          is_spoiler?: boolean | null
           manga_id?: string
           parent_id?: string | null
+          rich_content?: Json | null
           updated_at?: string
           user_id?: string
         }

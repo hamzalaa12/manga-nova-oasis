@@ -35,41 +35,67 @@ const SpoilerContent: React.FC<SpoilerContentProps> = ({
     return (
       <div 
         className={cn(
-          "bg-gradient-to-r from-gray-800 to-gray-900 text-gray-800 rounded-lg p-4 cursor-pointer",
-          "hover:from-gray-700 hover:to-gray-800 transition-all duration-300",
-          "flex items-center justify-center gap-2 min-h-[80px]",
-          "border-2 border-orange-500/30 hover:border-orange-500/50",
+          "relative overflow-hidden rounded-lg p-6 cursor-pointer group",
+          "bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-black/90",
+          "border-2 border-orange-500/40 hover:border-orange-400/60",
+          "transition-all duration-300 hover:scale-[1.02]",
+          "backdrop-blur-sm shadow-lg hover:shadow-xl",
+          "flex items-center justify-center gap-3 min-h-[100px]",
           className
         )}
         onClick={handleReveal}
       >
-        <AlertTriangle className="h-5 w-5 text-orange-500" />
-        <span className="font-medium text-orange-500">انقر لإظهار المحتوى المحرق</span>
-        <EyeOff className="h-5 w-5 text-orange-500" />
+        {/* خلفية متحركة */}
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 animate-pulse" />
+        
+        {/* المحتوى */}
+        <div className="relative z-10 flex items-center gap-3 text-center">
+          <AlertTriangle className="h-6 w-6 text-orange-400 animate-bounce" />
+          <div className="space-y-1">
+            <span className="font-bold text-orange-300 text-lg block">
+              ⚠️ تحذير: محتوى محرق
+            </span>
+            <span className="text-orange-400/80 text-sm block">
+              انقر لإظهار المحتوى المخفي
+            </span>
+          </div>
+          <EyeOff className="h-6 w-6 text-orange-400 group-hover:scale-110 transition-transform" />
+        </div>
+        
+        {/* تأثير الإضاءة */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
     );
   }
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <div className="flex items-center gap-2 text-orange-500 text-sm bg-orange-500/10 rounded-md p-2">
-        <AlertTriangle className="h-4 w-4" />
-        <span>⚠️ تحذير: محتوى محرق</span>
+    <div className={cn("space-y-3", className)}>
+      <div className="flex items-center justify-between bg-gradient-to-r from-orange-500/15 to-red-500/15 rounded-lg p-3 border border-orange-500/30">
+        <div className="flex items-center gap-2 text-orange-400">
+          <AlertTriangle className="h-4 w-4" />
+          <span className="font-medium">⚠️ محتوى محرق - تم إظهاره</span>
+        </div>
         <Button
           variant="ghost"
           size="sm"
-          className="h-6 w-6 p-0 text-orange-500 hover:text-orange-400"
+          className="h-7 w-7 p-0 text-orange-400 hover:text-orange-300 hover:bg-orange-500/20"
           onClick={() => setIsRevealed(false)}
+          title="إخفاء المحتوى"
         >
-          <EyeOff className="h-3 w-3" />
+          <EyeOff className="h-3.5 w-3.5" />
         </Button>
       </div>
+      
       <div 
-        className="text-foreground leading-relaxed whitespace-pre-wrap text-right border-l-4 border-orange-500 pl-4 bg-orange-500/5 rounded-r-md py-2"
+        className={cn(
+          "text-foreground leading-relaxed whitespace-pre-wrap text-right",
+          "border-r-4 border-orange-500 pr-4 bg-gradient-to-l from-orange-500/5 to-transparent",
+          "rounded-l-lg py-3 px-4 shadow-sm",
+          "animate-in slide-in-from-top-2 duration-500"
+        )}
         style={{ 
           fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
-          unicodeBidi: "embed",
-          animation: "spoiler-reveal 0.5s ease-out"
+          unicodeBidi: "embed"
         }}
       >
         {content}
