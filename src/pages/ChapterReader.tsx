@@ -879,11 +879,21 @@ const ChapterReader = () => {
         </p>
       </div>
 
-      {/* Comments Section */}
+      {/* Comments Section - Lazy Loaded */}
       {chapter && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
-            <ImprovedChapterComments chapterId={chapter.id} mangaId={manga.id} />
+            <div className="text-center mb-4">
+              <details className="group">
+                <summary className="cursor-pointer text-lg font-semibold text-white hover:text-red-400 transition-colors">
+                  عرض التعليقات
+                  <span className="ml-2 group-open:rotate-180 transition-transform inline-block">▼</span>
+                </summary>
+                <div className="mt-4">
+                  <ImprovedChapterComments chapterId={chapter.id} mangaId={manga.id} />
+                </div>
+              </details>
+            </div>
           </div>
         </div>
       )}
