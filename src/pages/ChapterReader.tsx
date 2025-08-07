@@ -49,6 +49,7 @@ import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useViewTracking } from "@/hooks/useViewTracking";
+import ChapterReaderSkeleton from "@/components/ChapterReaderSkeleton";
 
 interface Chapter {
   id: string;
@@ -202,7 +203,7 @@ const ChapterReader = () => {
         });
       }
     } catch (error: any) {
-      console.error("�� Error tracking chapter view:", {
+      console.error("❌ Error tracking chapter view:", {
         message: error?.message || 'Unknown error',
         code: error?.code,
         details: error?.details,
