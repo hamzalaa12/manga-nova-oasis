@@ -225,7 +225,18 @@ const ChapterReader = () => {
       const chapterNumber = parseFloat(chapterParam);
       const identifier = parseMangaIdentifier(slug);
 
-      let mangaQuery = supabase.from("manga").select("*");
+      let mangaQuery = supabase.from("manga").select(`
+        *,
+        chapters!chapters_manga_id_fkey (
+          id,
+          chapter_number,
+          title,
+          description,
+          pages,
+          views_count,
+          created_at
+        )
+      `);
 
       if (identifier.type === "slug") {
         mangaQuery = mangaQuery.eq("slug", identifier.value);
@@ -233,34 +244,30 @@ const ChapterReader = () => {
         mangaQuery = mangaQuery.eq("id", identifier.value);
       }
 
-      const { data: mangaData, error: mangaError } = await mangaQuery.single();
+      const { data: mangaWithChapters, error: mangaError } = await mangaQuery.single();
 
       if (mangaError) throw mangaError;
+
+      const { chapters: allChaptersData, ...mangaData } = mangaWithChapters;
       setManga(mangaData);
 
-      const { data: chapterData, error: chapterError } = await supabase
-        .from("chapters")
-        .select("*")
-        .eq("manga_id", mangaData.id)
-        .eq("chapter_number", chapterNumber)
-        .single();
+      // Find the specific chapter
+      const chapterData = allChaptersData.find(ch => ch.chapter_number === chapterNumber);
+      if (!chapterData) {
+        throw new Error('الفصل غير موجود');
+      }
 
-      if (chapterError) throw chapterError;
       setChapter(chapterData);
 
-      const { data: chaptersData, error: chaptersError } = await supabase
-        .from("chapters")
-        .select("id, chapter_number, title")
-        .eq("manga_id", mangaData.id)
-        .order("chapter_number", { ascending: true });
+      // Set all chapters sorted by chapter number
+      const sortedChapters = allChaptersData
+        .map(ch => ({ id: ch.id, chapter_number: ch.chapter_number, title: ch.title }))
+        .sort((a, b) => a.chapter_number - b.chapter_number);
+      setAllChapters(sortedChapters);
 
-      if (chaptersError) throw chaptersError;
-      setAllChapters(chaptersData || []);
+      // Track chapter view (non-blocking)
+      trackChapterViewOld(chapterData.id).catch(console.error);
 
-      // Track chapter view after we have all the data
-      setTimeout(() => {
-        trackChapterViewOld(chapterData.id);
-      }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
       setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
@@ -419,7 +426,7 @@ const ChapterReader = () => {
           <p className="text-gray-400 mb-6">تأكد من صحة الرابط</p>
           <Link to="/">
             <Button className="bg-red-600 hover:bg-red-700 text-white rounded-[20px] border-b-2 border-red-800">
-              ال��ودة للرئيسية
+              العودة للرئيسية
             </Button>
           </Link>
         </div>
