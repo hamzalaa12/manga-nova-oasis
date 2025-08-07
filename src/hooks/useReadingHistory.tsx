@@ -100,7 +100,7 @@ export const useReadingHistory = () => {
 
       toast({
         title: 'خطأ',
-        description: `فشل في تحميل سجل القراءة: ${error?.message || 'خطأ غير معروف'}`,
+        description: `فشل في تحميل سجل القراءة: ${error?.message || error?.code || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
       return false;
