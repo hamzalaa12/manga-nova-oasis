@@ -735,6 +735,11 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                     placeholder="اكتب ردك هنا..."
                     className="min-h-[80px] resize-none text-right"
                     dir="rtl"
+                    style={{
+                      fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
+                      unicodeBidi: "plaintext",
+                      whiteSpace: "pre-wrap"
+                    }}
                   />
                   
                   <div className="flex items-center justify-between">
