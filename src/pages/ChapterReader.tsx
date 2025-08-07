@@ -163,7 +163,6 @@ const ChapterReader = () => {
     }
 
     try {
-      console.log("📖 Tracking chapter view for ID:", chapterId);
 
       if (manga && manga.id) {
         await trackChapterView(chapterId, manga.id);
@@ -176,7 +175,6 @@ const ChapterReader = () => {
         try {
           const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
           if (progressSaved) {
-            console.log('✅ Reading progress saved via hook');
           } else {
             console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
           }
@@ -201,13 +199,6 @@ const ChapterReader = () => {
           });
         }
       } else {
-        console.log('Skipping reading progress update:', {
-          hasUser: !!sessionData.session?.user,
-          hasManga: !!manga,
-          hasChapter: !!chapter,
-          mangaId: manga?.id,
-          chapterId: chapter?.id
-        });
       }
     } catch (error: any) {
       console.error("❌ Error tracking chapter view:", {
@@ -275,7 +266,9 @@ const ChapterReader = () => {
       setAllChapters(sortedChapters);
 
       // Track chapter view (non-blocking)
-      trackChapterViewOld(chapterData.id).catch(console.error);
+      setTimeout(() => {
+        trackChapterViewOld(chapterData.id).catch(() => {});
+      }, 500);
 
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
@@ -320,7 +313,6 @@ const ChapterReader = () => {
         updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
           .then((success) => {
             if (success) {
-              console.log('📖 Chapter marked as completed via scroll');
             } else {
               console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
             }
@@ -711,14 +703,14 @@ const ChapterReader = () => {
                   alt={`صفحة ${currentPage + 1} من ${chapter.pages.length}`}
                   className="w-full max-w-full object-contain mx-auto select-none"
                   loading="eager"
-                  decoding="sync"
+                  decoding="async"
                   draggable={false}
                   onLoad={(e) => {
                     e.currentTarget.style.opacity = '1';
                   }}
                   style={{
                     opacity: '0',
-                    transition: 'opacity 0.3s ease-in-out'
+                    transition: 'opacity 0.2s ease-in-out'
                   }}
                 />
               )}
@@ -732,17 +724,15 @@ const ChapterReader = () => {
                     src={page?.url || "/placeholder.svg"}
                     alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
                     className="w-full max-w-full object-contain mx-auto select-none"
-                    loading={index < 2 ? "eager" : "lazy"}
-                    decoding={index < 2 ? "sync" : "async"}
+                    loading={index < 3 ? "eager" : "lazy"}
+                    decoding="async"
                     draggable={false}
                     onLoad={(e) => {
-                      if (index < 2) {
-                        e.currentTarget.style.opacity = '1';
-                      }
+                      e.currentTarget.style.opacity = '1';
                     }}
                     style={{
-                      opacity: index < 2 ? '0' : '1',
-                      transition: 'opacity 0.3s ease-in-out'
+                      opacity: '0',
+                      transition: 'opacity 0.2s ease-in-out'
                     }}
                   />
                 </div>
