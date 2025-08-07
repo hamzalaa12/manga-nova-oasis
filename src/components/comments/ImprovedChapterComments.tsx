@@ -163,7 +163,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
     staleTime: 30 * 1000,
   });
 
-  // نش�� تعليق جديد
+  // نشر تعليق جديد
   const addCommentMutation = useMutation({
     mutationFn: async ({ 
       content, 
@@ -377,7 +377,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
   // فحص الصلاحيات
   const canEditComment = (comment: Comment) => {
     if (!user) return false;
-    // يمكن للمستخدم تعديل تعل��قه أو للمشرفين تعديل أي تعليق
+    // يمكن للمستخدم تعديل تعليقه أو للمشرفين تعديل أي تعليق
     return comment.user_id === user.id || hasPermission(userRole, "can_moderate_comments");
   };
 
@@ -617,7 +617,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                       className="text-orange-600 focus:text-orange-600"
                     >
                       <Flag className="h-4 w-4 mr-2" />
-                      الإبلاغ ��ن التعليق
+                      الإبلاغ عن التعليق
                     </DropdownMenuItem>
                   </>
                 )}
@@ -835,6 +835,14 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                     placeholder="شارك رأيك حول هذا الفصل..."
                     className="min-h-[120px] resize-none text-right text-base comment-textarea"
                     dir="rtl"
+                    onKeyDown={(e) => {
+                      // منع التداخل مع اختصارات لوحة المفاتيح للصفحة
+                      e.stopPropagation();
+                    }}
+                    onKeyUp={(e) => {
+                      // منع التداخل مع اختصارات لوحة المفاتيح للصفحة
+                      e.stopPropagation();
+                    }}
                     style={{
                       fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                       unicodeBidi: "plaintext",
