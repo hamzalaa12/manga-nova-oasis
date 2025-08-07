@@ -163,7 +163,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
     staleTime: 30 * 1000,
   });
 
-  // نشر تعليق جديد
+  // نش�� تعليق جديد
   const addCommentMutation = useMutation({
     mutationFn: async ({ 
       content, 
@@ -377,7 +377,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
   // فحص الصلاحيات
   const canEditComment = (comment: Comment) => {
     if (!user) return false;
-    // يمكن للمستخدم تعديل تعليقه أو للمشرفين تعديل أي تعليق
+    // يمكن للمستخدم تعديل تعل��قه أو للمشرفين تعديل أي تعليق
     return comment.user_id === user.id || hasPermission(userRole, "can_moderate_comments");
   };
 
@@ -617,7 +617,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                       className="text-orange-600 focus:text-orange-600"
                     >
                       <Flag className="h-4 w-4 mr-2" />
-                      الإبلاغ عن التعليق
+                      الإبلاغ ��ن التعليق
                     </DropdownMenuItem>
                   </>
                 )}
@@ -632,7 +632,7 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                           className="text-red-600 focus:text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          حذف ��لتعليق
+                          حذف التعليق
                         </DropdownMenuItem>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -803,7 +803,10 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
   };
 
   return (
-    <div className="bg-gradient-to-br from-background to-muted/20 rounded-xl border backdrop-blur-sm">
+    <div
+      className="bg-gradient-to-br from-background to-muted/20 rounded-xl border backdrop-blur-sm"
+      data-comments-area="true"
+    >
       {/* رأس القسم */}
       <div className="p-6 border-b">
         <div className="space-y-4">
