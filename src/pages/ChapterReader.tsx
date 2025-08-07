@@ -98,6 +98,11 @@ const ChapterReader = () => {
   const { trackChapterView, trackMangaView } = useViewTracking();
 
   useEffect(() => {
+    // Reset data immediately when route parameters change
+    setLoading(true);
+    setChapter(null);
+    setCurrentPage(0);
+
     if (slug && chapterParam) {
       fetchChapterBySlugAndNumber();
     } else if (id) {
@@ -353,7 +358,7 @@ const ChapterReader = () => {
                       target.isContentEditable ||
                       target.closest('input, textarea, [contenteditable="true"]');
 
-      // إذا كان المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
+      // إذا كا�� المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
       if (isTyping) {
         return;
       }
