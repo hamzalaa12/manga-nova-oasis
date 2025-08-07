@@ -390,14 +390,7 @@ const ChapterReader = () => {
   }, [navigate, manga, chapter, allChapters]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#111119] flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <p className="text-xl font-bold">جاري تحميل الفصل...</p>
-        </div>
-      </div>
-    );
+    return <ChapterReaderSkeleton />;
   }
 
   if (error) {
