@@ -741,6 +741,14 @@ const ImprovedChapterComments = ({ chapterId, mangaId }: ImprovedChapterComments
                     placeholder="اكتب ردك هنا..."
                     className="min-h-[80px] resize-none text-right comment-textarea"
                     dir="rtl"
+                    onKeyDown={(e) => {
+                      // منع التداخل مع اختصارات لوحة المفاتيح للصفحة
+                      e.stopPropagation();
+                    }}
+                    onKeyUp={(e) => {
+                      // منع التداخل مع اختصارات لوحة المفاتيح للصفحة
+                      e.stopPropagation();
+                    }}
                     style={{
                       fontFamily: "'Noto Sans Arabic', 'Cairo', 'Amiri', sans-serif",
                       unicodeBidi: "plaintext",
