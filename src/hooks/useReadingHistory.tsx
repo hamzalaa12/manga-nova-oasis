@@ -137,7 +137,7 @@ export const useReadingHistory = () => {
             cover_image_url,
             author
           ),
-          chapters!reading_progress_chapter_id_fkey (
+          chapters (
             chapter_number,
             title
           )
@@ -281,7 +281,7 @@ export const useReadingHistory = () => {
         updated_at: new Date().toISOString()
       };
 
-      console.log('📝 Upsert data:', upsertData);
+      console.log('��� Upsert data:', upsertData);
 
       const { error, data: upsertResult } = await supabase
         .from('reading_progress')
