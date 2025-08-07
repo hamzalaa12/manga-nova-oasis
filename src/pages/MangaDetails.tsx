@@ -54,6 +54,7 @@ import PreloadContent from "@/components/PreloadContent";
 import ServerSideContent from "@/components/ServerSideContent";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useViewTracking } from "@/hooks/useViewTracking";
+import MangaDetailsSkeleton from "@/components/MangaDetailsSkeleton";
 
 interface Manga {
   id: string;
@@ -112,15 +113,28 @@ const MangaDetails = () => {
 
     try {
       const identifier = parseMangaIdentifier(slug);
-      let query = supabase.from("manga").select("*");
+      let mangaQuery = supabase.from("manga").select(`
+        *,
+        chapters:chapters (
+          id,
+          chapter_number,
+          title,
+          description,
+          views_count,
+          created_at,
+          is_premium,
+          is_private,
+          price
+        )
+      `);
 
       if (identifier.type === "slug") {
-        query = query.eq("slug", identifier.value);
+        mangaQuery = mangaQuery.eq("slug", identifier.value);
       } else {
-        query = query.eq("id", identifier.value);
+        mangaQuery = mangaQuery.eq("id", identifier.value);
       }
 
-      let { data, error } = await query.single();
+      let { data: mangaData, error } = await mangaQuery.single();
 
       if (error) {
         if (error.code === "PGRST116" && identifier.type === "slug") {
@@ -131,7 +145,20 @@ const MangaDetails = () => {
           // محاولة أخرى بعد إصلاح slugs
           const { data: retryData, error: retryError } = await supabase
             .from("manga")
-            .select("*")
+            .select(`
+              *,
+              chapters:chapters (
+                id,
+                chapter_number,
+                title,
+                description,
+                views_count,
+                created_at,
+                is_premium,
+                is_private,
+                price
+              )
+            `)
             .eq("slug", identifier.value)
             .single();
 
@@ -139,25 +166,30 @@ const MangaDetails = () => {
             throw new Error("المانجا غير موجودة");
           }
 
-          data = retryData;
+          mangaData = retryData;
         } else if (error.code === "PGRST116") {
-          throw new Error("المانجا غير موجو��ة");
+          throw new Error("المانجا غير موجودة");
         } else {
           throw error;
         }
       }
 
-      if (!data) {
-        throw new Error("لم يتم العثور على بي��نات المانجا");
+      if (!mangaData) {
+        throw new Error("لم يتم العثور على بيانات المانجا");
       }
 
-      setManga(data);
+      // استخراج البيانات
+      const { chapters: chaptersData, ...mangaOnly } = mangaData;
+      setManga(mangaOnly);
 
-      // جلب الفصول والتتبع في نفس الوقت
-      await Promise.all([
-        fetchChaptersForManga(data.id),
-        trackMangaView(data.id),
-      ]);
+      // ترتيب الفصول حسب رقم الفصل
+      const sortedChapters = (chaptersData || []).sort((a, b) => a.chapter_number - b.chapter_number);
+      setChapters(sortedChapters);
+
+      // تتبع المشاهدة (لا ننتظرها)
+      trackMangaView(mangaOnly.id).catch(console.error);
+
+      setLoading(false);
     } catch (error: any) {
       const errorMessage = error.message || "فشل في تحميل تفاصيل المانجا";
       console.error("Error fetching manga details:", errorMessage);
@@ -175,7 +207,17 @@ const MangaDetails = () => {
     try {
       const { data, error } = await supabase
         .from("chapters")
-        .select("*")
+        .select(`
+          id,
+          chapter_number,
+          title,
+          description,
+          views_count,
+          created_at,
+          is_premium,
+          is_private,
+          price
+        `)
         .eq("manga_id", mangaId)
         .order("chapter_number", { ascending: true });
 
@@ -185,11 +227,9 @@ const MangaDetails = () => {
       console.error("Error fetching chapters:", error.message || error);
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحميل ا��فصول",
+        description: error.message || "فشل في تحميل الفصول",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -291,7 +331,7 @@ const MangaDetails = () => {
 
       toast({
         title: "تم التحديث!",
-        description: isPremium ? "تم جعل الفصل مجاني" : "تم جعل الفصل مدفوع",
+        description: isPremium ? "تم جعل ا��فصل مجاني" : "تم جعل الفصل مدفوع",
       });
 
       if (manga?.id) {
@@ -335,47 +375,11 @@ const MangaDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <>
         <Header />
-        <main className="container mx-auto px-4 py-8">
-          <Skeleton className="h-6 w-32 mb-6" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-1">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="text-center space-y-4">
-                    <Skeleton className="w-full h-80 rounded-lg" />
-                    <Skeleton className="h-8 w-3/4 mx-auto" />
-                    <div className="flex gap-2 justify-center">
-                      <Skeleton className="h-6 w-16" />
-                      <Skeleton className="h-6 w-16" />
-                    </div>
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-2/3" />
-                    </div>
-                    <Skeleton className="h-10 w-full" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardContent className="p-6">
-                  <Skeleton className="h-6 w-24 mb-4" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-3/4" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </main>
+        <MangaDetailsSkeleton />
         <Footer />
-      </div>
+      </>
     );
   }
 
@@ -394,7 +398,7 @@ const MangaDetails = () => {
           <Card>
             <CardContent className="p-8 text-center">
               <div className="space-y-4">
-                <div className="text-destructive text-6xl">⚠️</div>
+                <div className="text-destructive text-6xl">���️</div>
                 <h1 className="text-2xl font-bold">حدث خطأ</h1>
                 <p className="text-muted-foreground">{error}</p>
                 <Button

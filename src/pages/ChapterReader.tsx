@@ -49,6 +49,7 @@ import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useViewTracking } from "@/hooks/useViewTracking";
+import ChapterReaderSkeleton from "@/components/ChapterReaderSkeleton";
 
 interface Chapter {
   id: string;
@@ -170,7 +171,7 @@ const ChapterReader = () => {
           if (progressSaved) {
             console.log('✅ Reading progress saved via hook');
           } else {
-            console.error('❌ Failed to save reading progress via hook - updateReadingProgress returned false');
+            console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
           }
         } catch (progressError) {
           console.error('❌ Error updating reading progress:', progressError);
@@ -224,7 +225,18 @@ const ChapterReader = () => {
       const chapterNumber = parseFloat(chapterParam);
       const identifier = parseMangaIdentifier(slug);
 
-      let mangaQuery = supabase.from("manga").select("*");
+      let mangaQuery = supabase.from("manga").select(`
+        *,
+        chapters!chapters_manga_id_fkey (
+          id,
+          chapter_number,
+          title,
+          description,
+          pages,
+          views_count,
+          created_at
+        )
+      `);
 
       if (identifier.type === "slug") {
         mangaQuery = mangaQuery.eq("slug", identifier.value);
@@ -232,34 +244,30 @@ const ChapterReader = () => {
         mangaQuery = mangaQuery.eq("id", identifier.value);
       }
 
-      const { data: mangaData, error: mangaError } = await mangaQuery.single();
+      const { data: mangaWithChapters, error: mangaError } = await mangaQuery.single();
 
       if (mangaError) throw mangaError;
+
+      const { chapters: allChaptersData, ...mangaData } = mangaWithChapters;
       setManga(mangaData);
 
-      const { data: chapterData, error: chapterError } = await supabase
-        .from("chapters")
-        .select("*")
-        .eq("manga_id", mangaData.id)
-        .eq("chapter_number", chapterNumber)
-        .single();
+      // Find the specific chapter
+      const chapterData = allChaptersData.find(ch => ch.chapter_number === chapterNumber);
+      if (!chapterData) {
+        throw new Error('الفصل غير موجود');
+      }
 
-      if (chapterError) throw chapterError;
       setChapter(chapterData);
 
-      const { data: chaptersData, error: chaptersError } = await supabase
-        .from("chapters")
-        .select("id, chapter_number, title")
-        .eq("manga_id", mangaData.id)
-        .order("chapter_number", { ascending: true });
+      // Set all chapters sorted by chapter number
+      const sortedChapters = allChaptersData
+        .map(ch => ({ id: ch.id, chapter_number: ch.chapter_number, title: ch.title }))
+        .sort((a, b) => a.chapter_number - b.chapter_number);
+      setAllChapters(sortedChapters);
 
-      if (chaptersError) throw chaptersError;
-      setAllChapters(chaptersData || []);
+      // Track chapter view (non-blocking)
+      trackChapterViewOld(chapterData.id).catch(console.error);
 
-      // Track chapter view after we have all the data
-      setTimeout(() => {
-        trackChapterViewOld(chapterData.id);
-      }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
       setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
@@ -305,7 +313,7 @@ const ChapterReader = () => {
             if (success) {
               console.log('📖 Chapter marked as completed via scroll');
             } else {
-              console.error('❌ Failed to mark chapter as completed via scroll - updateReadingProgress returned false');
+              console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
             }
           })
           .catch((error) => {
@@ -389,14 +397,7 @@ const ChapterReader = () => {
   }, [navigate, manga, chapter, allChapters]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#111119] flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <p className="text-xl font-bold">جاري تحميل الفصل...</p>
-        </div>
-      </div>
-    );
+    return <ChapterReaderSkeleton />;
   }
 
   if (error) {
@@ -680,7 +681,15 @@ const ChapterReader = () => {
                   alt={`صفحة ${currentPage + 1} من ${chapter.pages.length}`}
                   className="w-full max-w-full object-contain mx-auto select-none"
                   loading="eager"
+                  decoding="sync"
                   draggable={false}
+                  onLoad={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  style={{
+                    opacity: '0',
+                    transition: 'opacity 0.3s ease-in-out'
+                  }}
                 />
               )}
             </div>
@@ -693,8 +702,18 @@ const ChapterReader = () => {
                     src={page?.url || "/placeholder.svg"}
                     alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
                     className="w-full max-w-full object-contain mx-auto select-none"
-                    loading={index < 3 ? "eager" : "lazy"}
+                    loading={index < 2 ? "eager" : "lazy"}
+                    decoding={index < 2 ? "sync" : "async"}
                     draggable={false}
+                    onLoad={(e) => {
+                      if (index < 2) {
+                        e.currentTarget.style.opacity = '1';
+                      }
+                    }}
+                    style={{
+                      opacity: index < 2 ? '0' : '1',
+                      transition: 'opacity 0.3s ease-in-out'
+                    }}
                   />
                 </div>
               ))}
