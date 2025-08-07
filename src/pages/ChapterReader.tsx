@@ -50,6 +50,7 @@ import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useViewTracking } from "@/hooks/useViewTracking";
+import { useThrottledScroll } from "@/hooks/useThrottledScroll";
 import ChapterReaderSkeleton from "@/components/ChapterReaderSkeleton";
 
 interface Chapter {
@@ -297,53 +298,31 @@ const ChapterReader = () => {
       : null;
   };
 
-  // Scroll detection
-  useEffect(() => {
-    let hasTrackedCompletion = false;
+  // Scroll detection with throttling
+  const hasTrackedCompletion = useRef(false);
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
+  const handleScroll = useCallback(() => {
+    const scrollY = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
 
-      setShowNavigation(scrollY > 100);
+    setShowNavigation(scrollY > 100);
 
-      const scrollPercentage = (scrollY + windowHeight) / documentHeight;
-      if (scrollPercentage > 0.9 && !hasTrackedCompletion && chapter && manga && chapter.pages.length > 0) {
-        hasTrackedCompletion = true;
-        updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
-          .then((success) => {
-            if (success) {
-            } else {
-              console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
-            }
-          })
-          .catch((error) => {
-            console.error('❌ Error in scroll completion tracking:', error);
-            console.error('❌ Error details:', {
-              message: error?.message || 'Unknown error',
-              code: error?.code,
-              details: error?.details,
-              hint: error?.hint,
-              mangaId: manga.id,
-              chapterId: chapter.id,
-              errorType: typeof error,
-              errorString: String(error),
-              errorJSON: (() => {
-                try {
-                  return JSON.stringify(error, null, 2);
-                } catch (e) {
-                  return 'Could not stringify error: ' + String(e);
-                }
-              })()
-            });
-          });
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const scrollPercentage = (scrollY + windowHeight) / documentHeight;
+    if (scrollPercentage > 0.9 && !hasTrackedCompletion.current && chapter && manga && chapter.pages.length > 0) {
+      hasTrackedCompletion.current = true;
+      updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
+        .catch(() => {}); // Silent error handling for better performance
+    }
   }, [chapter, manga, updateReadingProgress]);
+
+  const throttledScroll = useThrottledScroll(handleScroll, 150);
+
+  useEffect(() => {
+    hasTrackedCompletion.current = false;
+    window.addEventListener("scroll", throttledScroll, { passive: true });
+    return () => window.removeEventListener("scroll", throttledScroll);
+  }, [throttledScroll, chapter?.id]);
 
   // Keyboard navigation and click-to-scroll
   useEffect(() => {
