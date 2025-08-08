@@ -111,13 +111,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (error) {
-        console.error('Error loading profile:', {
-          message: error?.message || 'Unknown error',
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-          error: JSON.stringify(error, null, 2)
-        });
+        const errorMessage = error?.message || error?.code || 'Unknown error';
+        console.error('Error loading profile:', errorMessage);
 
         // If profile doesn't exist, create it
         if (error.code === 'PGRST116' && retryCount === 0) {
