@@ -119,12 +119,20 @@ const ChaptersGrid = ({
   }
 
   if (error) {
+    const errorMessage = error?.message || error?.code || 'خطأ غير معروف';
     return (
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">{title}</h2>
-            <p className="text-muted-foreground">حدث خطأ في تحميل الفصول</p>
+            <p className="text-muted-foreground mb-4">حدث خطأ في تحميل الفصول</p>
+            <p className="text-sm text-red-400 mb-4">{errorMessage}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+            >
+              إعادة المحاولة
+            </button>
           </div>
         </div>
       </section>
