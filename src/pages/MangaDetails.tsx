@@ -163,7 +163,7 @@ const MangaDetails = () => {
             .single();
 
           if (retryError || !retryData) {
-            throw new Error("المانجا غير موجودة");
+            throw new Error("المانجا ��ير موجودة");
           }
 
           mangaData = retryData;
@@ -226,9 +226,17 @@ const MangaDetails = () => {
     } catch (error: any) {
       const errorMessage = error?.message || error?.code || String(error);
       console.error("Error fetching chapters:", errorMessage);
+
+      let userMessage = "فشل في تحميل الفصول";
+      if (errorMessage.includes('timeout')) {
+        userMessage = "انتهت مهلة الاستعلام. يرجى المحاولة مرة أخرى.";
+      } else if (errorMessage.includes('Failed to fetch')) {
+        userMessage = "فشل في الاتصال بالخادم. تحقق من اتصالك بالإنترنت.";
+      }
+
       toast({
         title: "خطأ",
-        description: error.message || "فشل في تحميل الفصول",
+        description: userMessage,
         variant: "destructive",
       });
     }
