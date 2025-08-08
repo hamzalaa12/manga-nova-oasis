@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { getChapterUrl, getMangaSlug } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
+import AdvancedImageLoader from "@/components/AdvancedImageLoader";
+import { memo, useMemo } from "react";
 
 interface ChapterCardProps {
   id: string;
@@ -20,7 +22,7 @@ interface ChapterCardProps {
   };
 }
 
-const ChapterCard = ({
+const ChapterCard = memo(({
   id,
   chapter_number,
   title,
@@ -29,8 +31,8 @@ const ChapterCard = ({
   is_premium,
   manga,
 }: ChapterCardProps) => {
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
+  const timeAgo = useMemo(() => {
+    const date = new Date(created_at);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -39,26 +41,30 @@ const ChapterCard = ({
     if (diffDays > 0) return `منذ ${diffDays} يوم`;
     if (diffHours > 0) return `منذ ${diffHours} ساعة`;
     return "منذ دقائق";
-  };
+  }, [created_at]);
 
-  const chapterUrl = getChapterUrl(getMangaSlug(manga), chapter_number);
+  const chapterUrl = useMemo(() =>
+    getChapterUrl(getMangaSlug(manga), chapter_number),
+    [manga, chapter_number]
+  );
 
-  // تحديد إذا كان الفصل جديد (آخر 3 أيام)
-  const isNewChapter = () => {
+  // Memoize expensive calculations
+  const isNewChapter = useMemo(() => {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     const chapterDate = new Date(created_at);
     return chapterDate >= threeDaysAgo;
-  };
+  }, [created_at]);
 
   return (
     <Link to={chapterUrl}>
       <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
         <div className="relative overflow-hidden">
-          <img
+          <AdvancedImageLoader
             src={manga.cover_image_url || "/placeholder.svg"}
             alt={manga.title}
-            className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-48 group-hover:scale-110 transition-transform duration-500"
+            priority={false}
           />
 
           {/* بادج الفصل مع تأثير جديد */}
@@ -72,7 +78,7 @@ const ChapterCard = ({
           </div>
 
           {/* بادج جديد مع تأثير نابض - فقط للفصول الحديثة */}
-          {isNewChapter() && (
+          {isNewChapter && (
             <div className="absolute top-2 left-2">
               <Badge
                 variant="secondary"
@@ -108,7 +114,7 @@ const ChapterCard = ({
               />
               <div className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full">
                 <Clock className="h-3 w-3" />
-                <span>{formatTimeAgo(created_at)}</span>
+                <span>{timeAgo}</span>
               </div>
             </div>
           </div>
@@ -146,6 +152,8 @@ const ChapterCard = ({
       </div>
     </Link>
   );
-};
+});
+
+ChapterCard.displayName = "ChapterCard";
 
 export default ChapterCard;
