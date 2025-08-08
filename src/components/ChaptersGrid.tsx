@@ -97,7 +97,8 @@ const ChaptersGrid = ({
   const totalCount = chaptersResponse?.totalCount || 0;
 
   if (error) {
-    console.error("Error fetching chapters:", error);
+    const errorMessage = error?.message || error?.code || String(error);
+    console.error("Error fetching chapters:", errorMessage);
   }
 
   if (loading) {
@@ -136,7 +137,7 @@ const ChaptersGrid = ({
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">{title}</h2>
-            <p className="text-muted-foreground">لا توجد ��صول متاحة حالياً</p>
+            <p className="text-muted-foreground">لا توجد فصول متاحة حالياً</p>
           </div>
         </div>
       </section>
