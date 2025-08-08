@@ -3,11 +3,12 @@
 // تحسين React Query للاستعلامات المتعددة
 export const PERFORMANCE_CONFIG = {
   // أوقات التخزين المؤقت
+  // تحديث PERFORMANCE_CONFIG لتحسين أكثر
   CACHE_TIMES: {
-    CHAPTERS: 5 * 60 * 1000, // 5 دقائق
-    MANGA: 10 * 60 * 1000, // 10 دقائق
-    PROFILES: 15 * 60 * 1000, // 15 دقيقة
-    STATIC_DATA: 30 * 60 * 1000, // 30 دقيقة
+    CHAPTERS: 10 * 60 * 1000, // 10 دقائق
+    MANGA: 15 * 60 * 1000, // 15 دقيقة
+    PROFILES: 20 * 60 * 1000, // 20 دقيقة
+    STATIC_DATA: 60 * 60 * 1000, // 60 دقيقة
   },
   
   // أحجام الصفحات
