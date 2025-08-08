@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ChapterCard from "./ChapterCard";
 import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { PERFORMANCE_CONFIG } from "@/utils/performance";
 
 interface ChaptersGridProps {
   title?: string;
@@ -32,16 +33,8 @@ const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{d
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  // الحصول على إجمالي عدد الفصول أولاً
-  const { count } = await supabase
-    .from("chapters")
-    .select("id", { count: "exact" })
-    .eq("is_private", false);
-
-  const totalCount = count || 0;
-
-  // جلب البيانات للصفحة الحالية
-  const { data, error } = await supabase
+  // جلب البيانات مع العدد الإجمالي في استعلام واحد لتحسين الأداء
+  const { data, error, count } = await supabase
     .from("chapters")
     .select(
       `
@@ -59,6 +52,7 @@ const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{d
         author
       )
     `,
+      { count: "exact" }
     )
     .eq("is_private", false)
     .order("created_at", { ascending: false })
@@ -68,7 +62,7 @@ const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{d
 
   return {
     data: data || [],
-    totalCount
+    totalCount: count || 0
   };
 };
 
@@ -85,8 +79,9 @@ const ChaptersGrid = ({
   } = useQuery({
     queryKey: ["chapters-grid", showAll, currentPage],
     queryFn: () => fetchChaptersData(showAll, showAll ? 1 : currentPage),
-    staleTime: 2 * 60 * 1000, // 2 دقائق (أقل من المانجا لأن الفصول تتحدث أكثر)
-    gcTime: 5 * 60 * 1000, // 5 دقائق
+    staleTime: PERFORMANCE_CONFIG.CACHE_TIMES.CHAPTERS,
+    gcTime: PERFORMANCE_CONFIG.CACHE_TIMES.CHAPTERS * 3,
+    refetchOnWindowFocus: false,
   });
 
   const chaptersData = chaptersResponse?.data || [];

@@ -69,7 +69,7 @@ export const moderateContent = (content: string): ModerationResult => {
     severity: maxSeverity,
     filteredContent,
     detectedWords,
-    needsManualReview: maxSeverity === 'moderate' || maxSeverity === 'severe'
+    needsManualReview: ['moderate', 'severe'].includes(maxSeverity)
   };
 };
 

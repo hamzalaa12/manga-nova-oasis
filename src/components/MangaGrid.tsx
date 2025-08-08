@@ -5,6 +5,7 @@ import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { PERFORMANCE_CONFIG } from "@/utils/performance";
 
 interface MangaGridProps {
   title?: string;
@@ -29,18 +30,12 @@ const fetchMangaData = async (showAll: boolean, page: number = 1): Promise<{data
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  // الحصول على إجمالي عدد المانجا أولاً
-  const { count } = await supabase
-    .from("manga")
-    .select("id", { count: "exact" });
-
-  const totalCount = count || 0;
-
-  // جلب البيانات للصفحة الحالية
-  const { data, error } = await supabase
+  // جلب البيانات مع العدد الإجمالي في استعلام واحد لتحسين الأداء
+  const { data, error, count } = await supabase
     .from("manga")
     .select(
       "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
+      { count: "exact" }
     )
     .order("updated_at", { ascending: false })
     .range(from, to);
@@ -49,7 +44,7 @@ const fetchMangaData = async (showAll: boolean, page: number = 1): Promise<{data
 
   return {
     data: data || [],
-    totalCount
+    totalCount: count || 0
   };
 };
 
@@ -66,8 +61,9 @@ const MangaGrid = ({
   } = useQuery({
     queryKey: ["manga-grid", showAll, currentPage],
     queryFn: () => fetchMangaData(showAll, showAll ? 1 : currentPage),
-    staleTime: 5 * 60 * 1000, // 5 دقائق
-    gcTime: 10 * 60 * 1000, // 10 دقائق
+    staleTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA,
+    gcTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA * 3,
+    refetchOnWindowFocus: false,
   });
 
   const mangaData = mangaResponse?.data || [];

@@ -64,11 +64,13 @@ const AddChapterForm = ({ onSuccess }: AddChapterFormProps) => {
   }, []);
 
   const fetchMangaList = async () => {
+    // تحميل 50 مانجا فقط في البداية لتحسين الأداء
     try {
       const { data, error } = await supabase
         .from("manga")
         .select("id, slug, title, manga_type")
-        .order("title");
+        .order("title")
+        .limit(100); // تقييد العدد لتحسين الأداء
 
       if (error) throw error;
       setMangaList(data || []);

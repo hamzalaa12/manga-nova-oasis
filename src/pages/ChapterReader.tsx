@@ -43,7 +43,7 @@ import {
   getMangaSlug,
 } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import ImprovedChapterComments from "@/components/comments/ImprovedChapterComments";
+import ChapterComments from "@/components/comments/ChapterComments";
 import ReportDialog from "@/components/ReportDialog";
 import SEO from "@/components/SEO";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
@@ -893,7 +893,7 @@ const ChapterReader = () => {
       {chapter && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
-            <ImprovedChapterComments chapterId={chapter.id} mangaId={manga.id} />
+            <ChapterComments chapterId={chapter.id} mangaId={manga.id} />
           </div>
         </div>
       )}
