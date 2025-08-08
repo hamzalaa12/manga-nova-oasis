@@ -224,7 +224,8 @@ const MangaDetails = () => {
       if (error) throw error;
       setChapters(data || []);
     } catch (error: any) {
-      console.error("Error fetching chapters:", error.message || error);
+      const errorMessage = error?.message || error?.code || String(error);
+      console.error("Error fetching chapters:", errorMessage);
       toast({
         title: "خطأ",
         description: error.message || "فشل في تحميل الفصول",
