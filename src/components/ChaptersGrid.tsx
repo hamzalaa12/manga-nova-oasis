@@ -27,49 +27,48 @@ interface Chapter {
   };
 }
 
+// Enhanced fetch function with better caching and performance
 const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{data: Chapter[], totalCount: number}> => {
-  const pageSize = 36;
+  const pageSize = showAll ? 18 : 36; // Reduce initial load for showAll
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  // الحصول على إجمالي عدد الفصول أولاً
-  const { count } = await supabase
-    .from("chapters")
-    .select("id", { count: "exact" })
-    .eq("is_private", false);
-
-  const totalCount = count || 0;
-
-  // جلب البيانات للصفحة الحالية
-  const { data, error } = await supabase
-    .from("chapters")
-    .select(
-      `
-      id,
-      chapter_number,
-      title,
-      created_at,
-      views_count,
-      is_premium,
-      manga!inner (
+  try {
+    // Single optimized query that gets both data and count
+    const { data, error, count } = await supabase
+      .from("chapters")
+      .select(
+        `
         id,
-        slug,
+        chapter_number,
         title,
-        cover_image_url,
-        author
+        created_at,
+        views_count,
+        is_premium,
+        manga!inner (
+          id,
+          slug,
+          title,
+          cover_image_url,
+          author
+        )
+      `,
+        { count: "exact" }
       )
-    `,
-    )
-    .eq("is_private", false)
-    .order("created_at", { ascending: false })
-    .range(from, to);
+      .eq("is_private", false)
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
-  if (error) throw error;
+    if (error) throw error;
 
-  return {
-    data: data || [],
-    totalCount
-  };
+    return {
+      data: data || [],
+      totalCount: count || 0
+    };
+  } catch (error) {
+    console.error('Error fetching chapters:', error);
+    throw error;
+  }
 };
 
 const ChaptersGrid = ({
@@ -82,11 +81,15 @@ const ChaptersGrid = ({
     data: chaptersResponse,
     isLoading: loading,
     error,
+    isFetching
   } = useQuery({
     queryKey: ["chapters-grid", showAll, currentPage],
-    queryFn: () => fetchChaptersData(showAll, showAll ? 1 : currentPage),
-    staleTime: 2 * 60 * 1000, // 2 دقائق (أقل من المانجا لأن الفصول تتحدث أكثر)
-    gcTime: 5 * 60 * 1000, // 5 دقائق
+    queryFn: () => fetchChaptersData(showAll, currentPage),
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    gcTime: 15 * 60 * 1000, // 15 minutes in memory
+    refetchOnWindowFocus: false, // Don't refetch on focus
+    retry: 2, // Retry failed requests
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const chaptersData = chaptersResponse?.data || [];
