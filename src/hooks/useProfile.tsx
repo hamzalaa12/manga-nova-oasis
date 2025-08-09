@@ -48,13 +48,8 @@ export const useProfile = () => {
         .select('*');
 
       if (error) {
-        console.error('Update profile error:', {
-          message: error?.message || 'Unknown error',
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-          error: error
-        });
+        const errorMessage = error?.message || error?.code || 'Unknown error';
+        console.error('Update profile error:', errorMessage);
         throw error;
       }
 
