@@ -75,13 +75,8 @@ export const useUserRestrictions = () => {
       });
 
       if (error) {
-        console.error('Error checking restriction:', {
-          message: error?.message || 'Unknown error',
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-          error: JSON.stringify(error, null, 2)
-        });
+        const errorMessage = error?.message || error?.code || 'Unknown error';
+        console.error('Error checking restriction:', errorMessage);
         return false;
       }
 
@@ -183,7 +178,7 @@ export const useUserRestrictions = () => {
 
       toast({
         title: 'تم رفع القيد',
-        description: `تم رفع ${restrictionNames[restrictionType]} عن المستخدم`
+        description: `ت�� رفع ${restrictionNames[restrictionType]} عن المستخدم`
       });
 
       return true;
