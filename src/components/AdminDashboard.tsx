@@ -28,6 +28,7 @@ import {
   Clock,
   Flag,
   Plus,
+  ExternalLink,
   Globe
 } from 'lucide-react';
 import { useUserManagement } from '@/hooks/useUserManagement';
