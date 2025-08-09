@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { ExternalLink, Clock, Eye, Gift, Plus, Link2 } from "lucide-react";
+import { ExternalLink, Clock, Eye, Gift, Plus, Link2, RefreshCw } from "lucide-react";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -53,19 +53,43 @@ interface QuickAdFormData {
 }
 
 const fetchActiveAds = async (): Promise<Ad[]> => {
-  const { data, error } = await supabase
-    .from('ads')
-    .select('*')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
+  console.log('Starting ads fetch...');
+  
+  try {
+    // Test the table exists first
+    const { data: testData, error: testError } = await supabase
+      .from('ads')
+      .select('count')
+      .limit(1);
+    
+    if (testError) {
+      console.error('Table test failed:', testError);
+      throw new Error(`Database table error: ${testError.message}`);
+    }
 
-  if (error) throw error;
-  return data || [];
+    const { data, error } = await supabase
+      .from('ads')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Query error:', error);
+      throw new Error(`Failed to fetch ads: ${error.message}`);
+    }
+    
+    console.log('Ads fetched successfully:', data?.length || 0, 'items');
+    return data || [];
+  } catch (err) {
+    console.error('Fetch error:', err);
+    throw err;
+  }
 };
 
 const Ads = () => {
   const { toast } = useToast();
   const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
   const [canClose, setCanClose] = useState(false);
@@ -85,11 +109,18 @@ const Ads = () => {
     duration_seconds: 0,
   });
 
-  const { data: ads, isLoading, error } = useQuery({
+  const { data: ads, isLoading, error, refetch } = useQuery({
     queryKey: ['active-ads'],
     queryFn: fetchActiveAds,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 3, // Retry 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
+
+  const handleRetry = () => {
+    console.log('Manual retry triggered');
+    refetch();
+  };
 
   // Countdown timer for ads with duration
   useEffect(() => {
@@ -180,9 +211,10 @@ const Ads = () => {
 
       setIsLinkDialogOpen(false);
       setLinkFormData({ title: '', url: '', description: '' });
-      // Refresh the data
-      window.location.reload();
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['active-ads'] });
     } catch (error) {
+      console.error('Error adding link:', error);
       toast({
         title: "خطأ",
         description: "فشل في إضافة الرابط",
@@ -229,12 +261,55 @@ const Ads = () => {
         reward_points: 5,
         duration_seconds: 0,
       });
-      // Refresh the data
-      window.location.reload();
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['active-ads'] });
     } catch (error) {
+      console.error('Error adding ad:', error);
       toast({
         title: "خطأ",
         description: "فشل في إضافة الإعلان",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const createSampleAds = async () => {
+    try {
+      const sampleAds = [
+        {
+          title: 'دعم الموقع',
+          description: 'ادعم موقعنا للحصول على محتوى أفضل',
+          url: 'https://ko-fi.com/mangafas',
+          reward_points: 10,
+          duration_seconds: 5,
+          is_active: true,
+          type: 'ad'
+        },
+        {
+          title: 'رابط سريع',
+          description: 'رابط مفيد للمستخدمين',
+          url: 'https://example.com',
+          reward_points: 0,
+          duration_seconds: 0,
+          is_active: true,
+          type: 'link'
+        }
+      ];
+
+      const { error } = await supabase.from('ads').insert(sampleAds);
+      if (error) throw error;
+
+      toast({
+        title: "تم إنشاء البيانات التجريبية",
+        description: "تم إضافة بعض الإعلانات التجريبية",
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['active-ads'] });
+    } catch (error) {
+      console.error('Error creating sample ads:', error);
+      toast({
+        title: "خطأ",
+        description: "فشل في إنشاء البيانات التجريبية",
         variant: "destructive",
       });
     }
@@ -262,9 +337,31 @@ const Ads = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="text-6xl mb-6">⚠️</div>
             <h2 className="text-2xl font-bold mb-4">حدث خطأ في تحميل الإعلانات</h2>
-            <Button onClick={() => window.location.reload()}>إعادة المحاولة</Button>
+            <p className="text-muted-foreground mb-6">
+              {error.message.includes('table') 
+                ? 'جدول الإعلانات غير موجود في قاعدة البيانات'
+                : error.message
+              }
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={handleRetry} className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" />
+                إعادة المحاولة
+              </Button>
+              {isAdmin && error.message.includes('table') && (
+                <Button 
+                  onClick={createSampleAds} 
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  إنشاء بيانات تجريبية
+                </Button>
+              )}
+            </div>
           </div>
         </div>
         <Footer />
@@ -326,7 +423,7 @@ const Ads = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="مشاهدة الإعلانات - مانجافاس"
-        description="ادعم الموقع من خلال مشاهدة ��لإعل��نات واحصل على نقاط مجانية"
+        description="ادعم الموقع من خلال مشاهدة الإعلانات واحصل على نقاط مجانية"
         keywords="إعلانات، دعم الموقع، نقاط مجانية، مانجا"
       />
       
@@ -577,7 +674,13 @@ const Ads = () => {
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📢</div>
             <h2 className="text-xl font-semibold mb-2">لا توجد إعلانات متاحة حالياً</h2>
-            <p className="text-muted-foreground">تحقق مرة أخرى لاحقاً ل��حصول على إعلانات جديدة</p>
+            <p className="text-muted-foreground mb-6">تحقق مرة أخرى لاحقاً للحصول على إعلانات جديدة</p>
+            {isAdmin && (
+              <Button onClick={createSampleAds} variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                إنشاء بيانات تجريبية
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
