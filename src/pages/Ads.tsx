@@ -266,7 +266,7 @@ const Ads = () => {
     } catch (error) {
       console.error('Error adding ad:', error);
       toast({
-        title: "��طأ",
+        title: "خطأ",
         description: "فشل في إضافة الإعلان",
         variant: "destructive",
       });
@@ -446,7 +446,7 @@ const Ads = () => {
       <SEO
         title="مشاهدة الإعلانات - مانجافاس"
         description="ادعم الموقع من خلال مشاهدة الإعلانات واحصل على نقاط مجانية"
-        keywords="إعلانات، دعم الم��قع، نقاط مجانية، مانجا"
+        keywords="إعلانات، دعم الموقع، نقاط مجانية، مانجا"
       />
       
       <Header />
@@ -562,7 +562,7 @@ const Ads = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="ad-image">رابط الصو��ة</Label>
+                      <Label htmlFor="ad-image">رابط الصورة</Label>
                       <Input
                         id="ad-image"
                         type="url"
@@ -698,9 +698,9 @@ const Ads = () => {
             <h2 className="text-xl font-semibold mb-2">لا توجد إعلانات متاحة حالياً</h2>
             <p className="text-muted-foreground mb-6">تحقق مرة أخرى لاحقاً للحصول على إعلانات جديدة</p>
             {isAdmin && (
-              <Button onClick={createSampleAds} variant="outline">
+              <Button onClick={initializeAdsSystem} variant="outline">
                 <Plus className="h-4 w-4 mr-2" />
-                إنشاء بيانات تجريبية
+                إضافة بيانات تجريبية
               </Button>
             )}
           </div>
