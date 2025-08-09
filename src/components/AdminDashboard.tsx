@@ -42,6 +42,7 @@ import RestrictionsMenu from './RestrictionsMenu';
 import SitemapManager from './admin/SitemapManager';
 import ContentManagement from './admin/ContentManagement';
 import LimitedUserManagement from './admin/LimitedUserManagement';
+import AdsManagement from './admin/AdsManagement';
 
 const AdminDashboard = () => {
   const { user: currentUser, refreshProfile, userRole } = useAuth();
