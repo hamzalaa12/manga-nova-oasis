@@ -140,12 +140,15 @@ const ChapterCard = memo(({
               <span className="font-medium">الفصل {chapter_number}</span>
             </div>
             {manga.author && (
-              <div className="flex items-center justify-center gap-1 mt-2">
-                <User className="h-3 w-3" />
-                <span className="truncate max-w-[100px] text-center">
-                  {manga.author}
-                </span>
-              </div>
+              <>
+                <div className="w-full h-px bg-border/50 my-2"></div>
+                <div className="flex items-center justify-center gap-1">
+                  <User className="h-3 w-3" />
+                  <span className="truncate max-w-[100px] text-center">
+                    {manga.author}
+                  </span>
+                </div>
+              </>
             )}
           </div>
         </div>
