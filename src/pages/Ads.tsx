@@ -65,9 +65,25 @@ const fetchActiveAds = async (): Promise<Ad[]> => {
 
 const Ads = () => {
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [countdown, setCountdown] = useState<number>(0);
   const [canClose, setCanClose] = useState(false);
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [isAdDialogOpen, setIsAdDialogOpen] = useState(false);
+  const [linkFormData, setLinkFormData] = useState<QuickLinkFormData>({
+    title: '',
+    url: '',
+    description: '',
+  });
+  const [adFormData, setAdFormData] = useState<QuickAdFormData>({
+    title: '',
+    url: '',
+    description: '',
+    image_url: '',
+    reward_points: 5,
+    duration_seconds: 0,
+  });
 
   const { data: ads, isLoading, error } = useQuery({
     queryKey: ['active-ads'],
@@ -220,7 +236,7 @@ const Ads = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="مشاهدة الإعلانات - مانجافاس"
-        description="ادعم الموقع من خلال مشاهدة الإعلانات واحصل على نقاط مجانية"
+        description="ادعم الموقع من خلال مشاهدة ��لإعلانات واحصل على نقاط مجانية"
         keywords="إعلانات، دعم الموقع، نقاط مجانية، مانجا"
       />
       
