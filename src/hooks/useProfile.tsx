@@ -113,13 +113,8 @@ export const useProfile = () => {
 
       return true;
     } catch (error) {
-      console.error('خطأ في تغيير كلمة المرور:', {
-        message: error?.message || 'Unknown error',
-        code: error?.code,
-        details: error?.details,
-        hint: error?.hint,
-        error: JSON.stringify(error, null, 2)
-      });
+      const errorMessage = error?.message || error?.code || 'Unknown error';
+      console.error('خطأ في تغيير كلمة المرور:', errorMessage);
       toast({
         title: 'خطأ',
         description: 'فشل في تغيير كلمة المرور',
