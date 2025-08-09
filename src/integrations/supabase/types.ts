@@ -759,6 +759,7 @@ export type Database = {
           click_count: number
           created_at: string
           updated_at: string
+          type: string | null
         }
         Insert: {
           id?: string
@@ -772,6 +773,7 @@ export type Database = {
           click_count?: number
           created_at?: string
           updated_at?: string
+          type?: string | null
         }
         Update: {
           id?: string
@@ -785,6 +787,7 @@ export type Database = {
           click_count?: number
           created_at?: string
           updated_at?: string
+          type?: string | null
         }
         Relationships: []
       }
