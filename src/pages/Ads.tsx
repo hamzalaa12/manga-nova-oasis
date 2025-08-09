@@ -34,6 +34,22 @@ interface Ad {
   is_active: boolean;
   click_count: number;
   created_at: string;
+  type?: 'link' | 'ad';
+}
+
+interface QuickLinkFormData {
+  title: string;
+  url: string;
+  description: string;
+}
+
+interface QuickAdFormData {
+  title: string;
+  url: string;
+  description: string;
+  image_url: string;
+  reward_points: number;
+  duration_seconds: number;
 }
 
 const fetchActiveAds = async (): Promise<Ad[]> => {
