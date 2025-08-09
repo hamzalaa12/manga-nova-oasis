@@ -213,7 +213,7 @@ const ChaptersGrid = ({
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">{title}</h2>
-            <p className="text-muted-foreground">لا توجد فصول متاحة حالياً</p>
+            <p className="text-muted-foreground">لا توجد ف��ول متاحة حالياً</p>
           </div>
         </div>
       </section>
@@ -221,7 +221,7 @@ const ChaptersGrid = ({
   }
 
   // حساب ��لبيانات المعروضة حسب الصفحة الحالية
-  const itemsPerPage = 36;
+  const itemsPerPage = showAll ? 12 : 24;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const displayData = chaptersData; // البيانات مقسمة بالفعل حسب الصفحة من الخادم
 
