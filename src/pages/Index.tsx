@@ -1,11 +1,10 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import MangaGrid from "@/components/MangaGrid";
-import ChaptersGrid from "@/components/ChaptersGrid";
+import OptimizedMangaGrid from "@/components/OptimizedMangaGrid";
+import OptimizedChaptersGrid from "@/components/OptimizedChaptersGrid";
 import Footer from "@/components/Footer";
 import AdminPanel from "@/components/AdminPanel";
 import SEO from "@/components/SEO";
-import SEOLinks from "@/components/SEOLinks";
 import { generatePageMeta, generateStructuredData } from "@/utils/seo";
 
 const Index = () => {
@@ -25,8 +24,8 @@ const Index = () => {
       />
       <Header />
       <Hero />
-      <ChaptersGrid />
-      <MangaGrid />
+      <OptimizedChaptersGrid />
+      <OptimizedMangaGrid />
       <Footer />
       <AdminPanel />
     </div>
