@@ -13,7 +13,7 @@ const Ads = () => {
 
   const handleViewLink = () => {
     // يمكن إضافة منطق مشاهدة الرابط هنا لاحقاً
-    window.open('https://example.com/link', '_blank');
+    window.open('https://ouo.io/Nv5QRq', '_blank');
   };
 
   return (
