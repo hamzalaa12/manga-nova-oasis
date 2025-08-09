@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Performance optimization utilities
 
 // Debounce function for search and scroll events
@@ -102,8 +104,6 @@ export const logBundleMetrics = () => {
   }
 };
 
-import React from 'react';
-
 // Component performance tracker
 export const withPerformanceTracking = <P extends object>(
   Component: React.ComponentType<P>,
@@ -112,13 +112,13 @@ export const withPerformanceTracking = <P extends object>(
   return (props: P) => {
     if (process.env.NODE_ENV === 'development') {
       const startTime = performance.now();
-
+      
       React.useEffect(() => {
         const endTime = performance.now();
         console.log(`${componentName} render time: ${endTime - startTime}ms`);
       });
     }
-
+    
     return React.createElement(Component, props);
   };
 };
