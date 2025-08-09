@@ -61,7 +61,7 @@ const AdminDashboard = () => {
     if (canViewUsers) count++;
     if (canModerateComments) count++;
     if (canSubmitContent) count++;
-    if (isSiteAdmin) count++;
+    if (isSiteAdmin) count += 2; // SEO + Ads
     return Math.max(count, 1);
   };
   const [searchParams, setSearchParams] = useSearchParams();
