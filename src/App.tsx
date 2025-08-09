@@ -11,6 +11,7 @@ import MangaByGenre from "./pages/MangaByGenre";
 import ChapterReader from "./pages/ChapterReader";
 import Profile from "./pages/Profile";
 import SiteSupport from "./pages/SiteSupport";
+import Ads from "./pages/Ads";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
 import ScrollToTop from "./components/ScrollToTop";
