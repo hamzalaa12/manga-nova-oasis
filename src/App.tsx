@@ -14,23 +14,8 @@ import SiteSupport from "./pages/SiteSupport";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
 import ScrollToTop from "./components/ScrollToTop";
-import { PERFORMANCE_CONFIG } from "./utils/performance";
 
-// إعدادات QueryClient محسنة للأداء
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA,
-      gcTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA * 2,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: true,
-      retry: PERFORMANCE_CONFIG.NETWORK.RETRY_COUNT,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 function App() {
   return (
