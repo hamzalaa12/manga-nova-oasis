@@ -55,6 +55,13 @@ const Header = () => {
               <Heart className="h-4 w-4" />
               دعم الموقع
             </Link>
+            <Link
+              to="/ads"
+              className="text-foreground hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <span className="h-4 w-4 text-green-500">📢</span>
+              مشاهدة إعلان
+            </Link>
           </nav>
         </div>
 
