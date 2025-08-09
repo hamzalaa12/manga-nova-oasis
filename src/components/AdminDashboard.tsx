@@ -393,6 +393,12 @@ const AdminDashboard = () => {
             <SitemapManager />
           </TabsContent>
         )}
+
+        {isSiteAdmin && (
+          <TabsContent value="ads" className="space-y-4">
+            <AdsManagement />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
@@ -599,7 +605,7 @@ const UserCard = ({
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
                     هل أنت مت��ك�� من رغبتك في حذف هذا ال��ستخدم نهائياً؟ 
-                    سيتم حذف جميع بيانات�� وتعل��قاته ولا يمكن التراجع ��ن ه��ا الإجراء.
+                    سيتم حذف جميع بيانات�� وتعل��قاته ولا يمكن التراجع ���ن ه��ا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
