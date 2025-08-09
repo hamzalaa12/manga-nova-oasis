@@ -273,43 +273,65 @@ const Ads = () => {
     }
   };
 
-  const createSampleAds = async () => {
+  const initializeAdsSystem = async () => {
     try {
-      const sampleAds = [
-        {
-          title: 'دعم الموقع',
-          description: 'ادعم موقعنا للحصول على محتوى أفضل',
-          url: 'https://ko-fi.com/mangafas',
-          reward_points: 10,
-          duration_seconds: 5,
-          is_active: true,
-          type: 'ad'
-        },
-        {
-          title: 'رابط سريع',
-          description: 'رابط مفيد للمستخدمين',
-          url: 'https://example.com',
-          reward_points: 0,
-          duration_seconds: 0,
-          is_active: true,
-          type: 'link'
-        }
-      ];
+      console.log('Initializing ads system...');
 
-      const { error } = await supabase.from('ads').insert(sampleAds);
-      if (error) throw error;
+      // First try to create the table using RPC function
+      const { error: rpcError } = await supabase.rpc('create_ads_table_if_not_exists');
+
+      if (rpcError) {
+        console.log('RPC function not available, trying direct SQL approach');
+
+        // If RPC fails, manually create sample ads
+        const sampleAds = [
+          {
+            title: 'دعم الموقع',
+            description: 'ادعم موقعنا للحصول على محتوى أفضل',
+            url: 'https://ko-fi.com/mangafas',
+            reward_points: 10,
+            duration_seconds: 5,
+            is_active: true,
+            type: 'ad'
+          },
+          {
+            title: 'رابط سريع',
+            description: 'رابط مفيد للمستخدمين',
+            url: 'https://example.com',
+            reward_points: 0,
+            duration_seconds: 0,
+            is_active: true,
+            type: 'link'
+          },
+          {
+            title: 'متجر الكتب',
+            description: 'اكتشف أفضل الكتب والمانجا',
+            url: 'https://bookstore.example.com',
+            image_url: 'https://via.placeholder.com/300x200?text=متجر+الكتب',
+            reward_points: 5,
+            duration_seconds: 3,
+            is_active: true,
+            type: 'ad'
+          }
+        ];
+
+        const { error: insertError } = await supabase.from('ads').insert(sampleAds);
+        if (insertError) {
+          throw insertError;
+        }
+      }
 
       toast({
-        title: "تم إنشاء البيانات التجريبية",
-        description: "تم إضافة بعض الإعلانات التجريبية",
+        title: "تم تهيئة النظام بنجاح",
+        description: "تم إنشاء نظام الإعلانات وإضافة بيانات تجريبية",
       });
 
       queryClient.invalidateQueries({ queryKey: ['active-ads'] });
     } catch (error) {
-      console.error('Error creating sample ads:', error);
+      console.error('Error initializing ads system:', error);
       toast({
-        title: "خطأ",
-        description: "فشل في إنشاء البيانات التجريبية",
+        title: "خطأ في التهيئة",
+        description: `فشل في تهيئة نظام الإعلانات: ${error.message}`,
         variant: "destructive",
       });
     }
