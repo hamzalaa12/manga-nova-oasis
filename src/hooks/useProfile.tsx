@@ -73,13 +73,8 @@ export const useProfile = () => {
         .single();
 
       if (verifyError) {
-        console.error('Verification error:', {
-        message: verifyError?.message || 'Unknown error',
-        code: verifyError?.code,
-        details: verifyError?.details,
-        hint: verifyError?.hint,
-        error: JSON.stringify(verifyError, null, 2)
-      });
+        const errorMessage = verifyError?.message || verifyError?.code || 'Unknown error';
+      console.error('Verification error:', errorMessage);
       } else {
         console.log('Updated profile verified:', verifyData);
       }
@@ -94,7 +89,7 @@ export const useProfile = () => {
 
       return true;
     } catch (error: any) {
-      console.error('خطأ في تحديث الملف الشخصي:', {
+      console.error('خطأ في تحديث الملف ال��خصي:', {
         message: error?.message || 'Unknown error',
         code: error?.code,
         details: error?.details,
