@@ -132,3 +132,5 @@ export const useProfile = () => {
     loading
   };
 };
+
+export default useProfile;
