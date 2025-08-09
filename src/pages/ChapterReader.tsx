@@ -150,7 +150,7 @@ const ChapterReader = () => {
       }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter details:", error);
-      setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
+      setError('فشل في تحميل الفصل. يرجى المحاولة مر�� أخرى.');
       setChapter(null);
       setManga(null);
     } finally {
@@ -182,38 +182,14 @@ const ChapterReader = () => {
           }
         } catch (progressError) {
           console.error('❌ Error updating reading progress:', progressError);
-          console.error('❌ Reading progress error details:', {
-            message: progressError?.message || 'Unknown error',
-            code: progressError?.code,
-            details: progressError?.details,
-            hint: progressError?.hint,
-            mangaId: manga.id,
-            chapterId: chapterId,
-            errorType: typeof progressError,
-            errorString: String(progressError),
-            errorJSON: (() => {
-              try {
-                return JSON.stringify(progressError, null, 2);
-              } catch (e) {
-                return 'Could not stringify error: ' + String(e);
-              }
-            })()
-          });
+          const progressErrorMessage = progressError?.message || progressError?.code || 'Unknown error';
+          console.error('Reading progress error:', progressErrorMessage);
         }
       } else {
       }
     } catch (error: any) {
-      console.error("❌ Error tracking chapter view:", {
-        message: error?.message || 'Unknown error',
-        code: error?.code,
-        details: error?.details,
-        hint: error?.hint,
-        chapterId,
-        mangaId: manga?.id,
-        errorType: typeof error,
-        errorString: String(error),
-        errorJSON: JSON.stringify(error, null, 2)
-      });
+      const errorMessage = error?.message || error?.code || 'Unknown error';
+      console.error("Error tracking chapter view:", errorMessage);
     }
   };
 
@@ -256,7 +232,7 @@ const ChapterReader = () => {
       // Find the specific chapter
       const chapterData = allChaptersData.find(ch => ch.chapter_number === chapterNumber);
       if (!chapterData) {
-        throw new Error('الفصل غير موجود');
+        throw new Error('الفص�� غير موجود');
       }
 
       setChapter({ ...chapterData, manga_id: mangaData.id });
