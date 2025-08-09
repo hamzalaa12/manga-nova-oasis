@@ -138,16 +138,106 @@ const Ads = () => {
   const handleCloseAd = () => {
     if (selectedAd) {
       window.open(selectedAd.url, '_blank');
-      
+
       toast({
         title: "شكراً لك!",
         description: selectedAd.reward_points ? `تم إضافة ${selectedAd.reward_points} نقطة لحسابك` : "شكراً لدعم الموقع",
       });
     }
-    
+
     setSelectedAd(null);
     setCountdown(0);
     setCanClose(false);
+  };
+
+  const handleAddLink = async () => {
+    if (!linkFormData.title || !linkFormData.url) {
+      toast({
+        title: "خطأ",
+        description: "العنوان والرابط مطلوبان",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('ads').insert([{
+        title: linkFormData.title,
+        description: linkFormData.description,
+        url: linkFormData.url,
+        reward_points: 0,
+        duration_seconds: 0,
+        is_active: true,
+        type: 'link'
+      }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "تم بنجاح",
+        description: "تم إضافة الرابط بنجاح",
+      });
+
+      setIsLinkDialogOpen(false);
+      setLinkFormData({ title: '', url: '', description: '' });
+      // Refresh the data
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "فشل في إضافة الرابط",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddAd = async () => {
+    if (!adFormData.title || !adFormData.url) {
+      toast({
+        title: "خطأ",
+        description: "العنوان والرابط مطلوبان",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('ads').insert([{
+        title: adFormData.title,
+        description: adFormData.description,
+        url: adFormData.url,
+        image_url: adFormData.image_url,
+        reward_points: adFormData.reward_points,
+        duration_seconds: adFormData.duration_seconds,
+        is_active: true,
+        type: 'ad'
+      }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "تم بنجاح",
+        description: "تم إضافة الإعلان بنجاح",
+      });
+
+      setIsAdDialogOpen(false);
+      setAdFormData({
+        title: '',
+        url: '',
+        description: '',
+        image_url: '',
+        reward_points: 5,
+        duration_seconds: 0,
+      });
+      // Refresh the data
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "فشل في إضافة الإعلان",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
