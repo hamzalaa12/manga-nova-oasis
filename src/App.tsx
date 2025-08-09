@@ -31,6 +31,7 @@ function App() {
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/support" element={<SiteSupport />} />
+            <Route path="/ads" element={<Ads />} />
             <Route path="/manga/:slug" element={<MangaDetails />} />
             <Route path="/type/:type" element={<MangaByType />} />
             <Route path="/genre/:genre" element={<MangaByGenre />} />
