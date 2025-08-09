@@ -197,13 +197,8 @@ export const useUserRestrictions = () => {
 
       return data?.map(r => r.restriction_type as RestrictionType) || [];
     } catch (error: any) {
-      console.error('Error in getUserRestrictions:', {
-        message: error?.message || 'Unknown error',
-        code: error?.code,
-        details: error?.details,
-        hint: error?.hint,
-        error: JSON.stringify(error, null, 2)
-      });
+      const errorMessage = error?.message || error?.code || 'Unknown error';
+      console.error('Error in getUserRestrictions:', errorMessage);
       return [];
     }
   };
