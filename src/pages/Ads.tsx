@@ -489,6 +489,90 @@ const Ads = () => {
           )}
         </div>
 
+        {/* البطاقات الرئيسية */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {/* بطاقة مشاهدة رابط */}
+          <Card className="hover:shadow-lg transition-all duration-300 border-2 border-blue-200 hover:border-blue-400">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <Link2 className="h-8 w-8 text-blue-600" />
+              </div>
+              <CardTitle className="text-xl text-blue-700">مشاهدة رابط</CardTitle>
+              <CardDescription>
+                اضغط هنا لمشاهدة الروابط السريعة والمفيدة
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button
+                className="w-full bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  const linkAds = ads?.filter(ad => (!ad.image_url && !ad.duration_seconds && ad.reward_points === 0)) || [];
+                  if (linkAds.length === 0) {
+                    toast({
+                      title: "لا توجد روابط",
+                      description: "لا توجد روابط متاحة حالياً",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  // عرض أول رابط متاح
+                  const firstLink = linkAds[0];
+                  window.open(firstLink.url, '_blank');
+                  // تحديث عداد النقرات
+                  supabase.from('ads').update({ click_count: firstLink.click_count + 1 }).eq('id', firstLink.id);
+                  toast({
+                    title: "شكراً لك!",
+                    description: "شكراً لدعم الموقع",
+                  });
+                }}
+              >
+                <Link2 className="h-4 w-4 mr-2" />
+                مشاهدة رابط الآن
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* بطاقة مشاهدة إعلان */}
+          <Card className="hover:shadow-lg transition-all duration-300 border-2 border-green-200 hover:border-green-400">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <Gift className="h-8 w-8 text-green-600" />
+              </div>
+              <CardTitle className="text-xl text-green-700">مشاهدة إعلان</CardTitle>
+              <CardDescription>
+                اضغط هنا لمشاهدة الإعلانات والحصول على نقاط مجانية
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button
+                className="w-full bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  const adAds = ads?.filter(ad => (ad.image_url || ad.duration_seconds || (ad.reward_points && ad.reward_points > 0))) || [];
+                  if (adAds.length === 0) {
+                    toast({
+                      title: "لا توجد إعلانات",
+                      description: "لا توجد إعلانات متاحة حالياً",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  // عرض أول إعلان متاح
+                  const firstAd = adAds[0];
+                  handleAdClick(firstAd);
+                }}
+              >
+                <Gift className="h-4 w-4 mr-2" />
+                مشاهدة إعلان الآن
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* جميع الإعلانات والروابط */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-center mb-6">جميع الإعلانات والروابط</h2>
+        </div>
+
         {!ads || ads.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📢</div>
