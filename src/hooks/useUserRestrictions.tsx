@@ -172,7 +172,7 @@ export const useUserRestrictions = () => {
       console.error('Error removing restriction:', errorMessage);
       toast({
         title: 'خطأ',
-        description: `فشل في رف�� القيد: ${error.message || 'خطأ غير معروف'}`,
+        description: `فشل في رفع القيد: ${error.message || 'خطأ غير معروف'}`,
         variant: 'destructive'
       });
       return false;
@@ -190,13 +190,8 @@ export const useUserRestrictions = () => {
         .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
 
       if (error) {
-        console.error('Error getting user restrictions:', {
-          message: error?.message || 'Unknown error',
-          code: error?.code,
-          details: error?.details,
-          hint: error?.hint,
-          error: JSON.stringify(error, null, 2)
-        });
+        const errorMessage = error?.message || error?.code || 'Unknown error';
+        console.error('Error getting user restrictions:', errorMessage);
         return [];
       }
 
