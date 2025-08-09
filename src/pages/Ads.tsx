@@ -1,760 +1,126 @@
-import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { ExternalLink, Clock, Eye, Gift, Plus, Link2, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Link2, Gift, Heart } from "lucide-react";
 import SEO from "@/components/SEO";
-import { useAuth } from "@/hooks/useAuth";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-
-interface Ad {
-  id: string;
-  title: string;
-  description: string;
-  url: string;
-  image_url?: string;
-  reward_points?: number;
-  duration_seconds?: number;
-  is_active: boolean;
-  click_count: number;
-  created_at: string;
-  type?: 'link' | 'ad';
-}
-
-interface QuickLinkFormData {
-  title: string;
-  url: string;
-  description: string;
-}
-
-interface QuickAdFormData {
-  title: string;
-  url: string;
-  description: string;
-  image_url: string;
-  reward_points: number;
-  duration_seconds: number;
-}
-
-const fetchActiveAds = async (): Promise<Ad[]> => {
-  console.log('Starting ads fetch...');
-  
-  try {
-    // Test the table exists first
-    const { data: testData, error: testError } = await supabase
-      .from('ads')
-      .select('count')
-      .limit(1);
-    
-    if (testError) {
-      console.error('Table test failed:', testError);
-      throw new Error(`Database table error: ${testError.message}`);
-    }
-
-    const { data, error } = await supabase
-      .from('ads')
-      .select('*')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Query error:', error);
-      throw new Error(`Failed to fetch ads: ${error.message}`);
-    }
-    
-    console.log('Ads fetched successfully:', data?.length || 0, 'items');
-    return data || [];
-  } catch (err) {
-    console.error('Fetch error:', err);
-    throw err;
-  }
-};
 
 const Ads = () => {
-  const { toast } = useToast();
-  const { isAdmin } = useAuth();
-  const queryClient = useQueryClient();
-  const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
-  const [countdown, setCountdown] = useState<number>(0);
-  const [canClose, setCanClose] = useState(false);
-  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
-  const [isAdDialogOpen, setIsAdDialogOpen] = useState(false);
-  const [linkFormData, setLinkFormData] = useState<QuickLinkFormData>({
-    title: '',
-    url: '',
-    description: '',
-  });
-  const [adFormData, setAdFormData] = useState<QuickAdFormData>({
-    title: '',
-    url: '',
-    description: '',
-    image_url: '',
-    reward_points: 5,
-    duration_seconds: 0,
-  });
-
-  const { data: ads, isLoading, error, refetch } = useQuery({
-    queryKey: ['active-ads'],
-    queryFn: fetchActiveAds,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 3, // Retry 3 times
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
-  });
-
-  const handleRetry = () => {
-    console.log('Manual retry triggered');
-    refetch();
+  const handleViewAd = () => {
+    // يمكن إضافة منطق مشاهدة الإعلان هنا لاحقاً
+    window.open('https://example.com/ad', '_blank');
   };
 
-  // Countdown timer for ads with duration
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (countdown === 0 && selectedAd?.duration_seconds) {
-      setCanClose(true);
-    }
-  }, [countdown, selectedAd]);
-
-  const handleAdClick = async (ad: Ad) => {
-    try {
-      // Update click count
-      await supabase
-        .from('ads')
-        .update({ click_count: ad.click_count + 1 })
-        .eq('id', ad.id);
-
-      // If ad has duration, show countdown
-      if (ad.duration_seconds && ad.duration_seconds > 0) {
-        setSelectedAd(ad);
-        setCountdown(ad.duration_seconds);
-        setCanClose(false);
-      } else {
-        // Open link directly
-        window.open(ad.url, '_blank');
-        
-        toast({
-          title: "شكراً لك!",
-          description: ad.reward_points ? `تم إضافة ${ad.reward_points} نقطة لحسابك` : "شكراً لدعم الموقع",
-        });
-      }
-    } catch (error) {
-      console.error('Error handling ad click:', error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء معالجة الإعلان",
-        variant: "destructive",
-      });
-    }
+  const handleViewLink = () => {
+    // يمكن إضافة منطق مشاهدة الرابط هنا لاحقاً
+    window.open('https://example.com/link', '_blank');
   };
-
-  const handleCloseAd = () => {
-    if (selectedAd) {
-      window.open(selectedAd.url, '_blank');
-
-      toast({
-        title: "شكراً لك!",
-        description: selectedAd.reward_points ? `تم إضافة ${selectedAd.reward_points} نقطة لحسابك` : "شكراً لدعم الموقع",
-      });
-    }
-
-    setSelectedAd(null);
-    setCountdown(0);
-    setCanClose(false);
-  };
-
-  const handleAddLink = async () => {
-    if (!linkFormData.title || !linkFormData.url) {
-      toast({
-        title: "خطأ",
-        description: "العنوان والرابط مطلوبان",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase.from('ads').insert([{
-        title: linkFormData.title,
-        description: linkFormData.description,
-        url: linkFormData.url,
-        reward_points: 0,
-        duration_seconds: 0,
-        is_active: true,
-        type: 'link'
-      }]);
-
-      if (error) throw error;
-
-      toast({
-        title: "تم بنجاح",
-        description: "تم إضافة الرابط بنجاح",
-      });
-
-      setIsLinkDialogOpen(false);
-      setLinkFormData({ title: '', url: '', description: '' });
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['active-ads'] });
-    } catch (error) {
-      console.error('Error adding link:', error);
-      toast({
-        title: "خطأ",
-        description: "فشل في إضافة الرابط",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleAddAd = async () => {
-    if (!adFormData.title || !adFormData.url) {
-      toast({
-        title: "خطأ",
-        description: "العنوان والرابط مطلوبان",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase.from('ads').insert([{
-        title: adFormData.title,
-        description: adFormData.description,
-        url: adFormData.url,
-        image_url: adFormData.image_url,
-        reward_points: adFormData.reward_points,
-        duration_seconds: adFormData.duration_seconds,
-        is_active: true,
-        type: 'ad'
-      }]);
-
-      if (error) throw error;
-
-      toast({
-        title: "تم بنجاح",
-        description: "تم إضافة الإعلان بنجاح",
-      });
-
-      setIsAdDialogOpen(false);
-      setAdFormData({
-        title: '',
-        url: '',
-        description: '',
-        image_url: '',
-        reward_points: 5,
-        duration_seconds: 0,
-      });
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['active-ads'] });
-    } catch (error) {
-      console.error('Error adding ad:', error);
-      toast({
-        title: "خطأ",
-        description: "فشل في إضافة الإعلان",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const initializeAdsSystem = async () => {
-    try {
-      console.log('Initializing ads system...');
-
-      // First try to create the table using RPC function
-      const { error: rpcError } = await supabase.rpc('create_ads_table_if_not_exists');
-
-      if (rpcError) {
-        console.log('RPC function not available, trying direct SQL approach');
-
-        // If RPC fails, manually create sample ads
-        const sampleAds = [
-          {
-            title: 'دعم الموقع',
-            description: 'ادعم موقعنا للحصول على محتوى أفضل',
-            url: 'https://ko-fi.com/mangafas',
-            reward_points: 10,
-            duration_seconds: 5,
-            is_active: true,
-            type: 'ad'
-          },
-          {
-            title: 'رابط سريع',
-            description: 'رابط مفيد للمستخدمين',
-            url: 'https://example.com',
-            reward_points: 0,
-            duration_seconds: 0,
-            is_active: true,
-            type: 'link'
-          },
-          {
-            title: 'متجر الكتب',
-            description: 'اكتشف أفضل الكتب والمانجا',
-            url: 'https://bookstore.example.com',
-            image_url: 'https://via.placeholder.com/300x200?text=متجر+الكتب',
-            reward_points: 5,
-            duration_seconds: 3,
-            is_active: true,
-            type: 'ad'
-          }
-        ];
-
-        const { error: insertError } = await supabase.from('ads').insert(sampleAds);
-        if (insertError) {
-          throw insertError;
-        }
-      }
-
-      toast({
-        title: "تم تهيئة النظام بنجاح",
-        description: "تم إنشاء نظام الإعلانات وإضافة بيانات تجريبية",
-      });
-
-      queryClient.invalidateQueries({ queryKey: ['active-ads'] });
-    } catch (error) {
-      console.error('Error initializing ads system:', error);
-      toast({
-        title: "خطأ في التهيئة",
-        description: `فشل في تهيئة نظام الإعلانات: ${error.message}`,
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">جاري تحميل الإعلانات...</p>
-            </div>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center max-w-2xl mx-auto">
-            <div className="text-6xl mb-6">⚠️</div>
-            <h2 className="text-2xl font-bold mb-4">حدث خطأ في تحميل الإعلانات</h2>
-            <p className="text-muted-foreground mb-6">
-              {error.message.includes('table') 
-                ? 'جدول الإعلانات غير موجود في قاعدة البيانات'
-                : error.message
-              }
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={handleRetry} className="flex items-center gap-2">
-                <RefreshCw className="h-4 w-4" />
-                إعادة المحاولة
-              </Button>
-              {isAdmin && error.message.includes('table') && (
-                <Button
-                  onClick={initializeAdsSystem}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  تهيئة نظام الإعلانات
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  // Ad viewer overlay
-  if (selectedAd) {
-    return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-auto">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">{selectedAd.title}</h3>
-              {countdown > 0 ? (
-                <Badge variant="secondary" className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  {countdown} ثانية
-                </Badge>
-              ) : (
-                <Button onClick={handleCloseAd} disabled={!canClose}>
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  زيارة الرابط
-                </Button>
-              )}
-            </div>
-            
-            {selectedAd.image_url && (
-              <img 
-                src={selectedAd.image_url} 
-                alt={selectedAd.title}
-                className="w-full h-64 object-cover rounded-lg mb-4"
-              />
-            )}
-            
-            <p className="text-muted-foreground mb-4">{selectedAd.description}</p>
-            
-            {selectedAd.reward_points && (
-              <div className="flex items-center gap-2 text-green-600 mb-4">
-                <Gift className="h-4 w-4" />
-                <span>احصل على {selectedAd.reward_points} نقطة</span>
-              </div>
-            )}
-            
-            {countdown === 0 && (
-              <Button onClick={handleCloseAd} className="w-full">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                زيارة الرابط والحصول على المكافأة
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="مشاهدة الإعلانات - مانجافاس"
-        description="ادعم الموقع من خلال مشاهدة الإعلانات واحصل على نقاط مجانية"
-        keywords="إعلانات، دعم الموقع، نقاط مجانية، مانجا"
+        title="مشاهدة الإعلانات - مانجا لو"
+        description="ادعم الموقع من خلال مشاهدة الإعلانات والروابط"
+        keywords="إعلانات، دعم الموقع، روابط"
       />
       
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-start mb-8">
-          <div className="text-center flex-1">
-            <h1 className="text-3xl font-bold mb-4">مشاهدة الإعلانات</h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              ادعم الموقع من خلال مشاهدة الإعلانات. احصل على نقاط مجانية واستمتع بمحتوى إضافي!
-            </p>
-          </div>
-
-          {/* أزرار الإدارة في أقصى اليمين */}
-          {isAdmin && (
-            <div className="flex flex-col gap-3 mr-4">
-              <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Link2 className="h-4 w-4" />
-                    إضافة رابط
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>إضافة رابط جديد</DialogTitle>
-                    <DialogDescription>
-                      أضف رابط سريع للمستخدمين
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="link-title">العنوان</Label>
-                      <Input
-                        id="link-title"
-                        value={linkFormData.title}
-                        onChange={(e) => setLinkFormData({...linkFormData, title: e.target.value})}
-                        placeholder="عنوان الرابط"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="link-url">الرابط</Label>
-                      <Input
-                        id="link-url"
-                        type="url"
-                        value={linkFormData.url}
-                        onChange={(e) => setLinkFormData({...linkFormData, url: e.target.value})}
-                        placeholder="https://example.com"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="link-description">الوصف</Label>
-                      <Textarea
-                        id="link-description"
-                        value={linkFormData.description}
-                        onChange={(e) => setLinkFormData({...linkFormData, description: e.target.value})}
-                        placeholder="وصف الرابط"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
-                      إلغاء
-                    </Button>
-                    <Button onClick={handleAddLink}>
-                      إضافة الرابط
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="default" size="sm" className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    إضافة إعلان
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>إضافة إعلان جديد</DialogTitle>
-                    <DialogDescription>
-                      أضف إعلان مع صورة ومكافآت
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="ad-title">العنوان</Label>
-                      <Input
-                        id="ad-title"
-                        value={adFormData.title}
-                        onChange={(e) => setAdFormData({...adFormData, title: e.target.value})}
-                        placeholder="عنوان الإعلان"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="ad-url">الرابط</Label>
-                      <Input
-                        id="ad-url"
-                        type="url"
-                        value={adFormData.url}
-                        onChange={(e) => setAdFormData({...adFormData, url: e.target.value})}
-                        placeholder="https://example.com"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="ad-description">الوصف</Label>
-                      <Textarea
-                        id="ad-description"
-                        value={adFormData.description}
-                        onChange={(e) => setAdFormData({...adFormData, description: e.target.value})}
-                        placeholder="وصف الإعلان"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="ad-image">رابط الصورة</Label>
-                      <Input
-                        id="ad-image"
-                        type="url"
-                        value={adFormData.image_url}
-                        onChange={(e) => setAdFormData({...adFormData, image_url: e.target.value})}
-                        placeholder="https://example.com/image.jpg"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="ad-points">نقاط المكافأة</Label>
-                        <Input
-                          id="ad-points"
-                          type="number"
-                          min="0"
-                          value={adFormData.reward_points}
-                          onChange={(e) => setAdFormData({...adFormData, reward_points: parseInt(e.target.value) || 0})}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="ad-duration">مدة الانتظار (ثانية)</Label>
-                        <Input
-                          id="ad-duration"
-                          type="number"
-                          min="0"
-                          value={adFormData.duration_seconds}
-                          onChange={(e) => setAdFormData({...adFormData, duration_seconds: parseInt(e.target.value) || 0})}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsAdDialogOpen(false)}>
-                      إلغاء
-                    </Button>
-                    <Button onClick={handleAddAd}>
-                      إضافة الإعلان
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+      <div className="container mx-auto px-4 py-16">
+        {/* رسالة الشكر */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-6">
+            <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-4 rounded-full">
+              <Heart className="h-12 w-12 text-white" />
             </div>
-          )}
+          </div>
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            شكراً لدعمك الموقع
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            مساهمتك تساعدنا في تقديم محتوى أفضل وتطوير الموقع باستمرار. 
+            اختر إحدى الطرق أدناه لدعم الموقع والحصول على المكافآت
+          </p>
         </div>
 
-        {/* البطاقات الرئيسية */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {/* بطاقة مشاهدة رابط */}
-          <Card className="hover:shadow-lg transition-all duration-300 border-2 border-blue-200 hover:border-blue-400">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Link2 className="h-8 w-8 text-blue-600" />
-              </div>
-              <CardTitle className="text-xl text-blue-700">مشاهدة رابط</CardTitle>
-              <CardDescription>
-                اضغط هنا لمشاهدة الروابط السريعة والمفيدة
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <Button
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                onClick={() => {
-                  const linkAds = ads?.filter(ad => (!ad.image_url && !ad.duration_seconds && ad.reward_points === 0)) || [];
-                  if (linkAds.length === 0) {
-                    toast({
-                      title: "لا توجد روابط",
-                      description: "لا توجد روابط متاحة حالياً",
-                      variant: "destructive",
-                    });
-                    return;
-                  }
-                  // عرض أول رابط متاح
-                  const firstLink = linkAds[0];
-                  window.open(firstLink.url, '_blank');
-                  // تحديث عداد النقرات
-                  supabase.from('ads').update({ click_count: firstLink.click_count + 1 }).eq('id', firstLink.id);
-                  toast({
-                    title: "شكراً لك!",
-                    description: "شكراً لدعم الموقع",
-                  });
-                }}
-              >
-                <Link2 className="h-4 w-4 mr-2" />
-                مشاهدة رابط الآن
-              </Button>
-            </CardContent>
-          </Card>
-
+        {/* البطاقتان الرئيسيتان */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
           {/* بطاقة مشاهدة إعلان */}
-          <Card className="hover:shadow-lg transition-all duration-300 border-2 border-green-200 hover:border-green-400">
-            <CardHeader className="text-center">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Gift className="h-8 w-8 text-green-600" />
+          <Card className="group hover:shadow-2xl transition-all duration-500 border-2 border-green-200 hover:border-green-400 hover:scale-105 bg-gradient-to-br from-green-50 to-emerald-50">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Gift className="h-10 w-10 text-white" />
               </div>
-              <CardTitle className="text-xl text-green-700">مشاهدة إعلان</CardTitle>
-              <CardDescription>
-                اضغط هنا لمشاهدة الإعلانات والحصول على نقاط مجانية
+              <CardTitle className="text-2xl text-green-700 mb-3">مشاهدة إعلان</CardTitle>
+              <CardDescription className="text-base text-green-600">
+                شاهد الإعلانات واحصل على نقاط مجانية ومكافآت رائعة
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
+              <div className="bg-white/70 rounded-lg p-4 mb-6">
+                <p className="text-sm text-green-700 font-medium mb-2">المكافآت المتاحة:</p>
+                <div className="flex items-center justify-center gap-2 text-green-600">
+                  <Gift className="h-4 w-4" />
+                  <span>نقاط مجانية • مكافآت خاصة • محتوى حصري</span>
+                </div>
+              </div>
               <Button
-                className="w-full bg-green-600 hover:bg-green-700"
-                onClick={() => {
-                  const adAds = ads?.filter(ad => (ad.image_url || ad.duration_seconds || (ad.reward_points && ad.reward_points > 0))) || [];
-                  if (adAds.length === 0) {
-                    toast({
-                      title: "لا توجد إعلانات",
-                      description: "لا توجد إعلانات متاحة حالياً",
-                      variant: "destructive",
-                    });
-                    return;
-                  }
-                  // عرض أول إعلان متاح
-                  const firstAd = adAds[0];
-                  handleAdClick(firstAd);
-                }}
+                onClick={handleViewAd}
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 text-lg group-hover:scale-105 transition-transform duration-300"
+                size="lg"
               >
-                <Gift className="h-4 w-4 mr-2" />
+                <Gift className="h-5 w-5 mr-2" />
                 مشاهدة إعلان الآن
               </Button>
             </CardContent>
           </Card>
-        </div>
 
-        {/* جميع الإعلانات والروابط */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-center mb-6">جميع الإعلانات والروابط</h2>
-        </div>
-
-        {!ads || ads.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📢</div>
-            <h2 className="text-xl font-semibold mb-2">لا توجد إعلانات متاحة حالياً</h2>
-            <p className="text-muted-foreground mb-6">تحقق مرة أخرى لاحقاً للحصول على إعلانات جديدة</p>
-            {isAdmin && (
-              <Button onClick={initializeAdsSystem} variant="outline">
-                <Plus className="h-4 w-4 mr-2" />
-                إضافة بيانات تجريبية
+          {/* بطا��ة مشاهدة رابط */}
+          <Card className="group hover:shadow-2xl transition-all duration-500 border-2 border-blue-200 hover:border-blue-400 hover:scale-105 bg-gradient-to-br from-blue-50 to-sky-50">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-400 to-sky-500 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Link2 className="h-10 w-10 text-white" />
+              </div>
+              <CardTitle className="text-2xl text-blue-700 mb-3">مشاهدة رابط</CardTitle>
+              <CardDescription className="text-base text-blue-600">
+                زيارة الروابط المفيدة والمواقع الشريكة لدعم الموقع
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className="bg-white/70 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-700 font-medium mb-2">ماذا ستجد:</p>
+                <div className="flex items-center justify-center gap-2 text-blue-600">
+                  <ExternalLink className="h-4 w-4" />
+                  <span>مواقع مفيدة • محتوى إضافي • خدمات مميزة</span>
+                </div>
+              </div>
+              <Button
+                onClick={handleViewLink}
+                className="w-full bg-gradient-to-r from-blue-500 to-sky-600 hover:from-blue-600 hover:to-sky-700 text-white font-semibold py-3 text-lg group-hover:scale-105 transition-transform duration-300"
+                size="lg"
+              >
+                <Link2 className="h-5 w-5 mr-2" />
+                زيارة رابط الآن
               </Button>
-            )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* رسالة شكر إضافية */}
+        <div className="text-center">
+          <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-8 max-w-3xl mx-auto">
+            <div className="flex justify-center mb-4">
+              <Heart className="h-8 w-8 text-rose-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              💝 نقدر دعمكم المستمر
+            </h3>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              كل مشاهدة ونقرة منكم تساعدنا في الاستمرار وتقديم أفضل محتوى مانجا باللغة العربية. 
+              شكراً لكونكم جزءاً من عائلة مانجا لو ❤️
+            </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ads.map((ad) => (
-              <Card key={ad.id} className="hover:shadow-lg transition-shadow duration-300">
-                <CardHeader>
-                  {ad.image_url && (
-                    <img 
-                      src={ad.image_url} 
-                      alt={ad.title}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
-                  )}
-                  <CardTitle className="text-lg">{ad.title}</CardTitle>
-                  <CardDescription>{ad.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between mb-4">
-                    {ad.reward_points && (
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Gift className="h-3 w-3" />
-                        {ad.reward_points} نقطة
-                      </Badge>
-                    )}
-                    
-                    {ad.duration_seconds && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {ad.duration_seconds}ث
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center justify-between mb-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      {ad.click_count} مشاهدة
-                    </span>
-                  </div>
-                  
-                  <Button 
-                    onClick={() => handleAdClick(ad)} 
-                    className="w-full"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    مشاهدة الإعلان
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+        </div>
       </div>
       
       <Footer />
