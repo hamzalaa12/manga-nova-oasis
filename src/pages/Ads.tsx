@@ -326,25 +326,174 @@ const Ads = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="مشاهدة الإعلانات - مانجافاس"
-        description="ادعم الموقع من خلال مشاهدة ��لإعلانات واحصل على نقاط مجانية"
+        description="ادعم الموقع من خلال مشاهدة ��لإعل��نات واحصل على نقاط مجانية"
         keywords="إعلانات، دعم الموقع، نقاط مجانية، مانجا"
       />
       
       <Header />
       
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-4">مشاهدة الإعلانات</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            ادعم الموقع من خلال مشاهدة الإعلانات. احصل على نقاط مجانية واستمتع بمحتوى إضافي!
-          </p>
+        <div className="flex justify-between items-start mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl font-bold mb-4">مشاهدة الإعلانات</h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              ادعم الموقع من خلال مشاهدة الإعلانات. احصل على نقاط مجانية واستمتع بمحتوى إضافي!
+            </p>
+          </div>
+
+          {/* أزرار الإدارة في أقصى اليمين */}
+          {isAdmin && (
+            <div className="flex flex-col gap-3 mr-4">
+              <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Link2 className="h-4 w-4" />
+                    إضافة رابط
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>إضافة رابط جديد</DialogTitle>
+                    <DialogDescription>
+                      أضف رابط سريع للمستخدمين
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="link-title">العنوان</Label>
+                      <Input
+                        id="link-title"
+                        value={linkFormData.title}
+                        onChange={(e) => setLinkFormData({...linkFormData, title: e.target.value})}
+                        placeholder="عنوان الرابط"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="link-url">الرابط</Label>
+                      <Input
+                        id="link-url"
+                        type="url"
+                        value={linkFormData.url}
+                        onChange={(e) => setLinkFormData({...linkFormData, url: e.target.value})}
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="link-description">الوصف</Label>
+                      <Textarea
+                        id="link-description"
+                        value={linkFormData.description}
+                        onChange={(e) => setLinkFormData({...linkFormData, description: e.target.value})}
+                        placeholder="وصف الرابط"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
+                      إلغاء
+                    </Button>
+                    <Button onClick={handleAddLink}>
+                      إضافة الرابط
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={isAdDialogOpen} onOpenChange={setIsAdDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="default" size="sm" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    إضافة إعلان
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>إضافة إعلان جديد</DialogTitle>
+                    <DialogDescription>
+                      أضف إعلان مع صورة ومكافآت
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="ad-title">العنوان</Label>
+                      <Input
+                        id="ad-title"
+                        value={adFormData.title}
+                        onChange={(e) => setAdFormData({...adFormData, title: e.target.value})}
+                        placeholder="عنوان الإعلان"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ad-url">الرابط</Label>
+                      <Input
+                        id="ad-url"
+                        type="url"
+                        value={adFormData.url}
+                        onChange={(e) => setAdFormData({...adFormData, url: e.target.value})}
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ad-description">الوصف</Label>
+                      <Textarea
+                        id="ad-description"
+                        value={adFormData.description}
+                        onChange={(e) => setAdFormData({...adFormData, description: e.target.value})}
+                        placeholder="وصف الإعلان"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ad-image">رابط الصورة</Label>
+                      <Input
+                        id="ad-image"
+                        type="url"
+                        value={adFormData.image_url}
+                        onChange={(e) => setAdFormData({...adFormData, image_url: e.target.value})}
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="ad-points">نقاط المكافأة</Label>
+                        <Input
+                          id="ad-points"
+                          type="number"
+                          min="0"
+                          value={adFormData.reward_points}
+                          onChange={(e) => setAdFormData({...adFormData, reward_points: parseInt(e.target.value) || 0})}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="ad-duration">مدة الانتظار (ثانية)</Label>
+                        <Input
+                          id="ad-duration"
+                          type="number"
+                          min="0"
+                          value={adFormData.duration_seconds}
+                          onChange={(e) => setAdFormData({...adFormData, duration_seconds: parseInt(e.target.value) || 0})}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsAdDialogOpen(false)}>
+                      إلغاء
+                    </Button>
+                    <Button onClick={handleAddAd}>
+                      إضافة الإعلان
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
         </div>
 
         {!ads || ads.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">📢</div>
             <h2 className="text-xl font-semibold mb-2">لا توجد إعلانات متاحة حالياً</h2>
-            <p className="text-muted-foreground">تحقق مرة أخرى لاحقاً للحصول على إعلانات جديدة</p>
+            <p className="text-muted-foreground">تحقق مرة أخرى لاحقاً ل��حصول على إعلانات جديدة</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
