@@ -179,7 +179,7 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error in handleRoleChange:', error);
-      // إذا حدث خطأ، أرجع التغيير في الوا��هة
+      // إذا حدث خطأ، أرجع التغيير في الوا����هة
       setLocalUsers(users);
     }
   };
@@ -266,6 +266,12 @@ const AdminDashboard = () => {
               تحسين محركات البحث
             </TabsTrigger>
           )}
+          {isSiteAdmin && (
+            <TabsTrigger value="ads" className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              إدارة الإعلانات
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* إدارة المستخدمين */}
@@ -294,7 +300,7 @@ const AdminDashboard = () => {
                   <SelectContent>
                     <SelectItem value="all">جميع الرتب</SelectItem>
                     <SelectItem value="user">م��تخدم عادي</SelectItem>
-                    <SelectItem value="beginner_fighter">مقاتل مبتدئ</SelectItem>
+                    <SelectItem value="beginner_fighter">مقاتل م��تدئ</SelectItem>
                     <SelectItem value="elite_fighter">مقاتل نخبة</SelectItem>
                     <SelectItem value="tribe_leader">قائد قبيلة</SelectItem>
                     <SelectItem value="admin">مدير</SelectItem>
@@ -439,7 +445,7 @@ const UserCard = ({
               {getRoleDisplayName(user.role)}
             </Badge>
             {user.is_banned && (
-              <Badge variant="destructive">محظور</Badge>
+              <Badge variant="destructive">��حظور</Badge>
             )}
           </div>
 
@@ -472,7 +478,7 @@ const UserCard = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          {/* تغ��ير الرت��ة */}
+          {/* تغ��ير ��لرت��ة */}
           <Select
             key={`${user.user_id}-${user.role}-${user.updated_at}`}
             value={user.role}
@@ -593,7 +599,7 @@ const UserCard = ({
                   <AlertDialogTitle>حذف المستخدم</AlertDialogTitle>
                   <AlertDialogDescription>
                     هل أنت مت��ك�� من رغبتك في حذف هذا ال��ستخدم نهائياً؟ 
-                    سيتم حذف جميع بيانات�� وتعليقاته ولا يمكن التراجع ��ن ه��ا الإجراء.
+                    سيتم حذف جميع بيانات�� وتعل��قاته ولا يمكن التراجع ��ن ه��ا الإجراء.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
