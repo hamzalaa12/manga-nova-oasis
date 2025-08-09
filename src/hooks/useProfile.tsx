@@ -30,13 +30,8 @@ export const useProfile = () => {
         .single();
 
       if (checkError) {
-        console.error('Error checking existing profile:', {
-          message: checkError?.message || 'Unknown error',
-          code: checkError?.code,
-          details: checkError?.details,
-          hint: checkError?.hint,
-          error: checkError
-        });
+        const errorMessage = checkError?.message || checkError?.code || 'Unknown error';
+        console.error('Error checking existing profile:', errorMessage);
         throw new Error('لم يتم العثور على الملف الشخصي');
       }
 
@@ -89,7 +84,7 @@ export const useProfile = () => {
 
       return true;
     } catch (error: any) {
-      console.error('خطأ في تحديث الملف ال��خصي:', {
+      console.error('خطأ في تحديث الملف الشخصي:', {
         message: error?.message || 'Unknown error',
         code: error?.code,
         details: error?.details,
