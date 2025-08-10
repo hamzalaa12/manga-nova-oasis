@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ChapterCard from "./ChapterCard";
 import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronLeft, ChevronRight, Search, Filter, SortAsc, SortDesc } from "lucide-react";
 
 interface ChaptersGridProps {
   title?: string;
   showAll?: boolean;
+  enableFilters?: boolean;
 }
 
 interface Chapter {
@@ -24,26 +27,47 @@ interface Chapter {
     title: string;
     cover_image_url: string;
     author: string;
+    rating?: number;
   };
 }
 
+type SortOption = "latest" | "oldest" | "popular" | "rating";
+
 // Enhanced fetch function with better error handling and performance
-const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{data: Chapter[], totalCount: number}> => {
-  const pageSize = showAll ? 12 : 24; // Reduced size to prevent timeout
+const fetchChaptersData = async (
+  showAll: boolean, 
+  page: number = 1,
+  sortBy: SortOption = "latest"
+): Promise<{data: Chapter[], totalCount: number}> => {
+  const pageSize = showAll ? 12 : 24;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
   try {
     // Optimized query with timeout handling
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    // Determine sort order
+    let orderBy: { column: string; ascending: boolean };
+    switch (sortBy) {
+      case "oldest":
+        orderBy = { column: "created_at", ascending: true };
+        break;
+      case "popular":
+        orderBy = { column: "views_count", ascending: false };
+        break;
+      case "latest":
+      default:
+        orderBy = { column: "created_at", ascending: false };
+        break;
+    }
 
     // Separate queries to avoid complex joins that might timeout
     const [chaptersResponse, countResponse] = await Promise.all([
       supabase
         .from("chapters")
-        .select(
-          `
+        .select(`
           id,
           chapter_number,
           title,
@@ -51,10 +75,9 @@ const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{d
           views_count,
           is_premium,
           manga_id
-        `
-        )
+        `)
         .eq("is_private", false)
-        .order("created_at", { ascending: false })
+        .order(orderBy.column, { ascending: orderBy.ascending })
         .range(from, to),
 
       supabase
@@ -76,7 +99,7 @@ const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{d
     if (mangaIds.length > 0) {
       const { data: mangaResponse, error: mangaError } = await supabase
         .from("manga")
-        .select("id, slug, title, cover_image_url, author")
+        .select("id, slug, title, cover_image_url, author, rating")
         .in("id", mangaIds);
 
       if (!mangaError) {
@@ -94,7 +117,8 @@ const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{d
           slug: 'unknown',
           title: 'Unknown Manga',
           cover_image_url: '/placeholder.svg',
-          author: 'Unknown'
+          author: 'Unknown',
+          rating: 0
         }
       };
     });
@@ -127,8 +151,12 @@ const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{d
 const ChaptersGrid = ({
   title = "آخر الفصول",
   showAll = false,
+  enableFilters = false
 }: ChaptersGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("latest");
+  const [filterPremium, setFilterPremium] = useState<"all" | "free" | "premium">("all");
 
   const {
     data: chaptersResponse,
@@ -137,13 +165,12 @@ const ChaptersGrid = ({
     isFetching,
     refetch
   } = useQuery({
-    queryKey: ["chapters-grid", showAll, currentPage],
-    queryFn: () => fetchChaptersData(showAll, currentPage),
+    queryKey: ["chapters-grid", showAll, currentPage, sortBy],
+    queryFn: () => fetchChaptersData(showAll, currentPage, sortBy),
     staleTime: 5 * 60 * 1000, // 5 minutes cache
     gcTime: 15 * 60 * 1000, // 15 minutes in memory
     refetchOnWindowFocus: false,
     retry: (failureCount, error: any) => {
-      // Don't retry on timeout or network errors more than once
       if (error?.message?.includes('timeout') || error?.message?.includes('Failed to fetch')) {
         return failureCount < 1;
       }
@@ -154,6 +181,30 @@ const ChaptersGrid = ({
 
   const chaptersData = chaptersResponse?.data || [];
   const totalCount = chaptersResponse?.totalCount || 0;
+
+  // Client-side filtering for search and premium filter
+  const filteredChapters = useMemo(() => {
+    let filtered = chaptersData;
+
+    // Search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(chapter => 
+        chapter.manga.title.toLowerCase().includes(searchLower) ||
+        chapter.title?.toLowerCase().includes(searchLower) ||
+        chapter.manga.author.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Premium filter
+    if (filterPremium !== "all") {
+      filtered = filtered.filter(chapter => 
+        filterPremium === "premium" ? chapter.is_premium : !chapter.is_premium
+      );
+    }
+
+    return filtered;
+  }, [chaptersData, searchTerm, filterPremium]);
 
   if (error) {
     const errorMessage = error?.message || error?.code || String(error);
@@ -168,7 +219,7 @@ const ChaptersGrid = ({
             <h2 className="text-3xl font-bold">{title}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-            {Array.from({ length: showAll ? 18 : 18 }).map((_, index) => (
+            {Array.from({ length: 18 }).map((_, index) => (
               <MangaCardSkeleton key={index} />
             ))}
           </div>
@@ -187,19 +238,19 @@ const ChaptersGrid = ({
             <p className="text-muted-foreground mb-4">حدث خطأ في تحميل الفصول</p>
             <p className="text-sm text-red-400 mb-4">{errorMessage}</p>
             <div className="flex gap-4 justify-center">
-              <button
+              <Button
                 onClick={() => refetch()}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                 disabled={isFetching}
+                className="flex items-center gap-2"
               >
                 {isFetching ? 'جاري المحاولة...' : 'إعادة المحاولة'}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                variant="outline"
               >
                 إعادة تحميل الصفحة
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -207,61 +258,147 @@ const ChaptersGrid = ({
     );
   }
 
-  if (!loading && chaptersData.length === 0) {
-    return (
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold mb-4">{title}</h2>
-            <p className="text-muted-foreground">لا توجد ف��ول متاحة حالياً</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  // حساب ��لبيانات المعروضة حسب الصفحة الحالية
   const itemsPerPage = showAll ? 12 : 24;
   const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const displayData = chaptersData; // البيانات مقسمة بالفعل حسب الصفحة من الخادم
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // التمرير لأعلى الصفحة
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSortChange = (newSort: SortOption) => {
+    setSortBy(newSort);
+    setCurrentPage(1); // Reset to first page when sorting changes
   };
 
   return (
     <section className="py-16 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-12">
+        {/* Header with title and page info */}
+        <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
             {title}
           </h2>
           {!showAll && totalPages > 1 && (
             <div className="text-sm text-muted-foreground">
-              صفحة {currentPage} من {totalPages}
+              صفحة {currentPage} من {totalPages} • {totalCount} فصل
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-          {displayData.map((chapter) => (
-            <ChapterCard
-              key={chapter.id}
-              id={chapter.id}
-              chapter_number={chapter.chapter_number}
-              title={chapter.title}
-              created_at={chapter.created_at}
-              views_count={chapter.views_count || 0}
-              is_premium={chapter.is_premium}
-              manga={chapter.manga}
-            />
-          ))}
-        </div>
+        {/* Enhanced filters and search */}
+        {enableFilters && (
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-border/50">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="ابحث في الفصول والمانجا..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
 
-        {/* أزرار التنقل بين الصفحات */}
-        {!showAll && totalPages > 1 && (
+              {/* Sort */}
+              <Select value={sortBy} onValueChange={handleSortChange}>
+                <SelectTrigger>
+                  <div className="flex items-center gap-2">
+                    <SortAsc className="h-4 w-4" />
+                    <SelectValue placeholder="ترتيب حسب" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="latest">الأحدث</SelectItem>
+                  <SelectItem value="oldest">الأقدم</SelectItem>
+                  <SelectItem value="popular">الأكثر مشاهدة</SelectItem>
+                  <SelectItem value="rating">الأعلى تقييماً</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Premium filter */}
+              <Select value={filterPremium} onValueChange={(value: "all" | "free" | "premium") => setFilterPremium(value)}>
+                <SelectTrigger>
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    <SelectValue placeholder="نوع المحتوى" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع ��لفصول</SelectItem>
+                  <SelectItem value="free">مجاني فقط</SelectItem>
+                  <SelectItem value="premium">مدفوع فقط</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Active filters display */}
+            {(searchTerm || filterPremium !== "all") && (
+              <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/50">
+                <span className="text-sm text-muted-foreground">الفلاتر النشطة:</span>
+                {searchTerm && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setSearchTerm("")}
+                    className="h-7 px-2 text-xs"
+                  >
+                    بحث: {searchTerm} ×
+                  </Button>
+                )}
+                {filterPremium !== "all" && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setFilterPremium("all")}
+                    className="h-7 px-2 text-xs"
+                  >
+                    {filterPremium === "premium" ? "مدفوع" : "مجاني"} ×
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Results count */}
+        {enableFilters && filteredChapters.length !== chaptersData.length && (
+          <div className="text-sm text-muted-foreground mb-4">
+            عرض {filteredChapters.length} من أصل {chaptersData.length} فصل
+          </div>
+        )}
+
+        {/* Chapters grid */}
+        {(!loading && (enableFilters ? filteredChapters : chaptersData).length === 0) ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">📚</div>
+            <h2 className="text-xl font-semibold mb-2">
+              {searchTerm ? "لا توجد نتائج للبحث" : "لا توجد فصول متاحة حالياً"}
+            </h2>
+            <p className="text-muted-foreground">
+              {searchTerm ? "جرب البحث بكلمات أخرى" : "تحقق مرة أخرى لاحقاً للحصول على فصول جديدة"}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+            {(enableFilters ? filteredChapters : chaptersData).map((chapter) => (
+              <ChapterCard
+                key={chapter.id}
+                id={chapter.id}
+                chapter_number={chapter.chapter_number}
+                title={chapter.title}
+                created_at={chapter.created_at}
+                views_count={chapter.views_count || 0}
+                is_premium={chapter.is_premium}
+                manga={chapter.manga}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Enhanced pagination */}
+        {!showAll && totalPages > 1 && !enableFilters && (
           <div className="flex items-center justify-center mt-12 gap-4">
             <Button
               variant="outline"
