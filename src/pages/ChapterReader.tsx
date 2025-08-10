@@ -5,20 +5,16 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Home,
-  ChevronDown,
-  Info,
-  Eye,
-  Bookmark,
   Settings,
-  Menu,
-  Flag,
-  Grid,
-  Book,
+  BookOpen,
+  Eye,
+  Maximize,
+  Minimize,
+  RotateCcw,
   Download,
-  Share,
-  Star,
-  Clock,
+  Share2,
+  Bookmark,
+  Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +23,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Select,
@@ -35,6 +32,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import {
   parseMangaIdentifier,
@@ -79,7 +79,30 @@ interface Manga {
   description?: string;
 }
 
-type ReadingMode = "full" | "single";
+type ReadingMode = "full" | "single" | "double";
+type ReadingDirection = "rtl" | "ltr";
+
+interface ReaderSettings {
+  mode: ReadingMode;
+  direction: ReadingDirection;
+  zoom: number;
+  autoScroll: boolean;
+  scrollSpeed: number;
+  showPageNumbers: boolean;
+  darkMode: boolean;
+  imageQuality: "low" | "medium" | "high";
+}
+
+const defaultSettings: ReaderSettings = {
+  mode: "full",
+  direction: "rtl",
+  zoom: 100,
+  autoScroll: false,
+  scrollSpeed: 50,
+  showPageNumbers: true,
+  darkMode: true,
+  imageQuality: "medium"
+};
 
 const ChapterReader = () => {
   const {
@@ -88,19 +111,43 @@ const ChapterReader = () => {
     id,
   } = useParams<{ slug?: string; chapter?: string; id?: string }>();
   const navigate = useNavigate();
+  
+  // Core state
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [manga, setManga] = useState<Manga | null>(null);
   const [allChapters, setAllChapters] = useState<ChapterNav[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showNavigation, setShowNavigation] = useState(false);
-  const [readingMode, setReadingMode] = useState<ReadingMode>("full");
+  
+  // Reader state
   const [currentPage, setCurrentPage] = useState(0);
+  const [settings, setSettings] = useState<ReaderSettings>(() => {
+    const saved = localStorage.getItem('readerSettings');
+    return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
+  });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showNavigation, setShowNavigation] = useState(false);
+  
+  // Auto-scroll
+  const [autoScrollInterval, setAutoScrollInterval] = useState<NodeJS.Timeout | null>(null);
+  
+  // Refs
+  const readerRef = useRef<HTMLDivElement>(null);
+  const hasTrackedCompletion = useRef(false);
+  
+  // Hooks
   const { updateReadingProgress } = useReadingHistory();
-  const { trackChapterView, trackMangaView } = useViewTracking();
+  const { trackChapterView } = useViewTracking();
 
+  // Save settings to localStorage
   useEffect(() => {
-    // Reset data immediately when route parameters change
+    localStorage.setItem('readerSettings', JSON.stringify(settings));
+  }, [settings]);
+
+  // Load chapter data
+  useEffect(() => {
     setLoading(true);
     setChapter(null);
     setCurrentPage(0);
@@ -114,8 +161,6 @@ const ChapterReader = () => {
 
   const fetchChapterDetails = async () => {
     setError(null);
-    setChapter(null);
-    setManga(null);
     try {
       const { data: chapterData, error: chapterError } = await supabase
         .from("chapters")
@@ -144,52 +189,15 @@ const ChapterReader = () => {
       if (chaptersError) throw chaptersError;
       setAllChapters(chaptersData || []);
 
-      // Track chapter view after we have all the data
+      // Track view
       setTimeout(() => {
-        trackChapterViewOld(id);
+        trackChapterView(id!, chapterData.manga_id).catch(() => {});
       }, 100);
     } catch (error: any) {
       console.error("Error fetching chapter details:", error);
-      setError('فشل في تحميل الفصل. يرجى المحاولة مر�� أخرى.');
-      setChapter(null);
-      setManga(null);
+      setError('فشل في تحميل الفصل. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const trackChapterViewOld = async (chapterId: string) => {
-    if (!chapterId) {
-      console.warn('Cannot track chapter view: chapterId is null or empty');
-      return;
-    }
-
-    try {
-
-      if (manga && manga.id) {
-        await trackChapterView(chapterId, manga.id);
-      } else {
-        console.warn('Cannot track chapter view: manga data not available');
-      }
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (sessionData.session?.user && manga && chapter && manga.id && chapter.id) {
-        try {
-          const progressSaved = await updateReadingProgress(manga.id, chapterId, 1, true);
-          if (progressSaved) {
-          } else {
-            console.warn('⚠️ Reading progress update failed - user may not be logged in or have insufficient permissions');
-          }
-        } catch (progressError) {
-          console.error('❌ Error updating reading progress:', progressError);
-          const progressErrorMessage = progressError?.message || progressError?.code || 'Unknown error';
-          console.error('Reading progress error:', progressErrorMessage);
-        }
-      } else {
-      }
-    } catch (error: any) {
-      const errorMessage = error?.message || error?.code || 'Unknown error';
-      console.error("Error tracking chapter view:", errorMessage);
     }
   };
 
@@ -197,8 +205,6 @@ const ChapterReader = () => {
     if (!slug || !chapterParam) return;
 
     setError(null);
-    setChapter(null);
-    setManga(null);
     try {
       const chapterNumber = parseFloat(chapterParam);
       const identifier = parseMangaIdentifier(slug);
@@ -229,35 +235,32 @@ const ChapterReader = () => {
       const { chapters: allChaptersData, ...mangaData } = mangaWithChapters;
       setManga(mangaData);
 
-      // Find the specific chapter
       const chapterData = allChaptersData.find(ch => ch.chapter_number === chapterNumber);
       if (!chapterData) {
-        throw new Error('الفص�� غير موجود');
+        throw new Error('الفصل غير موجود');
       }
 
       setChapter({ ...chapterData, manga_id: mangaData.id });
 
-      // Set all chapters sorted by chapter number
       const sortedChapters = allChaptersData
         .map(ch => ({ id: ch.id, chapter_number: ch.chapter_number, title: ch.title }))
         .sort((a, b) => a.chapter_number - b.chapter_number);
       setAllChapters(sortedChapters);
 
-      // Track chapter view (non-blocking)
+      // Track view
       setTimeout(() => {
-        trackChapterViewOld(chapterData.id).catch(() => {});
+        trackChapterView(chapterData.id, mangaData.id).catch(() => {});
       }, 500);
 
     } catch (error: any) {
       console.error("Error fetching chapter by slug and number:", error);
       setError('فشل في تحميل الفصل. تحقق من رابط الصفحة.');
-      setChapter(null);
-      setManga(null);
     } finally {
       setLoading(false);
     }
   };
 
+  // Navigation helpers
   const getCurrentChapterIndex = () => {
     return allChapters.findIndex((ch) => ch.id === chapter?.id);
   };
@@ -269,14 +272,41 @@ const ChapterReader = () => {
 
   const getNextChapter = () => {
     const currentIndex = getCurrentChapterIndex();
-    return currentIndex < allChapters.length - 1
-      ? allChapters[currentIndex + 1]
-      : null;
+    return currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
   };
 
-  // Scroll detection with throttling
-  const hasTrackedCompletion = useRef(false);
+  // Auto-scroll functionality
+  const startAutoScroll = useCallback(() => {
+    if (autoScrollInterval) return;
+    
+    const interval = setInterval(() => {
+      window.scrollBy({
+        top: settings.scrollSpeed,
+        behavior: 'smooth'
+      });
+    }, 100);
+    
+    setAutoScrollInterval(interval);
+  }, [settings.scrollSpeed, autoScrollInterval]);
 
+  const stopAutoScroll = useCallback(() => {
+    if (autoScrollInterval) {
+      clearInterval(autoScrollInterval);
+      setAutoScrollInterval(null);
+    }
+  }, [autoScrollInterval]);
+
+  useEffect(() => {
+    if (settings.autoScroll) {
+      startAutoScroll();
+    } else {
+      stopAutoScroll();
+    }
+    
+    return () => stopAutoScroll();
+  }, [settings.autoScroll, startAutoScroll, stopAutoScroll]);
+
+  // Scroll tracking
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
     const windowHeight = window.innerHeight;
@@ -285,10 +315,10 @@ const ChapterReader = () => {
     setShowNavigation(scrollY > 100);
 
     const scrollPercentage = (scrollY + windowHeight) / documentHeight;
-    if (scrollPercentage > 0.9 && !hasTrackedCompletion.current && chapter && manga && chapter.pages.length > 0) {
+    if (scrollPercentage > 0.9 && !hasTrackedCompletion.current && chapter && manga) {
       hasTrackedCompletion.current = true;
       updateReadingProgress(manga.id, chapter.id, chapter.pages.length, true)
-        .catch(() => {}); // Silent error handling for better performance
+        .catch(() => {});
     }
   }, [chapter, manga, updateReadingProgress]);
 
@@ -300,24 +330,24 @@ const ChapterReader = () => {
     return () => window.removeEventListener("scroll", throttledScroll);
   }, [throttledScroll, chapter?.id]);
 
-  // Keyboard navigation and click-to-scroll
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // التحقق من أن المستخدم ليس يكتب في input أو textarea
       const target = event.target as HTMLElement;
       const isTyping = target.tagName === 'INPUT' ||
                       target.tagName === 'TEXTAREA' ||
                       target.isContentEditable ||
                       target.closest('input, textarea, [contenteditable="true"]');
 
-      // إذا كان المستخدم يكتب، لا نتدخل في أحداث لوحة المفاتيح
-      if (isTyping) {
-        return;
-      }
+      if (isTyping) return;
 
       switch (event.key) {
         case "Escape":
-          navigate(-1);
+          if (isFullscreen) {
+            toggleFullscreen();
+          } else {
+            navigate(-1);
+          }
           break;
         case "ArrowLeft":
           const next = getNextChapter();
@@ -331,41 +361,54 @@ const ChapterReader = () => {
             navigate(getChapterUrl(getMangaSlug(manga), prev.chapter_number));
           }
           break;
-        case " ": // Space key
+        case "ArrowUp":
+          if (settings.mode === "single" && currentPage > 0) {
+            setCurrentPage(currentPage - 1);
+          }
+          break;
+        case "ArrowDown":
+          if (settings.mode === "single" && chapter && currentPage < chapter.pages.length - 1) {
+            setCurrentPage(currentPage + 1);
+          }
+          break;
+        case " ":
           event.preventDefault();
           window.scrollBy({
             top: window.innerHeight * 0.8,
             behavior: 'smooth'
           });
           break;
-      }
-    };
-
-    const handleClick = (event: MouseEvent) => {
-      // Only handle clicks on the reading area (not on buttons or other interactive elements)
-      const target = event.target as HTMLElement;
-      const isInteractiveElement = target.closest('button, select, a, [role="button"], [tabindex], input, textarea, [contenteditable="true"]');
-      const isCommentsArea = target.closest('.comment-card, .comment-textarea, [data-comments-area="true"]');
-      const isMainArea = target.closest('main');
-
-      // لا نتدخل إذا كان النقر في منطقة التعليقات أو على عناصر تفاعلية
-      if (isMainArea && !isInteractiveElement && !isCommentsArea) {
-        event.preventDefault();
-        window.scrollBy({
-          top: window.innerHeight * 0.8,
-          behavior: 'smooth'
-        });
+        case "f":
+          toggleFullscreen();
+          break;
+        case "s":
+          setShowSettings(!showSettings);
+          break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("click", handleClick);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [navigate, manga, chapter, allChapters, settings.mode, currentPage, isFullscreen, showSettings]);
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("click", handleClick);
-    };
-  }, [navigate, manga, chapter, allChapters]);
+  // Fullscreen functionality
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      readerRef.current?.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  // Settings handlers
+  const updateSetting = <K extends keyof ReaderSettings>(
+    key: K,
+    value: ReaderSettings[K]
+  ) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+  };
 
   if (loading) {
     return <ChapterReaderSkeleton />;
@@ -378,12 +421,12 @@ const ChapterReader = () => {
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold mb-2">حدث خطأ</h2>
           <p className="text-gray-300 mb-4">{error}</p>
-          <button
+          <Button
             onClick={() => window.location.reload()}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-[20px] border-b-2 border-red-800"
+            className="bg-red-600 hover:bg-red-700"
           >
             إعادة المحاولة
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -396,7 +439,7 @@ const ChapterReader = () => {
           <p className="mb-4 text-xl">الفصل غير موجود</p>
           <p className="text-gray-400 mb-6">تأكد من صحة الرابط</p>
           <Link to="/">
-            <Button className="bg-red-600 hover:bg-red-700 text-white rounded-[20px] border-b-2 border-red-800">
+            <Button className="bg-red-600 hover:bg-red-700">
               العودة للرئيسية
             </Button>
           </Link>
@@ -409,10 +452,10 @@ const ChapterReader = () => {
   const nextChapter = getNextChapter();
 
   return (
-    <article
-      itemScope
-      itemType="http://schema.org/CreativeWork"
-      className="min-h-screen bg-[#111119] text-white"
+    <div 
+      ref={readerRef}
+      className={`min-h-screen ${settings.darkMode ? 'bg-[#111119]' : 'bg-white'} text-white relative`}
+      style={{ zoom: `${settings.zoom}%` }}
     >
       {/* SEO Meta Tags */}
       {chapter && manga && (() => {
@@ -439,12 +482,115 @@ const ChapterReader = () => {
         );
       })()}
 
-      {/* Header Section */}
-      <div className="max-w-[1142px] mx-auto px-2.5 mb-4 text-center overflow-hidden">
-        <h1
-          itemProp="name"
-          className="text-[21px] font-bold leading-[31.5px] text-white mb-2"
-        >
+      {/* Enhanced floating controls */}
+      {showNavigation && (
+        <div className="fixed top-4 right-4 z-40 flex flex-col gap-2">
+          {/* Settings dropdown */}
+          <DropdownMenu open={showSettings} onOpenChange={setShowSettings}>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="secondary" className="backdrop-blur-sm">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-80 max-h-96 overflow-y-auto">
+              <div className="p-4 space-y-4">
+                <h3 className="font-semibold">إعدادات القراءة</h3>
+                
+                {/* Reading mode */}
+                <div className="space-y-2">
+                  <Label>نمط القراءة</Label>
+                  <Select value={settings.mode} onValueChange={(value: ReadingMode) => updateSetting('mode', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full">جميع الصفحات</SelectItem>
+                      <SelectItem value="single">صفحة واحدة</SelectItem>
+                      <SelectItem value="double">صفحتان</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Zoom */}
+                <div className="space-y-2">
+                  <Label>التكبير: {settings.zoom}%</Label>
+                  <Slider
+                    value={[settings.zoom]}
+                    onValueChange={([value]) => updateSetting('zoom', value)}
+                    min={50}
+                    max={200}
+                    step={10}
+                  />
+                </div>
+
+                {/* Image quality */}
+                <div className="space-y-2">
+                  <Label>جودة الصور</Label>
+                  <Select value={settings.imageQuality} onValueChange={(value: "low" | "medium" | "high") => updateSetting('imageQuality', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">منخفضة</SelectItem>
+                      <SelectItem value="medium">متوسطة</SelectItem>
+                      <SelectItem value="high">عالية</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <DropdownMenuSeparator />
+
+                {/* Auto-scroll */}
+                <div className="flex items-center justify-between">
+                  <Label>التمرير التلقائي</Label>
+                  <Switch
+                    checked={settings.autoScroll}
+                    onCheckedChange={(checked) => updateSetting('autoScroll', checked)}
+                  />
+                </div>
+
+                {settings.autoScroll && (
+                  <div className="space-y-2">
+                    <Label>سرعة التمرير</Label>
+                    <Slider
+                      value={[settings.scrollSpeed]}
+                      onValueChange={([value]) => updateSetting('scrollSpeed', value)}
+                      min={10}
+                      max={100}
+                      step={10}
+                    />
+                  </div>
+                )}
+
+                <DropdownMenuSeparator />
+
+                {/* Page numbers */}
+                <div className="flex items-center justify-between">
+                  <Label>عرض أرقام الصفحات</Label>
+                  <Switch
+                    checked={settings.showPageNumbers}
+                    onCheckedChange={(checked) => updateSetting('showPageNumbers', checked)}
+                  />
+                </div>
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Fullscreen toggle */}
+          <Button size="sm" variant="secondary" onClick={toggleFullscreen} className="backdrop-blur-sm">
+            {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+          </Button>
+
+          {/* Bookmark */}
+          <Button size="sm" variant="secondary" onClick={() => setIsBookmarked(!isBookmarked)} className="backdrop-blur-sm">
+            <Bookmark className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
+          </Button>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="max-w-[1142px] mx-auto px-2.5 mb-4 text-center pt-4">
+        <h1 className="text-[21px] font-bold leading-[31.5px] text-white mb-2">
           {manga.title} الفصل {chapter.chapter_number}
         </h1>
         <div className="text-[13px] leading-[19.5px] text-center">
@@ -458,385 +604,259 @@ const ChapterReader = () => {
         </div>
       </div>
 
-      {/* Breadcrumb Navigation */}
-      <div className="max-w-[1142px] mx-auto px-2.5 mb-5 overflow-hidden rounded-[3px] bg-gray-800/20 p-2.5 text-center">
-        <div
-          itemScope
-          itemType="http://schema.org/BreadcrumbList"
-          className="text-[13px] leading-[19.5px] text-center"
-        >
-          <span
-            itemProp="itemListElement"
-            itemScope
-            itemType="http://schema.org/ListItem"
-            className="inline"
-          >
-            <Link
-              itemProp="item"
-              to="/"
-              className="hover:text-red-400 transition-colors duration-100"
-            >
-              <span itemProp="name">الرئيسية</span>
-            </Link>
-          </span>
-          <span> › </span>
-          <span
-            itemProp="itemListElement"
-            itemScope
-            itemType="http://schema.org/ListItem"
-            className="inline"
-          >
-            <Link
-              itemProp="item"
-              to={getMangaUrl(getMangaSlug(manga))}
-              className="hover:text-red-400 transition-colors duration-100"
-            >
-              <span itemProp="name">{manga.title}</span>
-            </Link>
-          </span>
-          <span> › </span>
-          <span
-            itemProp="itemListElement"
-            itemScope
-            itemType="http://schema.org/ListItem"
-            className="inline"
-          >
-            <span itemProp="name">{manga.title} الفصل {chapter.chapter_number}</span>
-          </span>
-        </div>
-      </div>
-
-      {/* Top Control Bar */}
-      <div className="max-w-[1142px] mx-auto px-2.5 mb-5 overflow-hidden">
+      {/* Top control bar */}
+      <div className="max-w-[1142px] mx-auto px-2.5 mb-5">
         <div className="flex justify-between items-center flex-wrap gap-2">
-          {/* Chapter Selector */}
-          <div className="relative">
+          {/* Chapter selector */}
+          <Select
+            value={chapter.id}
+            onValueChange={(value) => {
+              const selectedChapter = allChapters.find(ch => ch.id === value);
+              if (selectedChapter && manga) {
+                navigate(getChapterUrl(getMangaSlug(manga), selectedChapter.chapter_number));
+              }
+            }}
+          >
+            <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[140px]">
+              <SelectValue placeholder="اختيار الفصل" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#161d1d] border-gray-700 max-h-72">
+              {allChapters.map((chapterItem) => (
+                <SelectItem
+                  key={chapterItem.id}
+                  value={chapterItem.id}
+                  className="text-white hover:bg-gray-700 cursor-pointer"
+                >
+                  الفصل {chapterItem.chapter_number}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Navigation buttons */}
+          <div className="flex gap-2">
+            {previousChapter ? (
+              <Link
+                to={getChapterUrl(getMangaSlug(manga), previousChapter.chapter_number)}
+                className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-red-600 transition-colors duration-100 flex items-center gap-1"
+              >
+                <ArrowRight className="h-4 w-4" />
+                السابق
+              </Link>
+            ) : (
+              <div className="bg-gray-700 border-2 border-gray-600 rounded-[20px] text-gray-400 text-[13px] font-bold leading-[25px] px-4 py-1 cursor-not-allowed flex items-center gap-1">
+                <ArrowRight className="h-4 w-4" />
+                السابق
+              </div>
+            )}
+
+            {nextChapter ? (
+              <Link
+                to={getChapterUrl(getMangaSlug(manga), nextChapter.chapter_number)}
+                className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-red-600 transition-colors duration-100 flex items-center gap-1"
+              >
+                التالي
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            ) : (
+              <div className="bg-gray-700 border-2 border-gray-600 rounded-[20px] text-gray-400 text-[13px] font-bold leading-[25px] px-4 py-1 cursor-not-allowed flex items-center gap-1">
+                التالي
+                <ArrowLeft className="h-4 w-4" />
+              </div>
+            )}
+          </div>
+
+          {/* Page counter for single mode */}
+          {settings.mode === "single" && chapter.pages.length > 0 && (
             <Select
-              value={chapter.id}
-              onValueChange={(value) => {
-                const selectedChapter = allChapters.find(ch => ch.id === value);
-                if (selectedChapter && manga) {
-                  navigate(getChapterUrl(getMangaSlug(manga), selectedChapter.chapter_number));
-                }
-              }}
+              value={currentPage.toString()}
+              onValueChange={(value) => setCurrentPage(parseInt(value))}
             >
-              <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[140px]">
-                <SelectValue placeholder="اختيار الفصل" />
+              <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[80px]">
+                <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#161d1d] border-gray-700 max-h-72">
-                {allChapters.map((chapterItem) => (
+              <SelectContent className="bg-[#161d1d] border-gray-700">
+                {chapter.pages.map((_, index) => (
                   <SelectItem
-                    key={chapterItem.id}
-                    value={chapterItem.id}
-                    className="text-white hover:bg-gray-700 cursor-pointer"
+                    key={index}
+                    value={index.toString()}
+                    className="text-white hover:bg-gray-700"
                   >
-                    الفصل {chapterItem.chapter_number}
+                    {index + 1}/{chapter.pages.length}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          {/* Reading Mode Selector */}
-          <div className="relative">
-            <Select
-              value={readingMode}
-              onValueChange={(value: ReadingMode) => setReadingMode(value)}
-            >
-              <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[120px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#161d1d] border-gray-700">
-                <SelectItem value="full" className="text-white hover:bg-gray-700">
-                  كل الصفحات
-                </SelectItem>
-                <SelectItem value="single" className="text-white hover:bg-gray-700">
-                  صفحة واحدة
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="flex gap-2 ltr:flex-row">
-            {/* Previous Button */}
-            {previousChapter && manga ? (
-              <Link
-                to={getChapterUrl(getMangaSlug(manga), previousChapter.chapter_number)}
-                rel="prev"
-                className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-red-600 transition-colors duration-100"
-              >
-                <ArrowRight className="h-4 w-4 inline ml-1" />
-                <span>السابق</span>
-              </Link>
-            ) : (
-              <div className="bg-gray-700 border-2 border-gray-600 rounded-[20px] text-gray-400 text-[13px] font-bold leading-[25px] px-4 py-1 cursor-not-allowed">
-                <ArrowRight className="h-4 w-4 inline ml-1" />
-                <span>السابق</span>
-              </div>
-            )}
-
-            {/* Next Button */}
-            {nextChapter && manga ? (
-              <Link
-                to={getChapterUrl(getMangaSlug(manga), nextChapter.chapter_number)}
-                rel="next"
-                className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-red-600 transition-colors duration-100"
-              >
-                <span>التالي</span>
-                <ArrowLeft className="h-4 w-4 inline mr-1" />
-              </Link>
-            ) : (
-              <div className="bg-gray-700 border-2 border-gray-600 rounded-[20px] text-gray-400 text-[13px] font-bold leading-[25px] px-4 py-1 cursor-not-allowed">
-                <span>التالي</span>
-                <ArrowLeft className="h-4 w-4 inline mr-1" />
-              </div>
-            )}
-          </div>
-
-          {/* Report Button */}
-          <ReportDialog
-            type="chapter"
-            targetId={chapter.id}
-            variant="outline"
-            className="bg-gray-700 border-2 border-gray-600 rounded-[20px] text-gray-300 text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-gray-600"
-          >
-            الإبلاغ عن فصل
-          </ReportDialog>
-
-          {/* Page Counter for Single Mode */}
-          {readingMode === "single" && chapter.pages.length > 0 && (
-            <div className="relative">
-              <Select
-                value={currentPage.toString()}
-                onValueChange={(value) => setCurrentPage(parseInt(value))}
-              >
-                <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[80px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#161d1d] border-gray-700">
-                  {chapter.pages.map((_, index) => (
-                    <SelectItem
-                      key={index}
-                      value={index.toString()}
-                      className="text-white hover:bg-gray-700"
-                    >
-                      {index + 1}/{chapter.pages.length}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           )}
         </div>
       </div>
 
-      {/* Chapter Content */}
-      <div itemProp="description" className="mx-auto mr-[1%]">
-        <main className="max-w-[1142px] mx-auto px-2.5 mb-2.5 text-center relative">
-          {loading ? (
-            <div className="flex items-center justify-center min-h-[70vh]">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
-                <p className="text-gray-400 text-xl">جاري تحميل الفصل...</p>
+      {/* Chapter content */}
+      <main className="max-w-[1142px] mx-auto px-2.5 mb-2.5 text-center relative">
+        {chapter.pages.length === 0 ? (
+          <div className="flex items-center justify-center min-h-[70vh]">
+            <div className="text-center">
+              <p className="text-gray-400 text-xl mb-4">
+                لا توجد صفحات في هذا الفصل
+              </p>
+              <p className="text-gray-500">يرجى المحاولة لاحقاً</p>
+            </div>
+          </div>
+        ) : settings.mode === "single" ? (
+          // Single page mode
+          <div className="relative">
+            {settings.showPageNumbers && (
+              <div className="text-center mb-4 text-muted-foreground">
+                صفحة {currentPage + 1} من {chapter.pages.length}
               </div>
+            )}
+            <OptimizedImage
+              src={chapter.pages[currentPage]?.url}
+              alt={`صفحة ${currentPage + 1} من ${chapter.pages.length}`}
+              priority={true}
+              quality={settings.imageQuality}
+              enableZoom={true}
+            />
+            <div className="flex justify-center gap-4 mt-4">
+              <Button
+                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+                variant="outline"
+              >
+                <ChevronRight className="h-4 w-4" />
+                السابقة
+              </Button>
+              <Button
+                onClick={() => setCurrentPage(Math.min(chapter.pages.length - 1, currentPage + 1))}
+                disabled={currentPage === chapter.pages.length - 1}
+                variant="outline"
+              >
+                التالية
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
             </div>
-          ) : chapter.pages.length === 0 ? (
-            <div className="flex items-center justify-center min-h-[70vh]">
-              <div className="text-center">
-                <p className="text-gray-400 text-xl mb-4">
-                  لا توجد صفحات في هذا الفصل
-                </p>
-                <p className="text-gray-500">يرجى المحاولة لاحقاً</p>
-              </div>
-            </div>
-          ) : readingMode === "single" ? (
-            // Single Page Mode
-            <div className="relative cursor-pointer" data-reading-area="true">
-              {chapter.pages[currentPage] && (
+          </div>
+        ) : settings.mode === "double" ? (
+          // Double page mode
+          <div className="space-y-4">
+            {Array.from({ length: Math.ceil(chapter.pages.length / 2) }, (_, pairIndex) => {
+              const leftPageIndex = pairIndex * 2;
+              const rightPageIndex = leftPageIndex + 1;
+              const leftPage = chapter.pages[leftPageIndex];
+              const rightPage = chapter.pages[rightPageIndex];
+
+              return (
+                <div key={pairIndex} className="flex gap-4 justify-center">
+                  {settings.direction === "rtl" ? (
+                    <>
+                      {rightPage && (
+                        <div className="flex-1 max-w-md">
+                          {settings.showPageNumbers && (
+                            <div className="text-center mb-2 text-sm text-muted-foreground">
+                              صفحة {rightPageIndex + 1}
+                            </div>
+                          )}
+                          <OptimizedImage
+                            src={rightPage.url}
+                            alt={`صفحة ${rightPageIndex + 1}`}
+                            quality={settings.imageQuality}
+                            enableZoom={true}
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 max-w-md">
+                        {settings.showPageNumbers && (
+                          <div className="text-center mb-2 text-sm text-muted-foreground">
+                            صفحة {leftPageIndex + 1}
+                          </div>
+                        )}
+                        <OptimizedImage
+                          src={leftPage.url}
+                          alt={`صفحة ${leftPageIndex + 1}`}
+                          quality={settings.imageQuality}
+                          enableZoom={true}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex-1 max-w-md">
+                        {settings.showPageNumbers && (
+                          <div className="text-center mb-2 text-sm text-muted-foreground">
+                            صفحة {leftPageIndex + 1}
+                          </div>
+                        )}
+                        <OptimizedImage
+                          src={leftPage.url}
+                          alt={`صفحة ${leftPageIndex + 1}`}
+                          quality={settings.imageQuality}
+                          enableZoom={true}
+                        />
+                      </div>
+                      {rightPage && (
+                        <div className="flex-1 max-w-md">
+                          {settings.showPageNumbers && (
+                            <div className="text-center mb-2 text-sm text-muted-foreground">
+                              صفحة {rightPageIndex + 1}
+                            </div>
+                          )}
+                          <OptimizedImage
+                            src={rightPage.url}
+                            alt={`صفحة ${rightPageIndex + 1}`}
+                            quality={settings.imageQuality}
+                            enableZoom={true}
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          // Full pages mode
+          <div className="space-y-2.5">
+            {chapter.pages.map((page, index) => (
+              <div key={index} className="relative">
+                {settings.showPageNumbers && (
+                  <div className="text-center mb-2 text-sm text-muted-foreground">
+                    صفحة {index + 1} من {chapter.pages.length}
+                  </div>
+                )}
                 <OptimizedImage
-                  src={chapter.pages[currentPage]?.url}
-                  alt={`صفحة ${currentPage + 1} من ${chapter.pages.length}`}
-                  priority={true}
-                />
-              )}
-            </div>
-          ) : (
-            // Full Pages Mode
-            <div className="space-y-2.5 cursor-pointer" data-reading-area="true">
-              {chapter.pages.map((page, index) => (
-                <OptimizedImage
-                  key={index}
                   src={page?.url}
                   alt={`صفحة ${index + 1} من ${chapter.pages.length}`}
                   priority={index < 2}
+                  quality={settings.imageQuality}
+                  enableZoom={true}
                 />
-              ))}
-            </div>
-          )}
-        </main>
-
-        {/* Bottom Control Bar */}
-        <div className="max-w-[1142px] mx-auto px-2.5 mb-5 overflow-hidden">
-          <div className="flex justify-between items-center flex-wrap gap-2">
-            {/* Chapter Selector */}
-            <div className="relative">
-              <Select
-                value={chapter.id}
-                onValueChange={(value) => {
-                  const selectedChapter = allChapters.find(ch => ch.id === value);
-                  if (selectedChapter && manga) {
-                    navigate(getChapterUrl(getMangaSlug(manga), selectedChapter.chapter_number));
-                  }
-                }}
-              >
-                <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[140px]">
-                  <SelectValue placeholder="اختيار الفصل" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#161d1d] border-gray-700 max-h-72">
-                  {allChapters.map((chapterItem) => (
-                    <SelectItem
-                      key={chapterItem.id}
-                      value={chapterItem.id}
-                      className="text-white hover:bg-gray-700 cursor-pointer"
-                    >
-                      الفصل {chapterItem.chapter_number}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Navigation Buttons */}
-            <div className="flex gap-2 ltr:flex-row">
-              {/* Previous Button */}
-              {previousChapter && manga ? (
-                <Link
-                  to={getChapterUrl(getMangaSlug(manga), previousChapter.chapter_number)}
-                  rel="prev"
-                  className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-red-600 transition-colors duration-100"
-                >
-                  <ArrowRight className="h-4 w-4 inline ml-1" />
-                  <span>السابق</span>
-                </Link>
-              ) : null}
-
-              {/* Next Button */}
-              {nextChapter && manga ? (
-                <Link
-                  to={getChapterUrl(getMangaSlug(manga), nextChapter.chapter_number)}
-                  rel="next"
-                  className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-red-600 transition-colors duration-100"
-                >
-                  <span>التالي</span>
-                  <ArrowLeft className="h-4 w-4 inline mr-1" />
-                </Link>
-              ) : null}
-            </div>
-
-            {/* Report Button */}
-            <ReportDialog
-              type="chapter"
-              targetId={chapter.id}
-              variant="outline"
-              className="bg-gray-700 border-2 border-gray-600 rounded-[20px] text-gray-300 text-[13px] font-bold leading-[25px] px-4 py-1 hover:bg-gray-600"
-            >
-              الإبلاغ عن فصل
-            </ReportDialog>
-
-            {/* Page Counter for Single Mode */}
-            {readingMode === "single" && chapter.pages.length > 0 && (
-              <div className="relative">
-                <Select
-                  value={currentPage.toString()}
-                  onValueChange={(value) => setCurrentPage(parseInt(value))}
-                >
-                  <SelectTrigger className="bg-[#161d1d] border-2 border-red-500 rounded-[20px] text-white text-[13px] px-2.5 py-1 min-w-[80px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#161d1d] border-gray-700">
-                    {chapter.pages.map((_, index) => (
-                      <SelectItem
-                        key={index}
-                        value={index.toString()}
-                        className="text-white hover:bg-gray-700"
-                      >
-                        {index + 1}/{chapter.pages.length}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
-            )}
+            ))}
           </div>
-        </div>
+        )}
+      </main>
 
-        {/* Chapter Metadata (Hidden by default, similar to original) */}
-        <div className="hidden max-w-[1142px] mx-auto mb-6 text-center">
-          <p className="mb-3.5 mt-0 text-center">
-            <strong className="font-bold">
-              {manga.title} الفصل {chapter.chapter_number}
-            </strong>
-            <span> - </span>
-            <strong className="font-bold">موقع مانجا</strong>
-            <span>, مانجا </span>
-            <strong className="font-bold">{manga.title}</strong>
-            <span> مترجمة</span>
-          </p>
-        </div>
-      </div>
-
-      {/* Additional metadata section (hidden by default like in the original) */}
-      <div className="hidden bg-[#222222] rounded-[3px] text-[13px] leading-[19.5px] mb-4 max-w-[1142px] mx-auto px-2.5">
-        <p className="text-[13px] font-bold leading-[19.5px] mb-0 mt-0">
-          <span>
-            الوسوم: قراءة {manga.title} الفصل {chapter.chapter_number}, مانجا{" "}
-            {manga.title} الفصل {chapter.chapter_number}, الفصل {manga.title}{" "}
-            الفصل {chapter.chapter_number} اونلاين, الفصل {manga.title} الفصل{" "}
-            {chapter.chapter_number} بجوده عاليه,
-          </span>
-          {chapter.created_at && (
-            <time
-              dateTime={new Date(chapter.created_at).toISOString()}
-              itemProp="datePublished"
-              className="inline text-[13px] font-bold leading-[19.5px]"
-            >
-              {new Date(chapter.created_at).toLocaleDateString('ar')}
-            </time>
-          )}
-          <span>, </span>
-          <span
-            itemProp="author"
-            className="inline text-[13px] font-bold leading-[19.5px]"
-          >
-            {manga.author || "مجهول"}
-          </span>
-        </p>
-      </div>
-
-      {/* Comments Section - Lazy Loaded */}
+      {/* Comments section */}
       {chapter && (
         <div className="bg-background py-8">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-4">
-              <details className="group">
-                <summary className="cursor-pointer text-lg font-semibold text-white hover:text-red-400 transition-colors">
-                  عرض التعليقات
-                  <span className="ml-2 group-open:rotate-180 transition-transform inline-block">▼</span>
-                </summary>
-                <div className="mt-4">
-                  <ImprovedChapterComments chapterId={chapter.id} mangaId={manga.id} />
-                </div>
-              </details>
-            </div>
+            <details className="group">
+              <summary className="cursor-pointer text-lg font-semibold text-white hover:text-red-400 transition-colors text-center">
+                عرض التعليقات
+                <span className="ml-2 group-open:rotate-180 transition-transform inline-block">▼</span>
+              </summary>
+              <div className="mt-4">
+                <ImprovedChapterComments chapterId={chapter.id} mangaId={manga.id} />
+              </div>
+            </details>
           </div>
         </div>
       )}
 
-
-      {/* ViewsCounter */}
+      {/* Views counter */}
       {chapter && <ViewsCounter viewsCount={chapter.views_count} type="chapter" />}
-    </article>
+    </div>
   );
 };
 
