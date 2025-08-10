@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { getMangaUrl, getMangaSlug } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import LazyImage from "@/components/LazyImage";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface MangaCardProps {
   id?: string;
@@ -31,11 +31,13 @@ const MangaCard = ({
   const CardContent = (
     <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
       <div className="relative overflow-hidden">
-        <LazyImage
+        <OptimizedImage
           src={cover}
           alt={title}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           placeholder="/placeholder.svg"
+          width={300}
+          height={192}
         />
         <div className="absolute top-2 right-2">
           <Badge

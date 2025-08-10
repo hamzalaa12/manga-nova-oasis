@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { getChapterUrl, getMangaSlug } from "@/lib/slug";
 import ViewsCounter from "@/components/ViewsCounter";
-import LazyImage from "@/components/LazyImage";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface ChapterCardProps {
   id: string;
@@ -56,11 +56,13 @@ const ChapterCard = ({
     <Link to={chapterUrl}>
       <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
         <div className="relative overflow-hidden">
-          <LazyImage
+          <OptimizedImage
             src={manga.cover_image_url || "/placeholder.svg"}
             alt={manga.title}
             className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
             placeholder="/placeholder.svg"
+            width={300}
+            height={192}
           />
 
           {/* بادج الفصل مع تأثير جديد */}

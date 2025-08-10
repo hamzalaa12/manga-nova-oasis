@@ -2,28 +2,42 @@
 
 // تحسين React Query للاستعلامات المتعددة
 export const PERFORMANCE_CONFIG = {
-  // أوقات التخزين المؤقت
-  // تحديث PERFORMANCE_CONFIG لتحسين أكثر
+  // أوقات التخزين المؤقت محسنة
   CACHE_TIMES: {
-    CHAPTERS: 10 * 60 * 1000, // 10 دقائق
-    MANGA: 15 * 60 * 1000, // 15 دقيقة
-    PROFILES: 20 * 60 * 1000, // 20 دقيقة
-    STATIC_DATA: 60 * 60 * 1000, // 60 دقيقة
+    CHAPTERS: 2 * 60 * 1000, // 2 دقيقة
+    MANGA: 3 * 60 * 1000, // 3 دقائق
+    PROFILES: 5 * 60 * 1000, // 5 دقائق
+    STATIC_DATA: 30 * 60 * 1000, // 30 دقيقة
+    IMAGES: 60 * 60 * 1000, // 60 دقيقة للصور
   },
   
-  // أحجام الصفحات
+  // أحجام الصفحات محسنة
   PAGE_SIZES: {
-    CHAPTERS: 36,
-    MANGA: 36,
-    COMMENTS: 20,
-    SEARCH_RESULTS: 20,
+    CHAPTERS: 24, // تقليل حجم الصفحة للتحميل السريع
+    MANGA: 24,
+    COMMENTS: 15,
+    SEARCH_RESULTS: 15,
   },
   
-  // إعدادات التحميل التدريجي
+  // إعدادات التحميل التدريجي محسنة
   LAZY_LOADING: {
     INTERSECTION_THRESHOLD: 0.1,
-    ROOT_MARGIN: '50px',
-    SKELETON_COUNT: 12,
+    ROOT_MARGIN: '100px', // تحميل الصور قبل 100px من ظهورها
+    SKELETON_COUNT: 8,
+    IMAGE_QUALITY: 0.8, // جودة الصور المضغوطة
+  },
+  
+  // إعدادات التحميل المسبق
+  PREFETCH: {
+    DELAY: 500, // تأخير 500ms قبل التحميل المسبق
+    MAX_CONCURRENT: 3, // أقصى عدد من العمليات المتزامنة
+  },
+  
+  // إعدادات الشبكة
+  NETWORK: {
+    TIMEOUT: 10000, // 10 ثوان
+    RETRY_ATTEMPTS: 2,
+    RETRY_DELAY: 1000,
   }
 };
 

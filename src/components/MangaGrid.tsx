@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import MangaCard from "./MangaCard";
 import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { PERFORMANCE_CONFIG } from "@/utils/performance";
+import { useOptimizedManga, usePrefetchData } from "@/hooks/useOptimizedData";
 
 interface MangaGridProps {
   title?: string;
@@ -25,49 +23,38 @@ interface Manga {
   manga_type: string;
 }
 
-const fetchMangaData = async (showAll: boolean, page: number = 1): Promise<{data: Manga[], totalCount: number}> => {
-  const pageSize = 36;
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-
-  // جلب البيانات مع العدد الإجمالي في استعلام واحد لتحسين الأداء
-  const { data, error, count } = await supabase
-    .from("manga")
-    .select(
-      "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
-      { count: "exact" }
-    )
-    .order("updated_at", { ascending: false })
-    .range(from, to);
-
-  if (error) throw error;
-
-  return {
-    data: data || [],
-    totalCount: count || 0
-  };
-};
+// استخدام Hook محسن للبيانات
 
 const MangaGrid = ({
   title = "الأحدث والأكثر شعبية",
   showAll = false,
 }: MangaGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const { prefetchManga } = usePrefetchData();
 
   const {
     data: mangaResponse,
     isLoading: loading,
     error,
-  } = useQuery({
-    queryKey: ["manga-grid", showAll, currentPage],
-    queryFn: () => fetchMangaData(showAll, showAll ? 1 : currentPage),
-    staleTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA,
-    gcTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA * 3,
-    refetchOnWindowFocus: false,
-  });
+  } = useOptimizedManga(showAll ? 1 : currentPage, true);
 
   const mangaData = mangaResponse?.data || [];
   const totalCount = mangaResponse?.totalCount || 0;
+
+  // تحميل مسبق للصفحة التالية
+  useEffect(() => {
+    if (!showAll && mangaData.length > 0) {
+      const nextPage = currentPage + 1;
+      const totalPages = Math.ceil(totalCount / 36);
+      if (nextPage <= totalPages) {
+        // تأخير بسيط لتجنب التحميل الزائد
+        const timer = setTimeout(() => {
+          prefetchManga(nextPage);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [currentPage, totalCount, mangaData.length, showAll, prefetchManga]);
 
   if (error) {
     console.error("Error fetching manga:", error);
