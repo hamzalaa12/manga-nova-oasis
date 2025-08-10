@@ -1,20 +1,36 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PERFORMANCE_CONFIG } from '@/utils/performance';
 
 interface LazyImageProps {
   src: string;
   alt: string;
   className?: string;
   placeholder?: string;
+  priority?: boolean;
 }
 
-const LazyImage = ({ src, alt, className, placeholder }: LazyImageProps) => {
+const LazyImage = ({ src, alt, className, placeholder, priority = false }: LazyImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(priority);
   const [error, setError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  const handleLoad = useCallback(() => {
+    setIsLoaded(true);
+  }, []);
+
+  const handleError = useCallback(() => {
+    setError(true);
+    setIsLoaded(true);
+  }, []);
+
   useEffect(() => {
+    if (priority) {
+      setIsInView(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -22,38 +38,44 @@ const LazyImage = ({ src, alt, className, placeholder }: LazyImageProps) => {
           observer.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: '50px' }
+      { 
+        threshold: PERFORMANCE_CONFIG.LAZY_LOADING.INTERSECTION_THRESHOLD,
+        rootMargin: PERFORMANCE_CONFIG.LAZY_LOADING.ROOT_MARGIN
+      }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+    const currentRef = imgRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+      observer.disconnect();
+    };
+  }, [priority]);
 
-  const handleLoad = () => {
-    setIsLoaded(true);
-  };
-
-  const handleError = () => {
-    setError(true);
-    setIsLoaded(true);
-  };
+  // تحسين معالجة الصور الكبيرة base64
+  const optimizedSrc = src?.length > 50000 ? placeholder || '/placeholder.svg' : src;
 
   return (
-    <div ref={imgRef} className={className}>
+    <div ref={imgRef} className={`relative overflow-hidden ${className}`}>
       {!isLoaded && (
-        <Skeleton className="w-full h-full absolute inset-0" />
+        <Skeleton className="w-full h-full absolute inset-0 bg-muted/10" />
       )}
       {isInView && (
         <img
-          src={error ? (placeholder || '/placeholder.svg') : src}
+          src={error ? (placeholder || '/placeholder.svg') : optimizedSrc}
           alt={alt}
-          className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+          className={`w-full h-full object-cover transition-opacity duration-200 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
           onLoad={handleLoad}
           onError={handleError}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
         />
       )}
     </div>

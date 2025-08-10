@@ -1,46 +1,70 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import MangaCard from "./MangaCard";
+import { useState, useMemo } from "react";
+import { useOptimizedQuery } from "@/hooks/useOptimizedQuery";
+import ChapterCard from "./ChapterCard";
 import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { PERFORMANCE_CONFIG } from "@/utils/performance";
+import { PERFORMANCE_CONFIG, smartPreload } from "@/utils/performance";
 
-interface MangaGridProps {
+interface OptimizedChaptersGridProps {
   title?: string;
   showAll?: boolean;
 }
 
-interface Manga {
+interface Chapter {
   id: string;
-  slug: string;
+  chapter_number: number;
   title: string;
-  cover_image_url: string;
-  rating: number;
+  created_at: string;
   views_count: number;
-  status: string;
-  genre: string[];
-  updated_at: string;
-  manga_type: string;
+  is_premium: boolean;
+  manga: {
+    id: string;
+    slug: string;
+    title: string;
+    cover_image_url: string;
+    author: string;
+  };
 }
 
-const fetchMangaData = async (showAll: boolean, page: number = 1): Promise<{data: Manga[], totalCount: number}> => {
-  const pageSize = 36;
+// جلب محسن للفصول
+const fetchOptimizedChaptersData = async (page: number = 1): Promise<{data: Chapter[], totalCount: number}> => {
+  const pageSize = PERFORMANCE_CONFIG.PAGE_SIZES.CHAPTERS;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  // جلب البيانات مع العدد الإجمالي في استعلام واحد لتحسين الأداء
   const { data, error, count } = await supabase
-    .from("manga")
+    .from("chapters")
     .select(
-      "id, slug, title, cover_image_url, rating, views_count, status, genre, updated_at, manga_type",
+      `
+      id,
+      chapter_number,
+      title,
+      created_at,
+      views_count,
+      is_premium,
+      manga!inner (
+        id,
+        slug,
+        title,
+        cover_image_url,
+        author
+      )
+    `,
       { count: "exact" }
     )
-    .order("updated_at", { ascending: false })
+    .eq("is_private", false)
+    .order("created_at", { ascending: false })
     .range(from, to);
 
   if (error) throw error;
+
+  // تحميل مسبق للصور
+  if (data?.length) {
+    const imageUrls = data.map(chapter => chapter.manga?.cover_image_url).filter(Boolean);
+    smartPreload(imageUrls, 'normal');
+  }
 
   return {
     data: data || [],
@@ -48,56 +72,33 @@ const fetchMangaData = async (showAll: boolean, page: number = 1): Promise<{data
   };
 };
 
-const MangaGrid = ({
-  title = "الأحدث والأكثر شعبية",
+const OptimizedChaptersGrid = ({
+  title = "آخر الفصول",
   showAll = false,
-}: MangaGridProps) => {
+}: OptimizedChaptersGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
-    data: mangaResponse,
+    data: chaptersResponse,
     isLoading: loading,
     error,
-  } = useQuery({
-    queryKey: ["manga-grid", showAll, currentPage],
-    queryFn: () => fetchMangaData(showAll, showAll ? 1 : currentPage),
-    staleTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA,
-    gcTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA * 3,
-    refetchOnWindowFocus: false,
+  } = useOptimizedQuery({
+    queryKey: ["optimized-chapters-grid", currentPage.toString()],
+    queryFn: () => fetchOptimizedChaptersData(currentPage),
+    cacheType: 'chapters',
   });
 
-  const mangaData = mangaResponse?.data || [];
-  const totalCount = mangaResponse?.totalCount || 0;
+  const chaptersData = chaptersResponse?.data || [];
+  const totalCount = chaptersResponse?.totalCount || 0;
 
-  if (error) {
-    console.error("Error fetching manga:", error);
-  }
+  // حساب عدد الصفحات
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalCount / PERFORMANCE_CONFIG.PAGE_SIZES.CHAPTERS);
+  }, [totalCount]);
 
-  const formatLastUpdate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffDays > 0) return `منذ ${diffDays} يوم`;
-    if (diffHours > 0) return `منذ ${diffHours} ساعة`;
-    return "منذ دقائق";
-  };
-
-  const getStatusInArabic = (status: string) => {
-    switch (status) {
-      case "ongoing":
-        return "مستمر";
-      case "completed":
-        return "مكتمل";
-      case "hiatus":
-        return "متوقف مؤقتاً";
-      case "cancelled":
-        return "ملغي";
-      default:
-        return status;
-    }
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (loading) {
@@ -108,7 +109,7 @@ const MangaGrid = ({
             <h2 className="text-3xl font-bold">{title}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-            {Array.from({ length: showAll ? 18 : 12 }).map((_, index) => (
+            {Array.from({ length: PERFORMANCE_CONFIG.LAZY_LOADING.SKELETON_COUNT }).map((_, index) => (
               <MangaCardSkeleton key={index} />
             ))}
           </div>
@@ -123,42 +124,33 @@ const MangaGrid = ({
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">{title}</h2>
-            <p className="text-muted-foreground">حدث خطأ في تحميل البيانات</p>
+            <p className="text-muted-foreground">حدث خطأ في تحميل الفصول</p>
           </div>
         </div>
       </section>
     );
   }
 
-  if (!loading && mangaData.length === 0) {
+  if (!loading && chaptersData.length === 0) {
     return (
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">{title}</h2>
-            <p className="text-muted-foreground">لا توجد مانجا متاحة حالياً</p>
+            <p className="text-muted-foreground">لا توجد فصول متاحة حالياً</p>
           </div>
         </div>
       </section>
     );
   }
 
-  // حساب البيانات المعروضة حسب الصفحة الحالية
-  const itemsPerPage = 36;
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const displayData = mangaData; // البيانات مقسمة بالفعل حسب الصفحة من الخادم
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // التمرير لأعلى الصفحة
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <section className="py-16">
+    <section className="py-16 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-12">
-          <h2 className="text-3xl font-bold">{title}</h2>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            {title}
+          </h2>
           {!showAll && totalPages > 1 && (
             <div className="text-sm text-muted-foreground">
               صفحة {currentPage} من {totalPages}
@@ -167,23 +159,21 @@ const MangaGrid = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-          {displayData.map((manga) => (
-            <MangaCard
-              key={manga.id}
-              id={manga.id}
-              slug={manga.slug}
-              title={manga.title}
-              cover={manga.cover_image_url || "/placeholder.svg"}
-              rating={manga.rating}
-              views={manga.views_count}
-              status={getStatusInArabic(manga.status)}
-              genre={manga.genre?.[0] || manga.manga_type}
-              lastUpdate={formatLastUpdate(manga.updated_at)}
+          {chaptersData.map((chapter) => (
+            <ChapterCard
+              key={chapter.id}
+              id={chapter.id}
+              chapter_number={chapter.chapter_number}
+              title={chapter.title}
+              created_at={chapter.created_at}
+              views_count={chapter.views_count || 0}
+              is_premium={chapter.is_premium}
+              manga={chapter.manga}
             />
           ))}
         </div>
 
-        {/* أزرار التنقل بين ا��صفحات */}
+        {/* التنقل المحسن */}
         {!showAll && totalPages > 1 && (
           <div className="flex items-center justify-center mt-12 gap-4">
             <Button
@@ -239,4 +229,4 @@ const MangaGrid = ({
   );
 };
 
-export default MangaGrid;
+export default OptimizedChaptersGrid;

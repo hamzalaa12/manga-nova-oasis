@@ -52,7 +52,7 @@ import { useViewTracking } from "@/hooks/useViewTracking";
 import ChapterReaderSkeleton from "@/components/ChapterReaderSkeleton";
 import ImagePreloader from "@/components/ImagePreloader";
 import OptimizedChapterPages from "@/components/OptimizedChapterPages";
-import FastPageLoader from "@/components/FastPageLoader";
+import FastChapterReader from "@/components/FastChapterReader";
 
 interface Chapter {
   id: string;
@@ -657,7 +657,7 @@ const ChapterReader = () => {
               </div>
             </div>
           ) : (
-            <FastPageLoader
+            <FastChapterReader
               pages={chapter.pages}
               readingMode={readingMode}
               currentPage={currentPage}

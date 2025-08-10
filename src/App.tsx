@@ -14,21 +14,17 @@ import SiteSupport from "./pages/SiteSupport";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/useAuth";
 import ScrollToTop from "./components/ScrollToTop";
-import MemoryOptimizer from "./components/MemoryOptimizer";
+import { PERFORMANCE_CONFIG } from "./utils/performance";
 
-// إعدادات محسنة لـ React Query لتحسين الأداء
+// إعدادات QueryClient محسنة للأداء
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 دقائق
-      gcTime: 10 * 60 * 1000, // 10 دقائق
+      staleTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA,
+      gcTime: PERFORMANCE_CONFIG.CACHE_TIMES.MANGA * 2,
       refetchOnWindowFocus: false,
-      retry: (failureCount, error: any) => {
-        // لا نعيد المحاولة للأخطاء الدائمة
-        if (error?.status >= 400 && error?.status < 500) return false;
-        return failureCount < 2;
-      },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      refetchOnReconnect: true,
+      retry: PERFORMANCE_CONFIG.NETWORK.RETRY_COUNT,
     },
     mutations: {
       retry: 1,
@@ -41,7 +37,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
-          <MemoryOptimizer />
           <ScrollToTop />
           <Sonner />
           <Routes>

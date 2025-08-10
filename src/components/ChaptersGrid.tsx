@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import ChapterCard from "./ChapterCard";
 import MangaCardSkeleton from "@/components/ui/manga-card-skeleton";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useOptimizedChapters, usePrefetchData } from "@/hooks/useOptimizedData";
+import { PERFORMANCE_CONFIG } from "@/utils/performance";
 
 interface ChaptersGridProps {
   title?: string;
@@ -26,38 +28,64 @@ interface Chapter {
   };
 }
 
-// استخدام Hook محسن للبيانات
+const fetchChaptersData = async (showAll: boolean, page: number = 1): Promise<{data: Chapter[], totalCount: number}> => {
+  const pageSize = 36;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  // جلب البيانات مع العدد الإجمالي في استعلام واحد لتحسين الأداء
+  const { data, error, count } = await supabase
+    .from("chapters")
+    .select(
+      `
+      id,
+      chapter_number,
+      title,
+      created_at,
+      views_count,
+      is_premium,
+      manga!inner (
+        id,
+        slug,
+        title,
+        cover_image_url,
+        author
+      )
+    `,
+      { count: "exact" }
+    )
+    .eq("is_private", false)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+
+  return {
+    data: data || [],
+    totalCount: count || 0
+  };
+};
 
 const ChaptersGrid = ({
   title = "آخر الفصول",
   showAll = false,
 }: ChaptersGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { prefetchChapters } = usePrefetchData();
 
   const {
     data: chaptersResponse,
     isLoading: loading,
     error,
-  } = useOptimizedChapters(showAll ? 1 : currentPage, true);
+  } = useQuery({
+    queryKey: ["chapters-grid", showAll, currentPage],
+    queryFn: () => fetchChaptersData(showAll, showAll ? 1 : currentPage),
+    staleTime: PERFORMANCE_CONFIG.CACHE_TIMES.CHAPTERS,
+    gcTime: PERFORMANCE_CONFIG.CACHE_TIMES.CHAPTERS * 3,
+    refetchOnWindowFocus: false,
+  });
 
   const chaptersData = chaptersResponse?.data || [];
   const totalCount = chaptersResponse?.totalCount || 0;
-
-  // تحميل مسبق للصفحة التالية
-  useEffect(() => {
-    if (!showAll && chaptersData.length > 0) {
-      const nextPage = currentPage + 1;
-      const totalPages = Math.ceil(totalCount / 36);
-      if (nextPage <= totalPages) {
-        // تأخير بسيط لتجنب التحميل الزائد
-        const timer = setTimeout(() => {
-          prefetchChapters(nextPage);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [currentPage, totalCount, chaptersData.length, showAll, prefetchChapters]);
 
   if (error) {
     console.error("Error fetching chapters:", error);
