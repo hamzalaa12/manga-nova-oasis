@@ -1,4 +1,4 @@
-import { Clock, BookOpen, User } from "lucide-react";
+import { Clock, BookOpen, User, Star, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { getChapterUrl, getMangaSlug } from "@/lib/slug";
@@ -19,6 +19,7 @@ interface ChapterCardProps {
     title: string;
     cover_image_url: string;
     author?: string;
+    rating?: number;
   };
 }
 
@@ -56,63 +57,77 @@ const ChapterCard = memo(({
     return chapterDate >= threeDaysAgo;
   }, [created_at]);
 
+  const isPopular = useMemo(() => views_count > 1000, [views_count]);
+
   return (
     <Link to={chapterUrl}>
-      <div className="group cursor-pointer bg-card rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1">
+      <div className="group cursor-pointer bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-2 transform-gpu">
         <div className="relative overflow-hidden">
           <AdvancedImageLoader
             src={manga.cover_image_url || "/placeholder.svg"}
             alt={manga.title}
-            className="w-full h-48 group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-48 group-hover:scale-110 transition-transform duration-500 ease-out"
             priority={false}
           />
 
-          {/* بادج الفصل مع تأثير جديد */}
-          <div className="absolute top-2 right-2">
-            <Badge
-              variant="default"
-              className="bg-gradient-to-r from-red-500 via-red-600 to-red-500 text-white text-xs font-bold shadow-lg border border-red-400/50"
-            >
-              الفصل رقم {chapter_number}
-            </Badge>
+          {/* Enhanced gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent group-hover:from-black/95 transition-all duration-300"></div>
+
+          {/* Top badges row */}
+          <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
+            <div className="flex flex-col gap-2">
+              {/* Chapter number badge */}
+              <Badge
+                variant="default"
+                className="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white text-xs font-bold shadow-lg border-0 backdrop-blur-sm"
+              >
+                الفصل {chapter_number}
+              </Badge>
+              
+              {/* Premium badge */}
+              {is_premium && (
+                <Badge
+                  variant="secondary"
+                  className="bg-gradient-to-r from-yellow-500 to-amber-500 text-black text-xs font-bold shadow-lg border-0"
+                >
+                  مدفوع
+                </Badge>
+              )}
+            </div>
+            
+            <div className="flex flex-col gap-2 items-end">
+              {/* New chapter badge */}
+              {isNewChapter && (
+                <Badge
+                  variant="secondary"
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-lg animate-pulse border-0"
+                >
+                  جديد
+                </Badge>
+              )}
+              
+              {/* Popular badge */}
+              {isPopular && (
+                <Badge
+                  variant="secondary"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-lg border-0"
+                >
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  رائج
+                </Badge>
+              )}
+            </div>
           </div>
 
-          {/* بادج جديد مع تأثير نابض - فقط للفصول الحديثة */}
-          {isNewChapter && (
-            <div className="absolute top-2 left-2">
-              <Badge
-                variant="secondary"
-                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold shadow-lg animate-pulse border border-green-400/50"
-              >
-                جديد
-              </Badge>
-            </div>
-          )}
-
-          {/* بادج مدفوع إن وجد */}
-          {is_premium && (
-            <div className="absolute top-10 left-2">
-              <Badge
-                variant="secondary"
-                className="bg-yellow-500 text-black text-xs font-bold shadow-lg"
-              >
-                مدفوع
-              </Badge>
-            </div>
-          )}
-
-          {/* تأثير التدرج المحسن */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/90"></div>
-
-          {/* شريط معلومات في الأسفل */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+          {/* Bottom info overlay */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 to-transparent p-4">
             <div className="flex items-center justify-between text-white text-xs">
               <ViewsCounter
                 viewsCount={views_count}
                 type="chapter"
                 className="text-white"
               />
-              <div className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full">
+              <div className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full backdrop-blur-sm">
                 <Clock className="h-3 w-3" />
                 <span>{timeAgo}</span>
               </div>
@@ -120,35 +135,42 @@ const ChapterCard = memo(({
           </div>
         </div>
 
-        <div className="p-4 space-y-2 text-center">
-          {/* عنوان المانجا */}
-          <h3 className="font-bold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+        <div className="p-4 space-y-3 text-center">
+          {/* Manga title */}
+          <h3 className="font-bold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-200">
             {manga.title}
           </h3>
 
-          {/* عنوان الفصل إن وجد */}
+          {/* Chapter title */}
           {title && (
             <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
               {title}
             </p>
           )}
 
-          {/* معلومات إضافية */}
-          <div className="flex items-center justify-center text-xs text-muted-foreground pt-2 border-t border-border/50">
-            <div className="flex items-center gap-1">
+          {/* Enhanced metadata section */}
+          <div className="space-y-2 pt-2 border-t border-border/50">
+            <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
               <BookOpen className="h-3 w-3" />
               <span className="font-medium">الفصل {chapter_number}</span>
             </div>
+            
+            {/* Rating display */}
+            {manga.rating && (
+              <div className="flex items-center justify-center gap-1 text-xs text-yellow-500">
+                <Star className="h-3 w-3 fill-current" />
+                <span className="font-medium">{manga.rating.toFixed(1)}</span>
+              </div>
+            )}
+            
+            {/* Author info */}
             {manga.author && (
-              <>
-                <div className="w-full h-px bg-border/50 my-2"></div>
-                <div className="flex items-center justify-center gap-1">
-                  <User className="h-3 w-3" />
-                  <span className="truncate max-w-[100px] text-center">
-                    {manga.author}
-                  </span>
-                </div>
-              </>
+              <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                <User className="h-3 w-3" />
+                <span className="truncate max-w-[120px]">
+                  {manga.author}
+                </span>
+              </div>
             )}
           </div>
         </div>
