@@ -18,8 +18,8 @@ export const generatePageMeta = (
     case 'manga':
       if (!data) return null;
       return {
-        title: `${data.title} - قراءة مانجا مترجمة | Sanime`,
-        description: `اقرأ مانجا ${data.title} مترجمة بجودة عالية مجاناً. ${data.description || ''} تابع جميع فصول ${data.title} على Sanime.`,
+        title: `${data.title} - قراءة مانجا مترجمة | mangafas`,
+        description: `اقرأ مانجا ${data.title} مترجمة بجودة عالية مجاناً. ${data.description || ''} تابع جميع فصول ${data.title} على mangafas.`,
         keywords: `${data.title}, مانجا ${data.title}, قراءة ${data.title}, ${data.author || ''}, ${data.genres?.join(', ') || ''}`,
         url: `${baseUrl}/manga/${data.slug}`,
         canonical: `${baseUrl}/manga/${data.slug}`,
@@ -30,8 +30,8 @@ export const generatePageMeta = (
     case 'chapter':
       if (!data) return null;
       return {
-        title: `${data.manga.title} - الفصل ${data.chapter_number} - Sanime`,
-        description: `اقرأ الفصل ${data.chapter_number} من مانجا ${data.manga.title} بجودة عالية على موقع Sanime.`,
+        title: `${data.manga.title} - الفصل ${data.chapter_number} - mangafas`,
+        description: `اقرأ الفصل ${data.chapter_number} من مانجا ${data.manga.title} بجودة عالية على موقع mangafas.`,
         keywords: `${data.manga.title} الفصل ${data.chapter_number}, مانجا ${data.manga.title}, قراءة الفصل ${data.chapter_number}`,
         url: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
         canonical: `${baseUrl}/read/${data.manga.slug}/${data.chapter_number}`,
@@ -142,7 +142,7 @@ export const generateStructuredData = (page: string, data?: any) => {
         },
         publisher: {
           "@type": "Organization",
-          name: "Sanime",
+          name: "mangafas",
           url: baseUrl
         },
         isPartOf: {
