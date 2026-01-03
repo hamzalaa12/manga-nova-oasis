@@ -1,0 +1,395 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Manga Website Design System - Dark theme optimized for reading */
+
+@layer base {
+  :root {
+    /* Dark background system */
+    --background: 220 13% 8%;
+    --foreground: 210 20% 95%;
+
+    /* Card system with subtle elevation */
+    --card: 220 13% 12%;
+    --card-foreground: 210 20% 95%;
+
+    /* Popover system */
+    --popover: 220 13% 10%;
+    --popover-foreground: 210 20% 95%;
+
+    /* Neon blue primary for manga theme */
+    --primary: 200 100% 60%;
+    --primary-foreground: 220 13% 8%;
+    --primary-glow: 200 100% 70%;
+
+    /* Subtle secondary colors */
+    --secondary: 220 13% 16%;
+    --secondary-foreground: 210 20% 90%;
+
+    /* Muted colors for less important content */
+    --muted: 220 13% 14%;
+    --muted-foreground: 210 15% 65%;
+
+    /* Accent colors for highlights */
+    --accent: 280 100% 70%;
+    --accent-foreground: 220 13% 8%;
+
+    /* Destructive colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Border and input styling */
+    --border: 220 13% 20%;
+    --input: 220 13% 16%;
+    --ring: 200 100% 60%;
+
+    /* Border radius */
+    --radius: 0.75rem;
+
+    /* Custom gradient system */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-hero: linear-gradient(135deg, hsl(220 13% 8%) 0%, hsl(220 13% 12%) 50%, hsl(200 50% 15%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 13% 14%));
+    
+    /* Shadow system with glow effects */
+    --shadow-card: 0 4px 20px -2px hsl(220 13% 4% / 0.3);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
+    --shadow-accent: 0 0 20px hsl(var(--accent) / 0.15);
+
+    /* Animation system */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+/* تأثيرات نظام التعليقات المتقدم */
+@keyframes spoiler-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes comment-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes reaction-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+/* أنماط التعليقات المتقدمة */
+.comment-card {
+  animation: comment-enter 0.3s ease-out;
+}
+
+.comment-edit-enter {
+  animation: spoiler-reveal 0.4s ease-out;
+}
+
+.reaction-active {
+  animation: reaction-bounce 0.6s ease-in-out;
+}
+
+.reply-depth-1 {
+  position: relative;
+}
+
+.reply-depth-1::before {
+  content: '';
+  position: absolute;
+  right: -1rem;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, hsl(var(--primary)), hsl(var(--primary-foreground)));
+  opacity: 0.3;
+  border-radius: 1.5px;
+}
+
+/* تحسينات البصرية للتعليقات */
+.comment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.spoiler-content {
+  position: relative;
+  overflow: hidden;
+}
+
+.spoiler-blur {
+  filter: blur(8px);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* تأثيرات التنسيق */
+.formatting-preview {
+  padding: 0.5rem;
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 0.5rem;
+  border-right: 3px solid hsl(var(--primary));
+  margin-top: 0.5rem;
+}
+
+/* تأثيرات التفاعل */
+.reaction-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.reaction-button:hover {
+  transform: scale(1.1);
+}
+
+.reaction-button.active {
+  animation: reaction-bounce 0.6s ease-in-out;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* تحسينات إمكانية الوصول */
+@media (prefers-reduced-motion: reduce) {
+  .comment-card,
+  .comment-edit-enter,
+  .reaction-active,
+  .reaction-button {
+    animation: none;
+    transition: none;
+  }
+  
+  .comment-card:hover {
+    transform: none;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Manga card hover effect */
+  .manga-card {
+    @apply relative overflow-hidden rounded-lg transition-all duration-300;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+  
+  .manga-card:hover {
+    @apply scale-105;
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Hero section styling */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+
+  /* Glowing button effect */
+  .btn-glow {
+    @apply relative overflow-hidden;
+    background: var(--gradient-primary);
+    transition: var(--transition-smooth);
+  }
+  
+  .btn-glow:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Search bar glow effect */
+  .search-glow:focus {
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.5);
+  }
+
+  /* Animated underline for navigation */
+  .nav-link {
+    @apply relative;
+  }
+  
+  .nav-link::after {
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
+    content: '';
+  }
+  
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  /* Spoiler Comment Styles */
+  .spoiler-hidden {
+    background: linear-gradient(45deg, #1a1a1a 25%, #2a2a2a 25%, #2a2a2a 50%, #1a1a1a 50%, #1a1a1a 75%, #2a2a2a 75%, #2a2a2a);
+    background-size: 28px 28px;
+    animation: spoiler-animate 2s linear infinite;
+    color: transparent;
+    user-select: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .spoiler-hidden:hover {
+    background-color: #333;
+    transform: scale(1.02);
+  }
+
+  .spoiler-revealed {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    border: 2px solid #ff6b35;
+    animation: spoiler-reveal 0.5s ease-out;
+  }
+
+  @keyframes spoiler-animate {
+    0% { background-position: 0 0; }
+    100% { background-position: 28px 28px; }
+  }
+
+  @keyframes spoiler-reveal {
+    0% {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Comment edit animation */
+  .comment-edit-enter {
+    animation: comment-edit-in 0.3s ease-out;
+  }
+
+  @keyframes comment-edit-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Improved comment hover effects */
+  .comment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+  }
+
+  /* Reply depth indicator */
+  .reply-depth-1 { border-right: 3px solid #3b82f6; }
+  .reply-depth-2 { border-right: 3px solid #10b981; }
+  .reply-depth-3 { border-right: 3px solid #f59e0b; }
+
+  /* إص��اح مشكلة المسافة في التعليقات */
+  textarea[dir="rtl"],
+  .comment-textarea {
+    unicode-bidi: plaintext !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-spacing: normal !important;
+  }
+
+  /* تحسين الخط العربي في التعليقات */
+  .comment-content,
+  .comment-textarea,
+  textarea[dir="rtl"] {
+    font-family: 'Noto Sans Arabic', 'Cairo', 'Amiri', 'Segoe UI', 'Tahoma', sans-serif !important;
+    line-height: 1.6 !important;
+    letter-spacing: 0.02em !important;
+    text-align: right !important;
+  }
+
+  /* ضمان عمل المسافة في جميع المتصفحات */
+  textarea {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+  }
+}
